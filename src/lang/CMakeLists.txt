@@ -11,6 +11,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(sources
     src/stream.cpp
+    src/tokenizer.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${sources})
