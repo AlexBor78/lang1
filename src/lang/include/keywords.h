@@ -40,6 +40,8 @@ namespace lang
         {"[", TokenType::LBRACKET},
         {"]", TokenType::RBRACKET},
         {";", TokenType::SEMICOLON},
+        {"::", TokenType::DOUBLECOLON},
+        {":", TokenType::COLON},
         {",", TokenType::COMMA},
         {".", TokenType::DOT},
 
@@ -55,6 +57,9 @@ namespace lang
         {"while", TokenType::WHILE},
         {"break", TokenType::BREAK},
         {"continue", TokenType::CONTINUE},
-        {"return", TokenType::RETURN}
+        {"return", TokenType::RETURN},
+        {"import", TokenType::IMPORT},
+        {"module", TokenType::MODULE},
+        {"namespace", TokenType::NAMESPACE}
     };
 }

@@ -1,5 +1,4 @@
 #include <cctype>
-#include <print>
 #include <stdexcept>
 #include <iostream>
 
@@ -15,28 +14,23 @@ namespace lang
         {
             try {
                 if(isspace(stream.curr())) {
-                    // std::println("space");
                     stream.skip_whitespace();
                     continue;
                 }
 
                 if(is_number()) {
-                    // std::println("number");
                     tokenize_number();
                     continue;
                 }
                 if(is_string()) {
-                    // std::println("string");
                     tokenize_string();
                     continue;
                 }
                 if(is_word()) {
-                    // std::println("word");
                     tokenize_word();
                     continue;
                 }
                 
-                // std::println("punct");
                 tokenize_punct();
             }
             catch(const std::exception& e) {

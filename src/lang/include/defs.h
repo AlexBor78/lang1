@@ -43,6 +43,8 @@ namespace lang
         LBRACKET,   // [
         RBRACKET,   // ]
         SEMICOLON,  // ;
+        COLON,      // :
+        DOUBLECOLON,// ::
         COMMA,      // ,
         DOT,        // .
 
@@ -59,6 +61,9 @@ namespace lang
         BREAK,
         CONTINUE,
         RETURN,
+        IMPORT,
+        MODULE,
+        NAMESPACE,
         
         // Special
         END,        // End of file
@@ -70,6 +75,7 @@ namespace lang
         std::string_view path;
         size_t line{0};
         size_t column{0};
+        size_t pos{0}; // column * line, but in file
     };
 
     struct Token
