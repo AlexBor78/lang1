@@ -5,8 +5,8 @@
 
 namespace lang::ast
 {
-    class ConstVisitor;
-    class NodeVisitor;
+    class ConstASTVisitor;
+    class ASTVisitor;
     class StmtNode;
     class ExprNode;
     class Type;
@@ -36,8 +36,8 @@ namespace lang::ast
         {}
 
     public:
-        virtual void accept(ConstVisitor&) const noexcept = 0;
-        virtual void accept(NodeVisitor&) noexcept = 0;
+        virtual void accept(ConstASTVisitor&) const noexcept = 0;
+        virtual void accept(ASTVisitor&) noexcept = 0;
         virtual ~BaseNode() = default;
         Position get_source_pos() const noexcept;
         void set_source_pos(const Position& pos) noexcept;
@@ -51,8 +51,8 @@ namespace lang::ast
         {}
     
     public:
-        virtual void accept(ConstVisitor&) const noexcept override = 0;
-        virtual void accept(NodeVisitor&) noexcept override = 0;
+        virtual void accept(ConstASTVisitor&) const noexcept override = 0;
+        virtual void accept(ASTVisitor&) noexcept override = 0;
     };
 
     class ExprNode : public StmtNode
@@ -75,8 +75,8 @@ namespace lang::ast
         {}
 
     public:
-        virtual void accept(ConstVisitor&) const noexcept override = 0;
-        virtual void accept(NodeVisitor&) noexcept override = 0;
+        virtual void accept(ConstASTVisitor&) const noexcept override = 0;
+        virtual void accept(ASTVisitor&) noexcept override = 0;
         const Type* get_type() const noexcept;
         void set_type(const Type*) noexcept;
     };

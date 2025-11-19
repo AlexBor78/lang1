@@ -6,10 +6,10 @@
 
 namespace lang::ast
 {
-class ConstVisitor
+    class ConstASTVisitor
     {
     protected:
-        ConstVisitor() = default;
+        ConstASTVisitor() = default;
         
     public:
         virtual void visit_block_stmt(const BlockStmt&) noexcept = 0;
@@ -26,6 +26,7 @@ class ConstVisitor
         virtual void visit_string_literal(const StringLiteral&) noexcept = 0;
         virtual void visit_bool_literal(const BoolLiteral&) noexcept = 0;
         virtual void visit_variable_expr(const VariableExpr&) noexcept = 0;
+        virtual void visit_namespace_expr(const NamespaceExpr&) noexcept = 0;
         virtual void visit_call_expr(const CallExpr&) noexcept = 0;
         virtual void visit_binop_expr(const BinOpExpr&) noexcept = 0;
         virtual void visit_prefix_unary_op_expr(const PrefixUnaryOpExpr&) noexcept = 0;
@@ -33,10 +34,10 @@ class ConstVisitor
         // virtual void visit_(const &) noexcept = 0;
     };
 
-    class NodeVisitor
+    class ASTVisitor
     {
     protected:
-        NodeVisitor() = default;
+        ASTVisitor() = default;
         
     public:
         virtual void visit_block_stmt(BlockStmt&) noexcept = 0;
@@ -53,6 +54,7 @@ class ConstVisitor
         virtual void visit_string_literal(StringLiteral&) noexcept = 0;
         virtual void visit_bool_literal(BoolLiteral&) noexcept = 0;
         virtual void visit_variable_expr(VariableExpr&) noexcept = 0;
+        virtual void visit_namespace_expr(NamespaceExpr&) noexcept = 0;
         virtual void visit_call_expr(CallExpr&) noexcept = 0;
         virtual void visit_binop_expr(BinOpExpr&) noexcept = 0;
         virtual void visit_prefix_unary_op_expr(PrefixUnaryOpExpr&) noexcept = 0;

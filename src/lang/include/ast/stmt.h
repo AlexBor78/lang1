@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ast/ast.h>
+#include <memory>
 #include <string_view>
 #include <vector>
 
@@ -22,9 +23,16 @@ namespace lang::ast
         ):  StmtNode(std::move(_pos))
         ,   m_body(std::move(_body))
         {}
+
+        explicit BlockStmt(
+            std::vector<StmtPtr> _body
+        ,   Position _pos = default_pos()
+        ):  StmtNode(std::move(_pos))
+        ,   m_body(std::move(_body))
+        {}
         
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
 
         const std::vector<StmtPtr>& get_body() const noexcept;
         std::vector<StmtPtr>& get_body() noexcept;
@@ -48,8 +56,8 @@ namespace lang::ast
         {}
 
     public:
-        virtual void accept(ConstVisitor&) const noexcept override = 0;
-        virtual void accept(NodeVisitor&) noexcept override = 0;
+        virtual void accept(ConstASTVisitor&) const noexcept override = 0;
+        virtual void accept(ASTVisitor&) noexcept override = 0;
 
         const ExprNode* get_cond() const;
         const StmtNode* get_body() const;
@@ -67,8 +75,8 @@ namespace lang::ast
             )
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
     };
 
     class ForStmt : public StructureStmt
@@ -91,8 +99,8 @@ namespace lang::ast
         ,   incr(std::move(_incr))
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
 
         const StmtNode* get_decl() const;
         const StmtNode* get_incr() const;
@@ -110,93 +118,119 @@ namespace lang::ast
             )
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
     };
 
     class DeclStmt : public StmtNode
     {
+    private:
+        std::string name;
+
     protected:
-        DeclStmt(Position _pos = default_pos()):
-            StmtNode(std::move(_pos))
+        DeclStmt(std::string_view _name
+        ,        Position _pos = default_pos()
+        ):  StmtNode(std::move(_pos))
+        ,   name(_name)
         {}
 
     public:
-        virtual void accept(ConstVisitor&) const noexcept override = 0;
-        virtual void accept(NodeVisitor&) noexcept override = 0;
+        virtual void accept(ConstASTVisitor&) const noexcept override = 0;
+        virtual void accept(ASTVisitor&) noexcept override = 0;
+
+        std::string_view get_name() const noexcept;
     };
 
     class DeclVar : public DeclStmt
     {
     private:
-        ExprPtr init;
+        ExprPtr init_expr;
 
     public:
-        explicit DeclVar(ExprPtr _init = nullptr
+        explicit DeclVar(std::string_view _name
+        ,                ExprPtr _init = nullptr
         ,                Position _pos = default_pos()
-        ):  DeclStmt(std::move(_pos))
-        ,   init(std::move(_init))
+        ):  DeclStmt(_name
+            ,        std::move(_pos)
+            )
+        ,   init_expr(std::move(_init))
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
 
+        const ExprNode* get_init_expr() const noexcept;
     };
 
     class DeclFunc : public DeclStmt
     {
     private:
-        std::vector<StmtPtr> args;
+        std::vector<std::unique_ptr<DeclVar>> args;
         StmtPtr body;
 
     public:
-        DeclFunc(std::vector<StmtPtr>& _args
+        DeclFunc(std::string_view _name
+        ,        std::vector<std::unique_ptr<DeclVar>>& _args
         ,        StmtPtr _body
         ,        Position _pos = default_pos()
-        ):  DeclStmt(std::move(_pos))
+        ):  DeclStmt(_name 
+            ,        std::move(_pos)
+            )
         ,   args(std::move(_args))
         ,   body(std::move(_body))
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        DeclFunc(std::string_view _name
+        ,        std::vector<std::unique_ptr<DeclVar>> _args
+        ,        StmtPtr _body
+        ,        Position _pos = default_pos()
+        ):  DeclStmt(_name 
+            ,        std::move(_pos)
+            )
+        ,   args(std::move(_args))
+        ,   body(std::move(_body))
+        {}
+
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
         
-        const std::vector<StmtPtr>& get_args() const noexcept;
+        const std::vector<std::unique_ptr<DeclVar>>& get_args() const noexcept;
         const StmtNode* get_body() const noexcept;
     };
 
     class DeclModule : public DeclStmt
     {
-    private:
-        std::string name;
     public:
         explicit DeclModule(std::string_view _name
         ,                   Position _pos = default_pos()
-        ):  DeclStmt(std::move(_pos))
-        ,   name(_name)
+        ):  DeclStmt(_name
+            ,        std::move(_pos)
+            )
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
-
-        std::string_view get_name() const noexcept;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
     };
 
     class DeclNamespace : public DeclStmt
     {
     private:
-        std::string name;
+        StmtPtr body;
+
     public:
         explicit DeclNamespace(std::string_view _name
+        ,                      StmtPtr _body
         ,                      Position _pos = default_pos()
-        ):  DeclStmt(std::move(_pos))
-        ,   name(_name)
+        ):  DeclStmt(_name
+            ,        std::move(_pos)
+            )
+        ,   body(std::move(_body))
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
 
-        std::string_view get_name() const noexcept;
+        const StmtNode* get_body() const noexcept;
     };
 
     class ImportStmt : public StmtNode
@@ -211,8 +245,8 @@ namespace lang::ast
         ,   imported(_imported)
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
 
         std::string_view get_imported() const noexcept;
     };
@@ -220,17 +254,17 @@ namespace lang::ast
     class ReturnStmt : public StmtNode
     {
     private:
-        ExprPtr ret{nullptr};
+        ExprPtr ret_expr{nullptr};
     public:
         explicit ReturnStmt(ExprPtr _ret = nullptr
         ,                   Position _pos = default_pos()
         ):  StmtNode(std::move(_pos))
-        ,   ret(std::move(_ret))
+        ,   ret_expr(std::move(_ret))
         {}
         
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
 
-        const ExprNode* get_ret() const noexcept;
+        const ExprNode* get_ret_expr() const noexcept;
     };
 }

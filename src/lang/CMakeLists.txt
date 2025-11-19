@@ -12,12 +12,15 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(sources
     src/stream.cpp
     src/tokenizer.cpp
-    src/utils.cpp
 
     # ast
     src/ast/ast.cpp
     src/ast/stmt.cpp
     src/ast/expr.cpp
+
+    # utils
+    src/utils/utils.cpp
+    src/utils/printast.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${sources})

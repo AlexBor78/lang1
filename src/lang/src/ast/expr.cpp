@@ -1,3 +1,4 @@
+#include "ast/ast.h"
 #include <ast/visitor.h>
 
 #include <ast/expr.h>
@@ -18,65 +19,87 @@ namespace lang::ast
 
 // NumberLiteral
     
-    void NumberLiteral::accept(ConstVisitor& visitor) const noexcept
+    void NumberLiteral::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_number_literal(*this);
     }
-    void NumberLiteral::accept(NodeVisitor& visitor) noexcept
+    void NumberLiteral::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_number_literal(*this);
     }
 
 // StringLiteral
     
-    void StringLiteral::accept(ConstVisitor& visitor) const noexcept
+    void StringLiteral::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_string_literal(*this);
     }
-    void StringLiteral::accept(NodeVisitor& visitor) noexcept
+    void StringLiteral::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_string_literal(*this);
     }
 
 // BoolLiteral
     
-    void BoolLiteral::accept(ConstVisitor& visitor) const noexcept
+    void BoolLiteral::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_bool_literal(*this);
     }
-    void BoolLiteral::accept(NodeVisitor& visitor) noexcept
+    void BoolLiteral::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_bool_literal(*this);
     }
 
-// VariableExpr
+// IdentifierExpr
 
-    void VariableExpr::accept(ConstVisitor& visitor) const noexcept
-    {
-        visitor.visit_variable_expr(*this);
-    }
-    void VariableExpr::accept(NodeVisitor& visitor) noexcept
-    {
-        visitor.visit_variable_expr(*this);
-    }
-
-    std::string_view VariableExpr::get_name() const noexcept
+    std::string_view IdentifierExpr::get_name() const noexcept
     {
         return name;
     }
 
+// VariableExpr
+
+    void VariableExpr::accept(ConstASTVisitor& visitor) const noexcept
+    {
+        visitor.visit_variable_expr(*this);
+    }
+    void VariableExpr::accept(ASTVisitor& visitor) noexcept
+    {
+        visitor.visit_variable_expr(*this);
+    }
+
+// NamespaceExpr
+
+    void NamespaceExpr::accept(ConstASTVisitor& visitor) const noexcept
+    {
+        visitor.visit_namespace_expr(*this);
+    }
+    void NamespaceExpr::accept(ASTVisitor& visitor) noexcept
+    {
+        visitor.visit_namespace_expr(*this);
+    }
+
+    const ExprNode* NamespaceExpr::get_identifier() const noexcept
+    {
+        return identifier.get();
+    }
+    ExprNode* NamespaceExpr::get_identifier() noexcept
+    {
+        return identifier.get();
+    }
+
 // CallExpr
 
-    void CallExpr::accept(ConstVisitor& visitor) const noexcept
+    void CallExpr::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_call_expr(*this);
     }
-    void CallExpr::accept(NodeVisitor& visitor) noexcept
+    void CallExpr::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_call_expr(*this);
     }
 
-    std::string_view CallExpr::get_callname() const noexcept
+    std::string_view CallExpr::get_callee() const noexcept
     {
         return callee;
     }
@@ -98,11 +121,11 @@ namespace lang::ast
 
 // BinOpExpr
 
-    void BinOpExpr::accept(ConstVisitor& visitor) const noexcept
+    void BinOpExpr::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_binop_expr(*this);
     }
-    void BinOpExpr::accept(NodeVisitor& visitor) noexcept
+    void BinOpExpr::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_binop_expr(*this);
     }
@@ -137,22 +160,22 @@ namespace lang::ast
 
 // PrefixUnaryOpExpr
 
-    void PrefixUnaryOpExpr::accept(ConstVisitor& visitor) const noexcept
+    void PrefixUnaryOpExpr::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_prefix_unary_op_expr(*this);
     }
-    void PrefixUnaryOpExpr::accept(NodeVisitor& visitor) noexcept
+    void PrefixUnaryOpExpr::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_prefix_unary_op_expr(*this);
     }
 
 // PostfixUnaryOpExpr
 
-    void PostfixUnaryOpExpr::accept(ConstVisitor& visitor) const noexcept
+    void PostfixUnaryOpExpr::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_postfix_unary_op_expr(*this);
     }
-    void PostfixUnaryOpExpr::accept(NodeVisitor& visitor) noexcept
+    void PostfixUnaryOpExpr::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_postfix_unary_op_expr(*this);
     }

@@ -1,7 +1,14 @@
 module main;
 import std;
 
+namespace math {
+    int add(int a, int b) {
+        return a + b;
+    }
+}
+
 int main() {
     std::println("Hello, World!");
+    std::println("5 + 7 = {}", math::add(5, 7));
     return 0;
 }

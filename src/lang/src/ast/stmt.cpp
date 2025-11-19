@@ -1,3 +1,4 @@
+#include "ast/ast.h"
 #include <ast/visitor.h>
 
 #include <ast/stmt.h>
@@ -6,11 +7,11 @@ namespace lang::ast
 {
 // BlockStmt
 
-    void BlockStmt::accept(ConstVisitor& visitor) const noexcept
+    void BlockStmt::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_block_stmt(*this);
     }
-    void BlockStmt::accept(NodeVisitor& visitor) noexcept
+    void BlockStmt::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_block_stmt(*this);
     }
@@ -41,22 +42,22 @@ namespace lang::ast
 
 // IfStmt
 
-    void IfStmt::accept(ConstVisitor& visitor) const noexcept
+    void IfStmt::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_if_stmt(*this);
     }
-    void IfStmt::accept(NodeVisitor& visitor) noexcept
+    void IfStmt::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_if_stmt(*this);
     }
 
 // ForStmt
 
-    void ForStmt::accept(ConstVisitor& visitor) const noexcept
+    void ForStmt::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_for_stmt(*this);
     }
-    void ForStmt::accept(NodeVisitor& visitor) noexcept
+    void ForStmt::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_for_stmt(*this);
     }
@@ -72,38 +73,50 @@ namespace lang::ast
 
 // WhileStmt
 
-    void WhileStmt::accept(ConstVisitor& visitor) const noexcept
+    void WhileStmt::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_while_stmt(*this);
     }
-    void WhileStmt::accept(NodeVisitor& visitor) noexcept
+    void WhileStmt::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_while_stmt(*this);
+    }
+
+// DeclStmt
+
+    std::string_view DeclStmt::get_name() const noexcept
+    {
+        return name;
     }
 
 // DeclVar
 
-    void DeclVar::accept(ConstVisitor& visitor) const noexcept
+    void DeclVar::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_decl_var(*this);
     }
-    void DeclVar::accept(NodeVisitor& visitor) noexcept
+    void DeclVar::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_decl_var(*this);
+    }
+
+    const ExprNode* DeclVar::get_init_expr() const noexcept
+    {
+        return init_expr.get();
     }
 
 // DeclFunc
 
-    void DeclFunc::accept(ConstVisitor& visitor) const noexcept
+    void DeclFunc::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_decl_func(*this);
     }
-    void DeclFunc::accept(NodeVisitor& visitor) noexcept
+    void DeclFunc::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_decl_func(*this);
     }
 
-    const std::vector<StmtPtr>& DeclFunc::get_args() const noexcept
+    const std::vector<std::unique_ptr<DeclVar>>& DeclFunc::get_args() const noexcept
     {
         return args;
     }
@@ -115,43 +128,38 @@ namespace lang::ast
 
 // DeclModule
 
-    void DeclModule::accept(ConstVisitor& visitor) const noexcept
+    void DeclModule::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_decl_module(*this);
     }
-    void DeclModule::accept(NodeVisitor& visitor) noexcept
+    void DeclModule::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_decl_module(*this);
-    }
-
-    std::string_view DeclModule::get_name() const noexcept
-    {
-        return name;
     }
 
 // DeclNamespace
 
-    void DeclNamespace::accept(ConstVisitor& visitor) const noexcept
+    void DeclNamespace::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_decl_namespace(*this);
     }
-    void DeclNamespace::accept(NodeVisitor& visitor) noexcept
+    void DeclNamespace::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_decl_namespace(*this);
     }
 
-    std::string_view DeclNamespace::get_name() const noexcept
+    const StmtNode* DeclNamespace::get_body() const noexcept
     {
-        return name;
+        return body.get();
     }
-
+    
 // ImportStmt
 
-    void ImportStmt::accept(ConstVisitor& visitor) const noexcept
+    void ImportStmt::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_import_stmt(*this);
     }
-    void ImportStmt::accept(NodeVisitor& visitor) noexcept
+    void ImportStmt::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_import_stmt(*this);
     }
@@ -163,17 +171,17 @@ namespace lang::ast
 
 // ReturnStmt
 
-    void ReturnStmt::accept(ConstVisitor& visitor) const noexcept
+    void ReturnStmt::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_return_stmt(*this);
     }
-    void ReturnStmt::accept(NodeVisitor& visitor) noexcept
+    void ReturnStmt::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_return_stmt(*this);
     }
 
-    const ExprNode* ReturnStmt::get_ret() const noexcept
+    const ExprNode* ReturnStmt::get_ret_expr() const noexcept
     {
-        return ret.get();
+        return ret_expr.get();
     }
 }

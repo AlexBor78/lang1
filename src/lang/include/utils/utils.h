@@ -1,10 +1,35 @@
-#include "ast/expr.h"
-#include <print>
-#include <stdexcept>
-#include <utils.h>
+#pragma once
+
+#include <memory>
+#include <vector>
+
+#include <defs.h>
+#include <ast/expr.h>
 
 namespace lang::utils
 {
+    // TokenType to string
+    constexpr const char* stringify(TokenType);
+
+    // OperatorExpr::OperatorKind to string
+    constexpr const char* stringify(ast::OperatorExpr::OperatorKind);
+
+    // print token or vector of tokens
+    void print(const std::vector<Token>&);
+    void print(const Token&);
+
+    // print ast or vector of ast's
+    void print(const std::vector<std::unique_ptr<ast::BaseNode>>&);
+    void print(const ast::BaseNode*);
+
+    // TokenType to OperatorExpr::OperatorKind
+    ast::OperatorExpr::OperatorKind token_to_op(TokenType);
+
+
+
+
+// constexpr implementations ---------------------------------------------------
+
     constexpr const char* stringify(TokenType ty)
     {
         switch(ty) {
@@ -72,19 +97,6 @@ namespace lang::utils
         } return "UNKNOWN";
     }
 
-    void print(const Token& tok) {
-        std::println("TokenType: {}, symbol {}",
-            stringify(tok.ty),
-            tok.sym
-        );
-    }
-
-    void print(const std::vector<Token>& tokens) {
-        for(const auto& tok : tokens) {
-            print(tok);
-        }
-    }
-
     constexpr const char* stringify(ast::OperatorExpr::OperatorKind op) {
         switch (op) {
             case ast::OperatorExpr::OperatorKind::ASSIGN:     return "ASSIGN";
@@ -105,28 +117,5 @@ namespace lang::utils
             case ast::OperatorExpr::OperatorKind::INCREMENT:  return "INCREMENT";
             case ast::OperatorExpr::OperatorKind::DECREMENT:  return "DECREMENT";
         } return "UNKNOWN";
-    }
-
-    ast::OperatorExpr::OperatorKind token_to_op(TokenType tok) {
-        switch (tok) {
-            case TokenType::ASSIGN:     return ast::OperatorExpr::OperatorKind::ASSIGN;
-            case TokenType::PLUS:       return ast::OperatorExpr::OperatorKind::PLUS;
-            case TokenType::MINUS:      return ast::OperatorExpr::OperatorKind::MINUS;
-            case TokenType::STAR:       return ast::OperatorExpr::OperatorKind::STAR;
-            case TokenType::SLASH:      return ast::OperatorExpr::OperatorKind::SLASH;
-            case TokenType::PERCENT:    return ast::OperatorExpr::OperatorKind::PERCENT;
-            case TokenType::EQ:         return ast::OperatorExpr::OperatorKind::EQ;
-            case TokenType::NEQ:        return ast::OperatorExpr::OperatorKind::NEQ;
-            case TokenType::LT:         return ast::OperatorExpr::OperatorKind::LT;
-            case TokenType::LE:         return ast::OperatorExpr::OperatorKind::LE;
-            case TokenType::GT:         return ast::OperatorExpr::OperatorKind::GT;
-            case TokenType::GE:         return ast::OperatorExpr::OperatorKind::GE;
-            case TokenType::BANG:       return ast::OperatorExpr::OperatorKind::BANG;
-            case TokenType::AND:        return ast::OperatorExpr::OperatorKind::AND;
-            case TokenType::OR:         return ast::OperatorExpr::OperatorKind::OR;
-            case TokenType::INCREMENT:  return ast::OperatorExpr::OperatorKind::INCREMENT;
-            case TokenType::DECREMENT:  return ast::OperatorExpr::OperatorKind::DECREMENT;
-            default: throw std::runtime_error("wrong TokenType to OperatorKind");
-        }
     }
 }

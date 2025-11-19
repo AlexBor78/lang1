@@ -21,8 +21,8 @@ namespace lang::ast
         {}
 
     public:
-        virtual void accept(ConstVisitor&) const noexcept override = 0;
-        virtual void accept(NodeVisitor&) noexcept override = 0;
+        virtual void accept(ConstASTVisitor&) const noexcept override = 0;
+        virtual void accept(ASTVisitor&) noexcept override = 0;
 
         std::string_view get_literal() const noexcept;
         const char* get_c_literal() const noexcept;
@@ -40,8 +40,8 @@ namespace lang::ast
             )
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
     };
 
     class StringLiteral : public LiteralExpr
@@ -56,8 +56,8 @@ namespace lang::ast
             )
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
     };
 
     class BoolLiteral : public LiteralExpr
@@ -72,27 +72,66 @@ namespace lang::ast
             )
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
     };
 
-    class VariableExpr : public ExprNode
+    class IdentifierExpr : public ExprNode
     {
     private:
         std::string name;
 
     public:
-        explicit VariableExpr(std::string_view _name
-        ,                     const Type* _type = nullptr
-        ,                     Position _pos = default_pos()
+        explicit IdentifierExpr(std::string_view _name
+        ,                       const Type* _type = nullptr
+        ,                       Position _pos = default_pos()
         ):  ExprNode(std::move(_pos))
         ,   name(_name)
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        virtual void accept(ConstASTVisitor&) const noexcept override = 0;
+        virtual void accept(ASTVisitor&) noexcept override = 0;
 
         std::string_view get_name() const noexcept;
+    };
+
+    class VariableExpr : public IdentifierExpr
+    {
+    public:
+        explicit VariableExpr(std::string_view _name
+        ,                     const Type* _type = nullptr
+        ,                     Position _pos = default_pos()
+        ):  IdentifierExpr(_name
+            ,              _type
+            ,              std::move(_pos)
+            )
+        {}
+
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
+    };
+
+    class NamespaceExpr : public IdentifierExpr
+    {
+    private:
+        ExprPtr identifier;
+    public:
+        NamespaceExpr(std::string_view _name
+        ,             ExprPtr _identifier
+        ,             const Type* _type = nullptr
+        ,             Position _pos = default_pos()
+        ):  IdentifierExpr(_name
+            ,              _type
+            ,              std::move(_pos)
+            )
+        ,   identifier(std::move(_identifier))
+        {}
+
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
+
+        const ExprNode* get_identifier() const noexcept;
+        ExprNode* get_identifier() noexcept;
     };
 
     class CallExpr : public ExprNode
@@ -102,19 +141,28 @@ namespace lang::ast
         std::vector<ExprPtr> args;
 
     public:
-        explicit CallExpr(std::string_view _callee
-        ,                 std::vector<ExprPtr>& _args
-        ,                 const Type* _type = nullptr
-        ,                 Position _pos = default_pos()
+        CallExpr(std::string_view _callee
+        ,        std::vector<ExprPtr>& _args
+        ,        const Type* _type = nullptr
+        ,        Position _pos = default_pos()
         ):  ExprNode(_type, std::move(_pos))
         ,   args(std::move(_args))
         ,   callee(_callee)
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        CallExpr(std::string_view _callee
+        ,        std::vector<ExprPtr> _args
+        ,        const Type* _type = nullptr
+        ,        Position _pos = default_pos()
+        ):  ExprNode(_type, std::move(_pos))
+        ,   args(std::move(_args))
+        ,   callee(_callee)
+        {}
 
-        std::string_view get_callname() const noexcept;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
+
+        std::string_view get_callee() const noexcept;
         const std::vector<ExprPtr>& get_args() const noexcept;
         std::vector<ExprPtr>& get_args() noexcept;
     };
@@ -153,8 +201,8 @@ namespace lang::ast
         {}
 
     public:
-        virtual void accept(ConstVisitor&) const noexcept override = 0;
-        virtual void accept(NodeVisitor&) noexcept override = 0;
+        virtual void accept(ConstASTVisitor&) const noexcept override = 0;
+        virtual void accept(ASTVisitor&) noexcept override = 0;
 
         OperatorKind get_op() const noexcept;
     };
@@ -165,9 +213,9 @@ namespace lang::ast
         ExprPtr left;
         ExprPtr right;
     public:
-        BinOpExpr(ExprPtr _left
+        BinOpExpr(OperatorKind _op
+        ,         ExprPtr _left
         ,         ExprPtr _right
-        ,         OperatorKind _op
         ,         const Type* _type = nullptr
         ,         Position _pos = default_pos()
         ):  OperatorExpr(_op
@@ -178,8 +226,8 @@ namespace lang::ast
         ,   right(std::move(_right))
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
 
         const ExprNode* get_left() const noexcept;
         ExprNode* get_left() noexcept;
@@ -207,8 +255,8 @@ namespace lang::ast
         {}
 
     public:
-        virtual void accept(ConstVisitor&) const noexcept override = 0;
-        virtual void accept(NodeVisitor&) noexcept override = 0;
+        virtual void accept(ConstASTVisitor&) const noexcept override = 0;
+        virtual void accept(ASTVisitor&) noexcept override = 0;
 
         const ExprNode* get_operand() const noexcept;
         ExprNode* get_operand() noexcept;
@@ -228,8 +276,8 @@ namespace lang::ast
             )
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
     };
 
     class PostfixUnaryOpExpr : public UnaryOpExpr
@@ -246,7 +294,7 @@ namespace lang::ast
             )
         {}
 
-        virtual void accept(ConstVisitor&) const noexcept override;
-        virtual void accept(NodeVisitor&) noexcept override;
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
     };
 }
