@@ -79,6 +79,7 @@ namespace lang
             buf += stream.next();
         
         stream.next();
+        pos.length = stream.get_pos().start - pos.start;
         
         if(auto it = keywords.find(buf); it != keywords.end()) {
             add_token({
@@ -101,6 +102,7 @@ namespace lang
         std::string buf;
         buf = stream.curr();
 
+        pos.length = 2;
         if(!stream.is_eof()) {
             buf += stream.peak();
             if(auto it = keywords.find(buf); it != keywords.end()) {
@@ -115,6 +117,7 @@ namespace lang
         }
 
         buf = stream.curr();
+        pos.length = 1;
         if(auto it = keywords.find(buf); it != keywords.end()) {
             stream.next();
             add_token({ 
@@ -141,7 +144,7 @@ namespace lang
                 has_dot = true;
             } buf += stream.curr();
             stream.next();
-        }
+        } pos.length = stream.get_pos().start - pos.start;
 
         add_token({
             .ty = TokenType::NUMBER,
@@ -163,6 +166,7 @@ namespace lang
                 continue;
             } buf += stream.next();
         } stream.next(2);
+        pos.length = stream.get_pos().start - pos.start;
 
         add_token({
             .ty = TokenType::STRING,

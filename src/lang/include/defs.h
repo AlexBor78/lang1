@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <string>
 #include <string_view>
 
@@ -73,9 +74,10 @@ namespace lang
     struct Position
     {
         std::string_view path;
-        size_t line{0};
-        size_t column{0};
-        size_t pos{0}; // column * line, but in file
+        size_t line{0}; // unused
+        size_t column{0}; // unused
+        size_t start{0}; // character pos
+        size_t length{1};
     };
 
     struct Token

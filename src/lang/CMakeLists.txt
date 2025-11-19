@@ -21,6 +21,7 @@ set(sources
     # utils
     src/utils/utils.cpp
     src/utils/printast.cpp
+    src/utils/error.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${sources})

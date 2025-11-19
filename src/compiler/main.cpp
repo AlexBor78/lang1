@@ -1,9 +1,9 @@
-#include "ast/ast.h"
 #include <memory>
 #include <print>
 #include <stream.h>
 #include <tokenizer.h>
 #include <utils/utils.h>
+#include <utils/error.h>
 
 #include <ast/stmt.h>
 #include <ast/expr.h>
@@ -117,6 +117,12 @@ int main()
     auto tokens = tokenizer.tokenize(stream);
     std::println("Success!");
     lang::utils::print(tokens);
+
+    std::println("\n\n\n");
+    auto tok = tokens[27];
+    auto err = lang::CompileError("here error message", tok.pos);
+    lang::utils::print(tok);
+    std::println("{}", err.what());
 
     auto ast = build_ast();
     std::println("\n\n\n");

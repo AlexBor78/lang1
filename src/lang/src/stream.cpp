@@ -107,9 +107,7 @@ namespace lang
         if(!file.is_open()) {
             throw std::runtime_error("couldn't open file" + path);
         }
-        buf = {std::istreambuf_iterator<char>(file),
-               std::istreambuf_iterator<char>()
-        };
+        buf = {std::istreambuf_iterator<char>(file), {}};
     }
 
     bool FileStream::is_end() const noexcept
@@ -168,7 +166,7 @@ namespace lang
             .path = path,
             .line = 0,
             .column = 0,
-            .pos = bufpos
+            .start = bufpos
         };
     }
 
