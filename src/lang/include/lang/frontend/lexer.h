@@ -9,11 +9,11 @@
 
 namespace lang::frontend::lexer
 {
-    class Tokenizer
+    class Lexer
     {
     public:
         std::vector<Token> tokenize(utils::InputStream&);
-        explicit Tokenizer(utils::InputStream& _stream):
+        explicit Lexer(utils::InputStream& _stream):
             stream(_stream)
         {}
 

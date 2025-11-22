@@ -6,7 +6,7 @@
 
 namespace lang::frontend::lexer
 {
-    std::vector<Token> Tokenizer::tokenize(utils::InputStream& _stream)
+    std::vector<Token> Lexer::tokenize(utils::InputStream& _stream)
     {
         tokens.clear();
         stream = _stream;
@@ -41,19 +41,19 @@ namespace lang::frontend::lexer
         return tokens;
     }
 
-    void Tokenizer::add_token(Token tok)
+    void Lexer::add_token(Token tok)
     {
         tokens.emplace_back(tok);
     }
 
-    bool Tokenizer::is_word() const noexcept
+    bool Lexer::is_word() const noexcept
     {
         if(isalpha(stream.curr()) || stream.curr() == '_')
             return true;
         return false;
     }
 
-    bool Tokenizer::is_number() const noexcept
+    bool Lexer::is_number() const noexcept
     {
         if(isdigit(stream.curr()))
             return true;
@@ -62,14 +62,14 @@ namespace lang::frontend::lexer
         return false;
     }
 
-    bool Tokenizer::is_string() const noexcept
+    bool Lexer::is_string() const noexcept
     {
         if(stream.curr() == '"')
             return true;
         return false;
     }
 
-    void Tokenizer::tokenize_word()
+    void Lexer::tokenize_word()
     {
         Position pos = stream.get_pos();
         std::string buf;
@@ -96,7 +96,7 @@ namespace lang::frontend::lexer
         });
     }
 
-    void Tokenizer::tokenize_punct()
+    void Lexer::tokenize_punct()
     {
         Position pos = stream.get_pos();
         std::string buf;
@@ -129,7 +129,7 @@ namespace lang::frontend::lexer
         }
     }
 
-    void Tokenizer::tokenize_number()
+    void Lexer::tokenize_number()
     {
         Position pos = stream.get_pos();
         std::string buf;
@@ -153,7 +153,7 @@ namespace lang::frontend::lexer
         });
     }
 
-    void Tokenizer::tokenize_string()
+    void Lexer::tokenize_string()
     {
         Position pos = stream.get_pos();
         std::string buf;
@@ -175,7 +175,7 @@ namespace lang::frontend::lexer
         });
     }
 
-    char Tokenizer::tokenize_escape()
+    char Lexer::tokenize_escape()
     {
         stream.next();
         switch (stream.peak()) {

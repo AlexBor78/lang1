@@ -19,7 +19,7 @@ int main()
     lang::utils::FileIStream istream(path);
 
     std::print("Tokenizing...");
-    lang::frontend::lexer::Tokenizer tokenizer(istream);
+    lang::frontend::lexer::Lexer tokenizer(istream);
     auto tokens = tokenizer.tokenize(istream);
     std::println("Success!");
     lang::utils::print(tokens);
