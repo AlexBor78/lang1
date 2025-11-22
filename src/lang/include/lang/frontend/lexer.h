@@ -25,12 +25,17 @@ namespace lang::frontend::lexer
         bool is_word() const noexcept;
         bool is_number() const noexcept;
         bool is_string() const noexcept;
+        bool is_comment() const noexcept;
         
         void tokenize_word();
         void tokenize_punct();
         void tokenize_number();
         void tokenize_string();
         char tokenize_escape();
+        
+        void process_comment();
+        void process_comment_line();
+        void process_comment_block();
 
         void add_token(Token);
     };
