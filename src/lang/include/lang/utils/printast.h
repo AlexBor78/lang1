@@ -3,7 +3,7 @@
 #include <format>
 #include <string>
 #include <string_view>
-#include <ast/visitor.h>
+#include <lang/ast/visitor.h>
 
 namespace lang::utils
 {
@@ -29,8 +29,8 @@ namespace lang::utils
         virtual void visit_if_stmt(const ast::IfStmt&) noexcept override;
         virtual void visit_for_stmt(const ast::ForStmt&) noexcept override;
         virtual void visit_while_stmt(const ast::WhileStmt&) noexcept override;
-        virtual void visit_decl_var(const ast::DeclVar&) noexcept override;
-        virtual void visit_decl_func(const ast::DeclFunc&) noexcept override;
+        virtual void visit_decl_var(const ast::DeclVariable&) noexcept override;
+        virtual void visit_decl_func(const ast::DeclFunction&) noexcept override;
         virtual void visit_decl_module(const ast::DeclModule&) noexcept override;
         virtual void visit_decl_namespace(const ast::DeclNamespace&) noexcept override;
         virtual void visit_import_stmt(const ast::ImportStmt&) noexcept override;
@@ -40,7 +40,7 @@ namespace lang::utils
         virtual void visit_bool_literal(const ast::BoolLiteral&) noexcept override;
         virtual void visit_variable_expr(const ast::VariableExpr&) noexcept override;
         virtual void visit_namespace_expr(const ast::NamespaceExpr&) noexcept override;
-        virtual void visit_call_expr(const ast::CallExpr&) noexcept override;
+        virtual void visit_call_expr(const ast::FunctionExpr&) noexcept override;
         virtual void visit_binop_expr(const ast::BinOpExpr&) noexcept override;
         virtual void visit_prefix_unary_op_expr(const ast::PrefixUnaryOpExpr&) noexcept override;
         virtual void visit_postfix_unary_op_expr(const ast::PostfixUnaryOpExpr&) noexcept override;

@@ -10,18 +10,27 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 set(sources
-    src/stream.cpp
-    src/tokenizer.cpp
+    # frontend
+    src/frontend/parser.cpp
+    src/frontend/lexer.cpp
 
     # ast
-    src/ast/ast.cpp
     src/ast/stmt.cpp
     src/ast/expr.cpp
+    src/ast/ast.cpp
 
+    # semantic
+    src/semantic/typesystem.cpp
+    src/semantic/identifier.cpp
+    src/semantic/program.cpp
+    src/semantic/module.cpp
+    src/semantic/scope.cpp
+    
     # utils
-    src/utils/utils.cpp
     src/utils/printast.cpp
+    src/utils/stream.cpp
     src/utils/error.cpp
+    src/utils/utils.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${sources})

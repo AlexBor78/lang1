@@ -1,0 +1,112 @@
+module test;
+import std;
+
+namespace math {
+    extern int pow(int a, int b);
+    
+    int add(int a, int b) {
+        return a + b;
+    }
+    
+    int complex_calc(int x, int y) {
+        int result = (x * y) + (x / y) - (x % y);
+        result = result & (result | 15);
+        result = result ^ 255;
+        result = ~result;
+        return result;
+    }
+}
+
+namespace utils {
+    void print_numbers() {
+        int i = 0;
+        i++;
+        ++i;
+        i--;
+        --i;
+        i += 5;
+        i -= 2;
+        i *= 3;
+        i /= 2;
+        i %= 4;
+        i &= 15;
+        i |= 8;
+        i ^= 3;
+        i = i << 1;
+        i = i >> 1;
+    }
+}
+
+const int GLOBAL_CONST = 42;
+
+int main() {
+    std::println("Testing parser...");
+    
+    int a = 10;
+    int b = 20;
+    int c = 123456789;
+    double d1 = 3.14;
+    double d2 = 0.5;
+    double d3 = 123.456;
+    
+    int e = a + b;
+    int f = a - b;
+    int g = a * b;
+    int h = b / a;
+    int i = b % a;
+    
+    bool flag1 = true;
+    bool flag2 = false;
+    bool result1 = flag1 && flag2;
+    bool result2 = flag1 || flag2;
+    bool result3 = !flag1;
+    
+    int x = 12;
+    int y = 10;
+    int bit_and = x & y;
+    int bit_or = x | y;
+    int bit_xor = x ^ y;
+    int bit_not = ~x;
+    int shift_left = x << 2;
+    int shift_right = x >> 1;
+    
+    bool cmp1 = a == b;
+    bool cmp2 = a != b;
+    bool cmp3 = a < b;
+    bool cmp4 = a <= b;
+    bool cmp5 = a > b;
+    bool cmp6 = a >= b;
+    
+    int sum = math::add(5, 7);
+    int power = math::pow(2, 8);
+    
+    int counter = 0;
+    counter += 5;
+    counter -= 2;
+    counter *= 3;
+    counter /= 2;
+    counter %= 10;
+    counter &= 15;
+    counter |= 8;
+    counter ^= 3;
+    
+    int idx = 0;
+    idx++;
+    ++idx;
+    idx--;
+    --idx;
+    
+    int complex = a + b * c - d1 / e % f;
+    int with_parens = (a + b) * (c - d1);
+    
+    return 0;
+}
+
+namespace extra {
+    const int VALUE = 100;
+    
+    void test_fn() {
+        int x = VALUE;
+        x = x + GLOBAL_CONST;
+    }
+}

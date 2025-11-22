@@ -2,9 +2,9 @@
 
 #include <string_view>
 #include <unordered_map>
-#include <defs.h>
+#include <lang/frontend/token.h>
 
-namespace lang
+namespace lang::frontend::lexer
 {
     inline std::unordered_map<std::string_view, TokenType> keywords =
     {
@@ -19,6 +19,7 @@ namespace lang
         {"*", TokenType::STAR},
         {"/", TokenType::SLASH},
         {"%", TokenType::PERCENT},
+        {"&", TokenType::AMPERSAND},
         {"==", TokenType::EQ},
         {"!=", TokenType::NEQ},
         {"<", TokenType::LT},
@@ -31,6 +32,24 @@ namespace lang
         {"||", TokenType::OR},
         {"++", TokenType::INCREMENT},
         {"--", TokenType::DECREMENT},
+        {"~",  TokenType::TILDE},
+        {"|",  TokenType::BIT_OR},
+        // {"&",  TokenType::BIT_AND}, = AMPERSAND
+        {"^",  TokenType::BIT_XOR},
+        {"<<", TokenType::SHIFT_LEFT},
+        {">>", TokenType::SHIFT_RIGHT},
+
+        // Compound assignments
+        {"+=",  TokenType::ADD_ASSIGN},
+        {"-=",  TokenType::SUB_ASSIGN},
+        {"*=",  TokenType::MUL_ASSIGN},
+        {"/=",  TokenType::DIV_ASSIGN},
+        {"%=",  TokenType::MOD_ASSIGN},
+        {"&=",  TokenType::AND_ASSIGN},
+        {"|=",  TokenType::OR_ASSIGN},
+        {"^=",  TokenType::XOR_ASSIGN},
+        {"<<=", TokenType::SHL_ASSIGN},
+        {">>=", TokenType::SHR_ASSIGN},
         
         // Delimiters  
         {"(", TokenType::LPAREN},
@@ -49,6 +68,9 @@ namespace lang
         {"const", TokenType::CONST},
         {"struct", TokenType::STRUCT},
         {"enum", TokenType::ENUM},
+        {"module", TokenType::MODULE},
+        {"namespace", TokenType::NAMESPACE},
+        {"extern", TokenType::EXTERN},
 
         // Keywords
         {"if", TokenType::IF},
@@ -58,8 +80,6 @@ namespace lang
         {"break", TokenType::BREAK},
         {"continue", TokenType::CONTINUE},
         {"return", TokenType::RETURN},
-        {"import", TokenType::IMPORT},
-        {"module", TokenType::MODULE},
-        {"namespace", TokenType::NAMESPACE}
+        {"import", TokenType::IMPORT}
     };
 }

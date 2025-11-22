@@ -2,25 +2,25 @@
 
 #include <vector>
 
-#include <defs.h>
-#include <stream.h>
-#include <keywords.h>
+#include <lang/utils/stream.h>
+#include <lang/frontend/keywords.h>
+#include <lang/frontend/token.h>
 
 
-namespace lang
+namespace lang::frontend::lexer
 {
     class Tokenizer
     {
     public:
-        std::vector<Token> tokenize(Stream&);
-        explicit Tokenizer(Stream& _stream):
+        std::vector<Token> tokenize(utils::InputStream&);
+        explicit Tokenizer(utils::InputStream& _stream):
             stream(_stream)
         {}
 
     private:
         std::vector<Token> tokens;
         std::string symbol;
-        Stream& stream;
+        utils::InputStream& stream;
 
         bool is_word() const noexcept;
         bool is_number() const noexcept;

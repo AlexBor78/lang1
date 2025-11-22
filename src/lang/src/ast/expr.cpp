@@ -1,8 +1,5 @@
-#include "ast/ast.h"
-#include <ast/visitor.h>
-
-#include <ast/expr.h>
-
+#include <lang/ast/visitor.h>
+#include <lang/ast/expr.h>
 
 namespace lang::ast
 {
@@ -90,24 +87,24 @@ namespace lang::ast
 
 // CallExpr
 
-    void CallExpr::accept(ConstASTVisitor& visitor) const noexcept
+    void FunctionExpr::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_call_expr(*this);
     }
-    void CallExpr::accept(ASTVisitor& visitor) noexcept
+    void FunctionExpr::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_call_expr(*this);
     }
 
-    std::string_view CallExpr::get_callee() const noexcept
+    std::string_view FunctionExpr::get_callee() const noexcept
     {
         return callee;
     }
-    const std::vector<ExprPtr>& CallExpr::get_args() const noexcept
+    const std::vector<ExprPtr>& FunctionExpr::get_args() const noexcept
     {
         return args;
     }
-    std::vector<ExprPtr>& CallExpr::get_args() noexcept
+    std::vector<ExprPtr>& FunctionExpr::get_args() noexcept
     {
         return args;
     }

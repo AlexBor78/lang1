@@ -1,7 +1,7 @@
 #include <format>
 #include <fstream>
 
-#include <utils/error.h>
+#include <lang/utils/error.h>
 
 namespace lang
 {
@@ -44,7 +44,7 @@ namespace lang
         if(pos.length == 2) buf += std::format("{}^^\n", std::string(column, ' '));
         if(pos.length == 1) buf += std::format("{}^\n", std::string(column, ' '));
 
-        buf += std::format("debug: token length = {}", pos.length);
+        // buf += std::format("debug: token length = {}", pos.length);
 
         msg = std::move(buf);
     }

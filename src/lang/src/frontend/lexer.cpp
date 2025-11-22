@@ -2,11 +2,11 @@
 #include <stdexcept>
 #include <iostream>
 
-#include <tokenizer.h>
+#include <lang/frontend/lexer.h>
 
-namespace lang
+namespace lang::frontend::lexer
 {
-    std::vector<Token> Tokenizer::tokenize(Stream& _stream)
+    std::vector<Token> Tokenizer::tokenize(utils::InputStream& _stream)
     {
         tokens.clear();
         stream = _stream;

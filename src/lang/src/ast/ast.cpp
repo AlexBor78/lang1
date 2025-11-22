@@ -1,5 +1,4 @@
-#include "defs.h"
-#include <ast/ast.h>
+#include <lang/ast/ast.h>
 
 namespace lang::ast
 {
@@ -12,11 +11,11 @@ namespace lang::ast
         source_pos = _pos;
     }
 
-    const Type* ExprNode::get_type() const noexcept
+    const QualType& ExprNode::get_type() const noexcept
     {
         return type;
     }
-    void ExprNode::set_type(const Type* _type) noexcept
+    void ExprNode::set_type(const QualType& _type) noexcept
     {
         type = _type;
     }

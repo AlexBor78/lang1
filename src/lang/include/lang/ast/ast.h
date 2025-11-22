@@ -1,7 +1,8 @@
 #pragma once
 
 #include <memory>
-#include <defs.h>
+#include <lang/common.h>
+#include <lang/semantic/typesystem.h>
 
 namespace lang::ast
 {
@@ -9,7 +10,7 @@ namespace lang::ast
     class ASTVisitor;
     class StmtNode;
     class ExprNode;
-    class Type;
+    class DeclStmt;
 
     using StmtPtr = std::unique_ptr<StmtNode>;
     using ExprPtr = std::unique_ptr<ExprNode>;
@@ -58,26 +59,19 @@ namespace lang::ast
     class ExprNode : public StmtNode
     {
     private:
-        const Type* type{nullptr};
+        QualType type;
         
     protected:
-        explicit ExprNode(const Type* _type): 
-            type(_type)
-        {}
-
-        explicit ExprNode(Position _pos = default_pos()): 
-            StmtNode(std::move(_pos))
-        {}
-
-        explicit ExprNode(const Type* _type, Position _pos = default_pos())
-        :   StmtNode(std::move(_pos))
-        ,   type(_type)
+        explicit ExprNode(QualType _type
+        ,                 Position _pos = default_pos()
+        ):  StmtNode(std::move(_pos))
+        ,    type(_type)
         {}
 
     public:
         virtual void accept(ConstASTVisitor&) const noexcept override = 0;
         virtual void accept(ASTVisitor&) noexcept override = 0;
-        const Type* get_type() const noexcept;
-        void set_type(const Type*) noexcept;
+        const QualType& get_type() const noexcept;
+        void set_type(const QualType&) noexcept;
     };
 }

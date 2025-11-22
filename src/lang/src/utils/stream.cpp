@@ -1,20 +1,16 @@
+#include <lang/utils/error.h>
+#include <lang/utils/stream.h>
 
-#include <cctype>
-
-#include <stdexcept>
-#include <stream.h>
-#include <string_view>
-
-namespace lang
+namespace lang::utils
 {
 // StringStream
 
-    bool StringStream::is_end() const noexcept
+    bool StringIStream::is_end() const noexcept
     {
         return pos >= str.length();
     }
 
-    std::string_view StringStream::get_line()
+    std::string_view StringIStream::read_line()
     {
         if(is_end()) return "";
         
@@ -31,7 +27,7 @@ namespace lang
         return std::string_view(str).substr(start, newline_pos - start);
     }
 
-    std::string_view StringStream::get_word()
+    std::string_view StringIStream::read_word()
     {
         if(is_end()) return "";
 
@@ -51,12 +47,12 @@ namespace lang
         return std::string_view(str).substr(wordstart_pos, wordend_pos - wordstart_pos);
     }
 
-    bool StringStream::is_eof() const noexcept
+    bool StringIStream::is_eof() const noexcept
     {
         return is_end();
     }
 
-    Position StringStream::get_pos() const
+    Position StringIStream::get_pos() const
     {
         return {
             .path = "code string literal",
@@ -65,13 +61,13 @@ namespace lang
         };
     }
 
-    char StringStream::curr() const
+    char StringIStream::curr() const
     {        
         if(is_end()) return 0;
         return str[pos];
     }
 
-    char StringStream::peak(size_t offset) const
+    char StringIStream::peak(size_t offset) const
     {
         if(is_end()) return 0;
         if(pos + offset < str.length())
@@ -79,7 +75,7 @@ namespace lang
         return 0;
     }
 
-    char StringStream::next(size_t offset)
+    char StringIStream::next(size_t offset)
     {
         pos += offset;
         if(is_end()) return 0;
@@ -88,7 +84,7 @@ namespace lang
         return 0;
     }
     
-    void StringStream::skip_whitespace()
+    void StringIStream::skip_whitespace()
     {
         while(pos < str.length() && isspace(str[pos]))
             ++pos;
@@ -96,7 +92,7 @@ namespace lang
 
 // FileStream
 
-    void FileStream::openfile(std::string_view _path)
+    void FileIStream::open(std::string_view _path)
     {
         file.close();
         buf.clear();
@@ -105,19 +101,19 @@ namespace lang
 
         file.open(path);
         if(!file.is_open()) {
-            throw std::runtime_error("couldn't open file" + path);
+            throw Error("couldn't open file" + path);
         }
         buf = {std::istreambuf_iterator<char>(file), {}};
     }
 
-    bool FileStream::is_end() const noexcept
+    bool FileIStream::is_end() const noexcept
     {
         return bufpos >= buf.size();
     }
 
-    std::string_view FileStream::get_line()
+    std::string_view FileIStream::read_line()
     {
-        if(!file.is_open()) throw std::runtime_error("file isn't open");
+        if(!file.is_open()) throw Error("file isn't open");
         if(is_end()) return "";
         
         // look for '\n' from curr pos
@@ -133,9 +129,9 @@ namespace lang
         return std::string_view(buf).substr(start, newline_pos - start);
     }
 
-    std::string_view FileStream::get_word()
+    std::string_view FileIStream::read_word()
     {
-        if(!file.is_open()) throw std::runtime_error("file isn't open");
+        if(!file.is_open()) throw Error("file isn't open");
         if(is_end()) return "";
 
         size_t wordstart_pos = buf.find_first_not_of(" \t\n", bufpos);
@@ -154,14 +150,14 @@ namespace lang
         return std::string_view(buf).substr(wordstart_pos, wordend_pos - wordstart_pos);
     }
 
-    bool FileStream::is_eof() const noexcept
+    bool FileIStream::is_eof() const noexcept
     {
         return is_end();
     }
 
-    Position FileStream::get_pos() const
+    Position FileIStream::get_pos() const
     {
-        if(!file.is_open()) throw std::runtime_error("file isn't open");
+        if(!file.is_open()) throw Error("file isn't open");
         return {
             .path = path,
             .line = 0,
@@ -170,25 +166,25 @@ namespace lang
         };
     }
 
-    char FileStream::curr() const
+    char FileIStream::curr() const
     {        
-        if(!file.is_open()) throw std::runtime_error("file isn't open");
+        if(!file.is_open()) throw Error("file isn't open");
         if(is_end()) return 0;
         return buf[bufpos];
     }
 
-    char FileStream::peak(size_t offset) const
+    char FileIStream::peak(size_t offset) const
     {
-        if(!file.is_open()) throw std::runtime_error("file isn't open");
+        if(!file.is_open()) throw Error("file isn't open");
         if(is_end()) return 0;
         if(bufpos + offset < buf.length())
             return buf[bufpos + offset];
         return 0;
     }
 
-    char FileStream::next(size_t offset)
+    char FileIStream::next(size_t offset)
     {
-        if(!file.is_open()) throw std::runtime_error("file isn't open");
+        if(!file.is_open()) throw Error("file isn't open");
         bufpos += offset;
         if(is_end()) return 0;
         if(bufpos + offset < buf.length())
@@ -196,9 +192,9 @@ namespace lang
         return 0;
     }
     
-    void FileStream::skip_whitespace()
+    void FileIStream::skip_whitespace()
     {
-        if(!file.is_open()) throw std::runtime_error("file isn't open");
+        if(!file.is_open()) throw Error("file isn't open");
         while(bufpos < buf.length() && isspace(buf[bufpos]))
             ++bufpos;
     }

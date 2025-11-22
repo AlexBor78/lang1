@@ -1,7 +1,5 @@
-#include "ast/ast.h"
-#include <ast/visitor.h>
-
-#include <ast/stmt.h>
+#include <lang/ast/visitor.h>
+#include <lang/ast/stmt.h>
 
 namespace lang::ast
 {
@@ -91,37 +89,37 @@ namespace lang::ast
 
 // DeclVar
 
-    void DeclVar::accept(ConstASTVisitor& visitor) const noexcept
+    void DeclVariable::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_decl_var(*this);
     }
-    void DeclVar::accept(ASTVisitor& visitor) noexcept
+    void DeclVariable::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_decl_var(*this);
     }
 
-    const ExprNode* DeclVar::get_init_expr() const noexcept
+    const ExprNode* DeclVariable::get_init_expr() const noexcept
     {
         return init_expr.get();
     }
 
-// DeclFunc
+// DeclFunction
 
-    void DeclFunc::accept(ConstASTVisitor& visitor) const noexcept
+    void DeclFunction::accept(ConstASTVisitor& visitor) const noexcept
     {
         visitor.visit_decl_func(*this);
     }
-    void DeclFunc::accept(ASTVisitor& visitor) noexcept
+    void DeclFunction::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_decl_func(*this);
     }
 
-    const std::vector<std::unique_ptr<DeclVar>>& DeclFunc::get_args() const noexcept
+    const std::vector<std::unique_ptr<DeclVariable>>& DeclFunction::get_args() const noexcept
     {
         return args;
     }
 
-    const StmtNode* DeclFunc::get_body() const noexcept
+    const StmtNode* DeclFunction::get_body() const noexcept
     {
         return body.get();
     }

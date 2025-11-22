@@ -1,5 +1,5 @@
 #pragma once
-#include <ast/ast.h>
+#include <lang/ast/ast.h>
 #include <string_view>
 #include <vector>
 
@@ -12,7 +12,7 @@ namespace lang::ast
 
     protected:
         explicit LiteralExpr(std::string_view _literal
-        ,                    const Type* _type = nullptr
+        ,                    QualType _type
         ,                    Position _pos = default_pos()
         ):  ExprNode(_type
             ,        std::move(_pos)
@@ -32,7 +32,7 @@ namespace lang::ast
     {
     public:
         explicit NumberLiteral(std::string_view _literal
-        ,                      const Type* _type = nullptr
+        ,                      QualType _type
         ,                      Position _pos = default_pos()
         ):  LiteralExpr(_literal
             ,           _type
@@ -48,7 +48,7 @@ namespace lang::ast
     {
     public:
         explicit StringLiteral(std::string_view _literal
-        ,                      const Type* _type = nullptr
+        ,                      QualType _type
         ,                      Position _pos = default_pos()
         ):  LiteralExpr(_literal
             ,           _type
@@ -64,7 +64,7 @@ namespace lang::ast
     {
     public:
         explicit BoolLiteral(std::string_view _literal
-        ,                    const Type* _type = nullptr
+        ,                    QualType _type
         ,                    Position _pos = default_pos()
         ):  LiteralExpr(_literal
             ,           _type
@@ -83,9 +83,10 @@ namespace lang::ast
 
     public:
         explicit IdentifierExpr(std::string_view _name
-        ,                       const Type* _type = nullptr
+        ,                       QualType _type
         ,                       Position _pos = default_pos()
-        ):  ExprNode(std::move(_pos))
+        ):  ExprNode(_type
+            ,        std::move(_pos))
         ,   name(_name)
         {}
 
@@ -99,7 +100,7 @@ namespace lang::ast
     {
     public:
         explicit VariableExpr(std::string_view _name
-        ,                     const Type* _type = nullptr
+        ,                     QualType _type
         ,                     Position _pos = default_pos()
         ):  IdentifierExpr(_name
             ,              _type
@@ -118,7 +119,7 @@ namespace lang::ast
     public:
         NamespaceExpr(std::string_view _name
         ,             ExprPtr _identifier
-        ,             const Type* _type = nullptr
+        ,             QualType _type
         ,             Position _pos = default_pos()
         ):  IdentifierExpr(_name
             ,              _type
@@ -134,25 +135,25 @@ namespace lang::ast
         ExprNode* get_identifier() noexcept;
     };
 
-    class CallExpr : public ExprNode
+    class FunctionExpr : public ExprNode
     {
     private:
         std::string callee;
         std::vector<ExprPtr> args;
 
     public:
-        CallExpr(std::string_view _callee
+        FunctionExpr(std::string_view _callee
         ,        std::vector<ExprPtr>& _args
-        ,        const Type* _type = nullptr
+        ,        QualType _type
         ,        Position _pos = default_pos()
         ):  ExprNode(_type, std::move(_pos))
         ,   args(std::move(_args))
         ,   callee(_callee)
         {}
 
-        CallExpr(std::string_view _callee
+        FunctionExpr(std::string_view _callee
         ,        std::vector<ExprPtr> _args
-        ,        const Type* _type = nullptr
+        ,        QualType _type
         ,        Position _pos = default_pos()
         ):  ExprNode(_type, std::move(_pos))
         ,   args(std::move(_args))
@@ -171,30 +172,61 @@ namespace lang::ast
     {
     public: enum class OperatorKind
     {
+        // Assignment
         ASSIGN,     // =
+        ADD_ASSIGN,       // +=
+        SUB_ASSIGN,       // -=
+        MUL_ASSIGN,       // *=
+        DIV_ASSIGN,       // /=
+        MOD_ASSIGN,       // %=
+        AND_ASSIGN,       // &=
+        OR_ASSIGN,        // |=
+        XOR_ASSIGN,       // ^=
+        SHL_ASSIGN,       // <<=
+        SHR_ASSIGN,        // >>=
+
+        // Arithmetic
         PLUS,       // +
         MINUS,      // -
         STAR,       // *
         SLASH,      // /
         PERCENT,    // %
+
+        // Unary / Address / Dereference
+        AMPERSAND,  // &
+        BANG,       // !
+        TILDE,      // ~
+
+        // Increment / Decrement
+        INCREMENT,  // ++
+        DECREMENT,  // --
+
+        // Comparison
         EQ,         // ==
         NEQ,        // !=
         LT,         // <
         LE,         // <=
         GT,         // >
         GE,         // >=
-        BANG,       // !
+
+        // Logical
         AND,        // &&
         OR,         // ||
-        INCREMENT,  // ++
-        DECREMENT   // --
+
+        // Bitwise
+        BIT_OR,         // |
+        // BIT_AND = AMPERSAND, // &
+        BIT_XOR,        // ^
+        SHIFT_LEFT,     // <<
+        SHIFT_RIGHT     // >>
     };
+
     private:
         OperatorKind op;
         
     protected:
         explicit OperatorExpr(OperatorKind _op
-        ,                    const Type* _type = nullptr
+        ,                    QualType _type
         ,                    Position _pos = default_pos()
         ):  ExprNode(_type, std::move(_pos))
         ,   op(_op)
@@ -216,7 +248,7 @@ namespace lang::ast
         BinOpExpr(OperatorKind _op
         ,         ExprPtr _left
         ,         ExprPtr _right
-        ,         const Type* _type = nullptr
+        ,         QualType _type
         ,         Position _pos = default_pos()
         ):  OperatorExpr(_op
             ,           _type
@@ -243,9 +275,9 @@ namespace lang::ast
         ExprPtr operand;
 
     protected:
-        UnaryOpExpr(ExprPtr _operand
-        ,           OperatorKind _op
-        ,           const Type* _type = nullptr
+        UnaryOpExpr(OperatorKind _op
+        ,           ExprPtr _operand
+        ,           QualType _type
         ,           Position _pos = default_pos()
         ):  OperatorExpr(_op
             ,           _type
@@ -265,12 +297,12 @@ namespace lang::ast
     class PrefixUnaryOpExpr : public UnaryOpExpr
     {
     public:
-        PrefixUnaryOpExpr(ExprPtr _operand
-        ,                 OperatorKind _op
-        ,                 const Type* _type = nullptr
+        PrefixUnaryOpExpr(OperatorKind _op
+        ,                 ExprPtr _operand
+        ,                 QualType _type
         ,                 Position _pos = default_pos()
-        ):  UnaryOpExpr(std::move(_operand)
-            ,           _op
+        ):  UnaryOpExpr(_op
+            ,           std::move(_operand)
             ,           _type
             ,           std::move(_pos)
             )
@@ -283,12 +315,12 @@ namespace lang::ast
     class PostfixUnaryOpExpr : public UnaryOpExpr
     {
     public:
-        PostfixUnaryOpExpr(ExprPtr _operand
-        ,                  OperatorKind _op
-        ,                  const Type* _type = nullptr
+        PostfixUnaryOpExpr(OperatorKind _op
+        ,                  ExprPtr _operand
+        ,                  QualType _type
         ,                  Position _pos = default_pos()
-        ):  UnaryOpExpr(std::move(_operand)
-            ,           _op
+        ):  UnaryOpExpr(_op
+            ,           std::move(_operand)
             ,           _type
             ,           std::move(_pos)
             )

@@ -1,8 +1,7 @@
-#include "ast/expr.h"
 #include <print>
 #include <utility>
-#include <utils/utils.h>
-#include <utils/printast.h>
+#include <lang/utils/printast.h>
+#include <lang/utils/ast_utils.h>
 
 namespace lang::utils
 {
@@ -121,7 +120,7 @@ namespace lang::utils
         else println("null");
         remove_from_prefix(4);
     }
-    void PrintAST::visit_decl_var(const ast::DeclVar& node) noexcept
+    void PrintAST::visit_decl_var(const ast::DeclVariable& node) noexcept
     {
         println("DeclVar:");
         add_to_prefix();
@@ -134,7 +133,7 @@ namespace lang::utils
         else println("null");
         remove_from_prefix(4);
     }
-    void PrintAST::visit_decl_func(const ast::DeclFunc& node) noexcept
+    void PrintAST::visit_decl_func(const ast::DeclFunction& node) noexcept
     {
         println("DeclFunc:");
         add_to_prefix();
@@ -233,7 +232,7 @@ namespace lang::utils
         else println("null");
         remove_from_prefix(4);
     }
-    void PrintAST::visit_call_expr(const ast::CallExpr& node) noexcept
+    void PrintAST::visit_call_expr(const ast::FunctionExpr& node) noexcept
     {
         println("CallExpr:");
         add_to_prefix();
