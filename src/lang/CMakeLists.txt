@@ -31,6 +31,7 @@ set(sources
     src/utils/istream.cpp
     src/utils/ostream.cpp
     src/utils/stream.cpp
+    src/utils/logger.cpp
     src/utils/error.cpp
     src/utils/utils.cpp
 )

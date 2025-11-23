@@ -16,3 +16,8 @@ Makefile
 
 # VS Code
 .vscode/
+
+# logs
+logs/
+log/
+*.log
