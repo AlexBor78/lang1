@@ -15,8 +15,8 @@
         - [ ] implement OutputStream
         - [X] create ConsoleOSteam
         - [X] create ConsoleErrOSteam
-        - [ ] create FileOStream
-        - [ ] create StringOStream
+        - [X] create FileOStream
+        - [X] create StringOStream
 
 - [ ] done Logger
     - [X] add .log to gitignore
