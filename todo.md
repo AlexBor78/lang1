@@ -4,14 +4,14 @@
     - [ ] add more literals (0xFF, etc)
     - [X] use lexer api instead of stream api (use steam api IN imp of lexer api)
 
-- [ ] done streams
+- [X] done streams
     - [X] move stream.h to stream.h istream.h ostream.h
     - [X] done InputStream classes
         - [X] implement InputStream
         - [X] add StringIStream
         - [X] add FileIStream
         - [x] add ConsoleIStream
-    - [ ] done OutputStream classes
+    - [X] done OutputStream classes
         - [ ] implement OutputStream
         - [X] create ConsoleOSteam
         - [X] create ConsoleErrOSteam
