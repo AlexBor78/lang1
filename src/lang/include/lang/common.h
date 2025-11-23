@@ -2,12 +2,10 @@
 
 #include <string_view>
 
-// #define DEBUGING
-
 namespace lang
 {
     inline void debug_break() {
-        #ifdef DEBUGING
+        #ifdef DEBUGGING
             #if defined(__x86_64__) || defined(__i386__)
                 asm volatile ("int3");  // x86/x64
                 

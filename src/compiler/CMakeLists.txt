@@ -15,5 +15,9 @@ set(sources
 add_executable(${PROJECT_NAME} ${sources})
 target_link_libraries(${PROJECT_NAME} PUBLIC Lang)
 
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
+# for breakpoints in code for debug
+if(DEBUGGING)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUGGING)
+endif()
 
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)

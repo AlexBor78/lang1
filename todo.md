@@ -18,9 +18,10 @@
         - [X] create FileOStream
         - [X] create StringOStream
 
-- [X] done Logger
+- [ ] done Logger
     - [X] add .log to gitignore
     - [x] implement logger
+    - [ ] add colors to logger output
 
 - [ ] project code refactor
     - [ ] rename src/compiler folder to src/app or something similar
@@ -62,10 +63,10 @@
             - [X] in Lexer
             - [ ] in Parser
 
-    - [ ] upgrade build.sh script
-        - [ ] add build arg (debug)
-        - [ ] use multiple cores
-        - [ ] pass DEBUGING through flags
+    - [X] upgrade build.sh script
+        - [X] add build arg (debug)
+        - [X] use multiple cores
+        - [X] pass DEBUGING through flags
 
 - [ ] extend parser
     - [ ] add END token
