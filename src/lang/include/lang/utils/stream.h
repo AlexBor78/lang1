@@ -13,7 +13,7 @@ namespace lang::utils
     class AbstractStream
     {
     protected:
-        Position pos;
+        SourceLocation pos;
 
     protected:
         AbstractStream() = default;
@@ -26,7 +26,7 @@ namespace lang::utils
         virtual ~AbstractStream() = default;
         virtual bool good() const noexcept = 0;
         virtual bool bad() const noexcept = 0;
-        virtual Position get_pos() const = 0;
+        virtual SourceLocation get_pos() const = 0;
     };
 
     class InputStream : public AbstractStream
@@ -50,7 +50,7 @@ namespace lang::utils
         virtual bool is_eof(size_t n = 1) const;
         virtual bool good() const noexcept override;
         virtual bool bad() const noexcept override;
-        virtual Position get_pos() const override;
+        virtual SourceLocation get_pos() const override;
 
         virtual std::string read_word();
 
@@ -84,7 +84,7 @@ namespace lang::utils
     public:
         virtual bool good() const noexcept override;
         virtual bool bad() const noexcept override;
-        virtual Position get_pos() const override;
+        virtual SourceLocation get_pos() const override;
         
         virtual void write_word(std::string_view);
         virtual void write_line(std::string_view);

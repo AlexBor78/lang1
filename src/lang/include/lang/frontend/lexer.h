@@ -40,7 +40,7 @@ namespace lang::frontend::lexer
         char advance(size_t offset = 0);
         void skip(size_t n = 1);
 
-        Position get_pos() const;
+        SourceLocation get_pos() const;
         std::string read_word();
         void skip_whitespace();
 

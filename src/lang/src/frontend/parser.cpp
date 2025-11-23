@@ -90,34 +90,34 @@ namespace lang::frontend::parser
         return CompileError(std::format("expected bool, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
     CompileError Parser::tokens_nullptr(size_t offset) const noexcept {
-        return CompileError("tokens = nullptr", Position());
+        return CompileError("tokens = nullptr", SourceLocation());
     }
     CompileError Parser::strcut_is_not_suported(size_t offset) const noexcept {
-        return CompileError("strcut is currently not suported", Position());
+        return CompileError("strcut is currently not suported", SourceLocation());
     }
     CompileError Parser::enum_is_not_suported(size_t offset) const noexcept {
-        return CompileError("enum is currently not suported", Position());
+        return CompileError("enum is currently not suported", SourceLocation());
     }
     CompileError Parser::if_is_not_suported(size_t offset) const noexcept {
-        return CompileError("if is currently not suported", Position());
+        return CompileError("if is currently not suported", SourceLocation());
     }
     CompileError Parser::else_is_not_suported(size_t offset) const noexcept {
-        return CompileError("else is currently not suported", Position());
+        return CompileError("else is currently not suported", SourceLocation());
     }
     CompileError Parser::for_is_not_suported(size_t offset) const noexcept {
-        return CompileError("for is currently not suported", Position());
+        return CompileError("for is currently not suported", SourceLocation());
     }
     CompileError Parser::while_is_not_suported(size_t offset) const noexcept {
-        return CompileError("while is currently not suported", Position());
+        return CompileError("while is currently not suported", SourceLocation());
     }
     CompileError Parser::break_is_not_suported(size_t offset) const noexcept {
-        return CompileError("break is currently not suported", Position());
+        return CompileError("break is currently not suported", SourceLocation());
     }
     CompileError Parser::continue_is_not_suported(size_t offset) const noexcept {
-        return CompileError("continue is currently not suported", Position());
+        return CompileError("continue is currently not suported", SourceLocation());
     }
     CompileError Parser::multiple_module_decl_in_file(size_t offset) const noexcept {
-        return CompileError("multiple module in one file is not allowed", Position());
+        return CompileError("multiple module in one file is not allowed", SourceLocation());
     }
     CompileError Parser::unexpected_token(size_t offset) const noexcept {
         return CompileError(std::format("unexpected token: {}"

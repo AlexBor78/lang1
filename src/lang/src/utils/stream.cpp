@@ -49,11 +49,11 @@ namespace lang::utils
     }
 
     void InputStream::update_pos(char c) noexcept {
-        ++pos.start;
+        ++pos.start.column;
         if(c == '\n') {
-            ++pos.line;
-            pos.column = 0;
-        } else ++pos.column;
+            ++pos.start.line;
+            pos.start.column = 0;
+        } else ++pos.start.column;
     }
 
     void InputStream::load_to_buf(size_t offset) const {
@@ -68,7 +68,7 @@ namespace lang::utils
         }
     }
 
-    Position InputStream::get_pos() const {
+    SourceLocation InputStream::get_pos() const {
         check_stream();
         return pos;
     }
@@ -119,11 +119,11 @@ namespace lang::utils
     }
 
     void OutputStream::update_pos(char c) {
-        ++pos.start;
+        ++pos.start.column;
         if(c == '\n') {
-            ++pos.line;
-            pos.column = 0;
-        } else ++pos.column;
+            ++pos.start.line;
+            pos.start.column = 0;
+        } else ++pos.start.column;
     }
 
     void OutputStream::update_pos(std::string_view str) {
@@ -142,7 +142,7 @@ namespace lang::utils
         return ostream && ostream->bad();
     }
 
-    Position OutputStream::get_pos() const {
+    SourceLocation OutputStream::get_pos() const {
         check_stream();
         return pos;
     }

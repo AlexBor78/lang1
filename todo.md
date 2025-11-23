@@ -30,9 +30,9 @@
         - [ ] Lexer
         - [ ] Parser
 
-    - refactor Position
-        - [ ] rename Position to SourceLocation 
-        - [ ] add end pos (and remove length)
+    - [X] refactor Position
+        - [X] rename Position to SourceLocation 
+        - [X] add end pos (and remove length)
         - [X] set pos.line and pos.column in stream
 
     - [ ] refactor and extend Error

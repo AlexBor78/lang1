@@ -18,21 +18,39 @@ namespace lang::ast
     class BaseNode
     {
     private:
-        Position source_pos = {
+        SourceLocation source_pos = {
             .path = "null",
-            .line = 0,
-            .column = 0
-        };
-    protected:
-        static constexpr Position default_pos() noexcept 
-        {
-            return {
-                .path = "null",
+            .start = {
+                .index = 0,
                 .line = 0,
                 .column = 0
-            };
+            },
+            .end = {
+                .index = 0,
+                .line = 0,
+                .column = 0
+            },
+            .length = 0
+        };
+    protected:
+        static constexpr SourceLocation default_pos() noexcept 
+        {
+            return {
+            .path = "null",
+            .start = {
+                .index = 0,
+                .line = 0,
+                .column = 0
+            },
+            .end = {
+                .index = 0,
+                .line = 0,
+                .column = 0
+            },
+            .length = 0
+        };
         }
-        explicit BaseNode(Position _pos = default_pos()): 
+        explicit BaseNode(SourceLocation _pos = default_pos()): 
             source_pos(std::move(_pos))
         {}
 
@@ -40,14 +58,14 @@ namespace lang::ast
         virtual void accept(ConstASTVisitor&) const noexcept = 0;
         virtual void accept(ASTVisitor&) noexcept = 0;
         virtual ~BaseNode() = default;
-        Position get_source_pos() const noexcept;
-        void set_source_pos(const Position& pos) noexcept;
+        SourceLocation get_source_pos() const noexcept;
+        void set_source_pos(const SourceLocation& pos) noexcept;
     };
 
     class StmtNode : public BaseNode
     {
     protected:
-        explicit StmtNode(Position _pos = default_pos()):
+        explicit StmtNode(SourceLocation _pos = default_pos()):
             BaseNode(std::move(_pos))
         {}
     
@@ -63,7 +81,7 @@ namespace lang::ast
         
     protected:
         explicit ExprNode(QualType _type
-        ,                 Position _pos = default_pos()
+        ,                 SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
         ,    type(_type)
         {}

@@ -13,7 +13,7 @@ namespace lang::ast
     protected:
         explicit LiteralExpr(std::string_view _literal
         ,                    QualType _type
-        ,                    Position _pos = default_pos()
+        ,                    SourceLocation _pos = default_pos()
         ):  ExprNode(_type
             ,        std::move(_pos)
             )
@@ -33,7 +33,7 @@ namespace lang::ast
     public:
         explicit NumberLiteral(std::string_view _literal
         ,                      QualType _type
-        ,                      Position _pos = default_pos()
+        ,                      SourceLocation _pos = default_pos()
         ):  LiteralExpr(_literal
             ,           _type
             ,           std::move(_pos)
@@ -49,7 +49,7 @@ namespace lang::ast
     public:
         explicit StringLiteral(std::string_view _literal
         ,                      QualType _type
-        ,                      Position _pos = default_pos()
+        ,                      SourceLocation _pos = default_pos()
         ):  LiteralExpr(_literal
             ,           _type
             ,           std::move(_pos)
@@ -65,7 +65,7 @@ namespace lang::ast
     public:
         explicit BoolLiteral(std::string_view _literal
         ,                    QualType _type
-        ,                    Position _pos = default_pos()
+        ,                    SourceLocation _pos = default_pos()
         ):  LiteralExpr(_literal
             ,           _type
             ,           std::move(_pos)
@@ -84,7 +84,7 @@ namespace lang::ast
     public:
         explicit IdentifierExpr(std::string_view _name
         ,                       QualType _type
-        ,                       Position _pos = default_pos()
+        ,                       SourceLocation _pos = default_pos()
         ):  ExprNode(_type
             ,        std::move(_pos))
         ,   name(_name)
@@ -101,7 +101,7 @@ namespace lang::ast
     public:
         explicit VariableExpr(std::string_view _name
         ,                     QualType _type
-        ,                     Position _pos = default_pos()
+        ,                     SourceLocation _pos = default_pos()
         ):  IdentifierExpr(_name
             ,              _type
             ,              std::move(_pos)
@@ -120,7 +120,7 @@ namespace lang::ast
         NamespaceExpr(std::string_view _name
         ,             ExprPtr _identifier
         ,             QualType _type
-        ,             Position _pos = default_pos()
+        ,             SourceLocation _pos = default_pos()
         ):  IdentifierExpr(_name
             ,              _type
             ,              std::move(_pos)
@@ -145,7 +145,7 @@ namespace lang::ast
         FunctionExpr(std::string_view _callee
         ,        std::vector<ExprPtr>& _args
         ,        QualType _type
-        ,        Position _pos = default_pos()
+        ,        SourceLocation _pos = default_pos()
         ):  ExprNode(_type, std::move(_pos))
         ,   args(std::move(_args))
         ,   callee(_callee)
@@ -154,7 +154,7 @@ namespace lang::ast
         FunctionExpr(std::string_view _callee
         ,        std::vector<ExprPtr> _args
         ,        QualType _type
-        ,        Position _pos = default_pos()
+        ,        SourceLocation _pos = default_pos()
         ):  ExprNode(_type, std::move(_pos))
         ,   args(std::move(_args))
         ,   callee(_callee)
@@ -227,7 +227,7 @@ namespace lang::ast
     protected:
         explicit OperatorExpr(OperatorKind _op
         ,                    QualType _type
-        ,                    Position _pos = default_pos()
+        ,                    SourceLocation _pos = default_pos()
         ):  ExprNode(_type, std::move(_pos))
         ,   op(_op)
         {}
@@ -249,7 +249,7 @@ namespace lang::ast
         ,         ExprPtr _left
         ,         ExprPtr _right
         ,         QualType _type
-        ,         Position _pos = default_pos()
+        ,         SourceLocation _pos = default_pos()
         ):  OperatorExpr(_op
             ,           _type
             ,           std::move(_pos)
@@ -278,7 +278,7 @@ namespace lang::ast
         UnaryOpExpr(OperatorKind _op
         ,           ExprPtr _operand
         ,           QualType _type
-        ,           Position _pos = default_pos()
+        ,           SourceLocation _pos = default_pos()
         ):  OperatorExpr(_op
             ,           _type
             ,           std::move(_pos)
@@ -300,7 +300,7 @@ namespace lang::ast
         PrefixUnaryOpExpr(OperatorKind _op
         ,                 ExprPtr _operand
         ,                 QualType _type
-        ,                 Position _pos = default_pos()
+        ,                 SourceLocation _pos = default_pos()
         ):  UnaryOpExpr(_op
             ,           std::move(_operand)
             ,           _type
@@ -318,7 +318,7 @@ namespace lang::ast
         PostfixUnaryOpExpr(OperatorKind _op
         ,                  ExprPtr _operand
         ,                  QualType _type
-        ,                  Position _pos = default_pos()
+        ,                  SourceLocation _pos = default_pos()
         ):  UnaryOpExpr(_op
             ,           std::move(_operand)
             ,           _type

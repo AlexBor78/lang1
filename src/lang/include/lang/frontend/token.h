@@ -106,7 +106,7 @@ namespace lang::frontend
     struct Token
     {
         TokenType ty{TokenType::ILLEGAL};
-        Position pos;
+        SourceLocation pos;
         std::string sym;
     };
 }

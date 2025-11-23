@@ -16,7 +16,7 @@ namespace lang::frontend::parser
     private:
         std::vector<std::unique_ptr<ast::BaseNode>> ast;
         const std::vector<Token>* tokens{nullptr};
-        CompileError error = {"", Position()};
+        CompileError error = {"", SourceLocation()};
         
         TypeTable typetable;
         bool module_declared{false};

@@ -32,14 +32,14 @@ namespace lang
     class CompileError : public Error
     {
     private:
-        Position pos;
+        SourceLocation pos;
         std::string msg;
 
         void build_error();
 
     public:
         CompileError(const std::string& _msg, 
-              Position _pos
+              SourceLocation _pos
         ):  Error(_msg)
         ,   msg(_msg)
         ,   pos(std::move(_pos))

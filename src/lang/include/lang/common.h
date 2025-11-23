@@ -1,6 +1,7 @@
 #pragma once
 
-#include <string_view>
+#include <cstddef>
+#include <string>
 
 namespace lang
 {
@@ -17,12 +18,16 @@ namespace lang
         #endif
     }
 
-    struct Position
-    {
-        std::string_view path;
-        size_t line{0}; // unused
-        size_t column{0}; // unused
-        size_t start{0}; // character pos
+    struct FileLocation {
+        size_t index{0};
+        size_t line{0};
+        size_t column{0};
+    };
+
+    struct SourceLocation {
+        std::string path;
+        FileLocation start;
+        FileLocation end;
         size_t length{1};
     };
 }

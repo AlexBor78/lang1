@@ -105,7 +105,7 @@ namespace lang::frontend::lexer
         check_data();
         stream->skip_whitespace();
     }
-    Position Lexer::get_pos() const {
+    SourceLocation Lexer::get_pos() const {
         check_stream();
         return stream->get_pos();
     }
@@ -140,10 +140,10 @@ namespace lang::frontend::lexer
 
     void Lexer::tokenize_word() {
         debug_break();
-        Position pos = get_pos();
+        SourceLocation pos = get_pos();
         std::string buf = read_word();
         
-        pos.length = get_pos().start - pos.start;
+        pos.length = get_pos().start.index - pos.start.index;
         
         if(auto it = keywords.find(buf); it != keywords.end()) {
             add_token({
@@ -162,7 +162,7 @@ namespace lang::frontend::lexer
 
     void Lexer::tokenize_punct() {
         debug_break();
-        Position pos = get_pos();
+        SourceLocation pos = get_pos();
         std::string buf;
 
         for(int length = 3; length > 0; --length) {
@@ -187,7 +187,7 @@ namespace lang::frontend::lexer
 
     void Lexer::tokenize_number() {
         debug_break();
-        Position pos = get_pos();
+        SourceLocation pos = get_pos();
         std::string buf;
         bool has_dot{false};
         if(peek() == '.') {
@@ -199,7 +199,7 @@ namespace lang::frontend::lexer
                 if(has_dot) throw CompileError("wrong number format", pos);
                 has_dot = true;
             } buf += advance();
-        } pos.length = get_pos().start - pos.start;
+        } pos.length = get_pos().start.index - pos.start.index;
 
         add_token({
             .ty = TokenType::NUMBER,
@@ -210,7 +210,7 @@ namespace lang::frontend::lexer
 
     void Lexer::tokenize_string() {
         debug_break();
-        Position pos = get_pos();
+        SourceLocation pos = get_pos();
         std::string buf;
 
         skip(); // skip '"'
@@ -222,7 +222,7 @@ namespace lang::frontend::lexer
             } buf += advance();
         } skip(); // skip '"'
 
-        pos.length = get_pos().start - pos.start;
+        pos.length = get_pos().start.index - pos.start.index;
 
         add_token({
             .ty = TokenType::STRING,
