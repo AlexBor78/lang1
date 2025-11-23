@@ -17,15 +17,13 @@ namespace lang::utils
 
     protected:
         AbstractStream() = default;
-        Error stream_empty() const;
+        Error stream_null() const;
         Error stream_bad() const;
         Error reached_eof() const;
         Error passed_zero() const;
         
     public:
         virtual ~AbstractStream() = default;
-        // check for n tokens, is there n tokens befor eof
-        virtual bool is_eof(size_t n = 1) const = 0;
         virtual bool good() const noexcept = 0;
         virtual bool bad() const noexcept = 0;
         virtual Position get_pos() const = 0;
@@ -49,7 +47,7 @@ namespace lang::utils
         {}
 
     public:
-        virtual bool is_eof(size_t n = 1) const override;
+        virtual bool is_eof(size_t n = 1) const;
         virtual bool good() const noexcept override;
         virtual bool bad() const noexcept override;
         virtual Position get_pos() const override;
@@ -73,6 +71,10 @@ namespace lang::utils
     private:
         std::ostream* ostream{nullptr};
 
+        void check_stream() const;
+        void update_pos(char);
+        void update_pos(std::string_view);
+
     protected:
         void set_ostream(std::ostream*);
         explicit OutputStream(std::ostream* _stream = nullptr):
@@ -80,11 +82,12 @@ namespace lang::utils
         {}
 
     public:
-        virtual bool is_eof(size_t n = 1) const override = 0;
-        virtual Position get_pos() const override = 0;
+        virtual bool good() const noexcept override;
+        virtual bool bad() const noexcept override;
+        virtual Position get_pos() const override;
         
-        virtual void write_line(std::string_view) = 0;
-        virtual void write_word(std::string_view) = 0;
+        virtual void write_word(std::string_view);
+        virtual void write_line(std::string_view);
 
         template<typename... Args>
         void write_format_line(std::format_string<Args...> fmt, Args&&...) noexcept;

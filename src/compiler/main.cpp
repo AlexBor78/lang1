@@ -1,6 +1,7 @@
 #include <print>
 
 #include <lang/utils/istream.h>
+#include <lang/utils/ostream.h>
 #include <lang/frontend/lexer.h>
 #include <lang/frontend/parser.h>
 

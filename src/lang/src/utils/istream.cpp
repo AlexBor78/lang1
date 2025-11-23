@@ -13,8 +13,7 @@ namespace lang::utils
     }
 
     bool FileIStream::is_open() const noexcept {
-        if(!file) return false;
-        return file->is_open();
+        return file && file->is_open();
     }
 
 // StringStream

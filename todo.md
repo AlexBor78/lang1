@@ -13,15 +13,20 @@
         - [x] add ConsoleIStream
     - [ ] done OutputStream classes
         - [ ] implement OutputStream
-        - [ ] create ConsoleOSteam
-        - [ ] create ConsoleErrOSteam
+        - [X] create ConsoleOSteam
+        - [X] create ConsoleErrOSteam
         - [ ] create FileOStream
+        - [ ] create StringOStream
 
 - [ ] done Logger
     - [X] add .log to gitignore
     - [ ] implement logger
 
 - [ ] project code refactor
+    - [ ] upgrade build.sh script
+        - [ ] add build arg
+        - [ ] use multiple cores
+        - [ ] pass DEBUGING define through flags
     - [ ] rename src/compiler folder to src/app or something similar
     - [ ] update api
         - [ ] add and use match() function
@@ -69,9 +74,14 @@
     - [ ] pass paths to find modules
 
 - [ ] semantic...
+    - [X] create semantic types
+        - [X] identifier
+        - [X] scope
+        - [X] module
+        - [X] program
+
     - [ ] create semantic analysts
         - [ ] types creator
         - [ ] identifier checker
         - [ ] type checker
         - [ ] optimizer
-

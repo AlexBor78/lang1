@@ -1,10 +1,12 @@
+#include "lang/common.h"
 #include <lang/utils/stream.h>
+#include <string_view>
 
 namespace lang::utils
 {
 // AbstractStream
 
-    Error AbstractStream::stream_empty() const {
+    Error AbstractStream::stream_null() const {
         return Error("stream error: stream is empty");
     }
     Error AbstractStream::stream_bad() const {
@@ -42,7 +44,7 @@ namespace lang::utils
     }
 
     void InputStream::check_stream() const {
-        if(!istream) throw stream_empty();
+        if(!istream) throw stream_null();
         if(bad()) throw stream_bad();
     }
 
@@ -111,8 +113,48 @@ namespace lang::utils
 
 // OutputStream
 
+    void OutputStream::check_stream() const {
+        if(!ostream) throw stream_null();
+        if(bad()) throw stream_bad();
+    }
+
+    void OutputStream::update_pos(char c) {
+        ++pos.start;
+        if(c == '\n') {
+            ++pos.line;
+            pos.column = 0;
+        } else ++pos.column;
+    }
+
+    void OutputStream::update_pos(std::string_view str) {
+        for(const auto& c :str) update_pos(c);
+    }
+
     void OutputStream::set_ostream(std::ostream* _stream) {
         ostream = _stream;
+    }
+
+    bool OutputStream::good() const noexcept {
+        return ostream && ostream->good();
+    }
+
+    bool OutputStream::bad() const noexcept {
+        return ostream && ostream->bad();
+    }
+
+    Position OutputStream::get_pos() const {
+        check_stream();
+        return pos;
+    }
+
+    void OutputStream::write_word(std::string_view word) {
+        check_stream();
+        (*ostream) << word;
+        update_pos(word);
+    }
+    void OutputStream::write_line(std::string_view line) {
+        write_word(line);
+        write_word("\n");
     }
 
     template<typename... Args>

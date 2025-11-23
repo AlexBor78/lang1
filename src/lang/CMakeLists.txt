@@ -29,6 +29,7 @@ set(sources
     # utils
     src/utils/printast.cpp
     src/utils/istream.cpp
+    src/utils/ostream.cpp
     src/utils/stream.cpp
     src/utils/error.cpp
     src/utils/utils.cpp
