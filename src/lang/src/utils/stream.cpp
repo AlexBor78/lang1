@@ -1,202 +1,127 @@
-#include <lang/utils/error.h>
 #include <lang/utils/stream.h>
 
 namespace lang::utils
 {
-// StringStream
+// AbstractStream
 
-    bool StringIStream::is_end() const noexcept
-    {
-        return pos >= str.length();
+    Error AbstractStream::stream_empty() const {
+        return Error("stream error: stream is empty");
     }
-
-    std::string_view StringIStream::read_line()
-    {
-        if(is_end()) return "";
-        
-        // look for '\n' from curr pos
-        size_t start = pos;
-        size_t newline_pos = str.find('\n', pos);
-
-        if(newline_pos == std::string::npos) {
-            pos = str.length();
-            return std::string_view(str).substr(start);
-        }
-        
-        pos = newline_pos + 1;
-        return std::string_view(str).substr(start, newline_pos - start);
+    Error AbstractStream::stream_bad() const {
+        return Error("stream error: stream is bad");
     }
-
-    std::string_view StringIStream::read_word()
-    {
-        if(is_end()) return "";
-
-        size_t wordstart_pos = str.find_first_not_of(" \t\n", pos);
-        if(wordstart_pos == std::string::npos) {
-            pos = str.length();
-            return "";
-        }
-
-        size_t wordend_pos = str.find_first_of(" \t\n", wordstart_pos);
-        if(wordend_pos == std::string::npos) {
-            pos = str.length();
-            return std::string_view(str).substr(wordstart_pos);
-        }
-
-        pos = wordend_pos + 1;
-        return std::string_view(str).substr(wordstart_pos, wordend_pos - wordstart_pos);
+    Error AbstractStream::reached_eof() const {
+        return Error("stream error: reached eof");
     }
-
-    bool StringIStream::is_eof() const noexcept
-    {
-        return is_end();
-    }
-
-    Position StringIStream::get_pos() const
-    {
-        return {
-            .path = "code string literal",
-            .line = 0,
-            .column = pos
-        };
-    }
-
-    char StringIStream::curr() const
-    {        
-        if(is_end()) return 0;
-        return str[pos];
-    }
-
-    char StringIStream::peak(size_t offset) const
-    {
-        if(is_end()) return 0;
-        if(pos + offset < str.length())
-            return str[pos + offset];
-        return 0;
-    }
-
-    char StringIStream::next(size_t offset)
-    {
-        pos += offset;
-        if(is_end()) return 0;
-        if(pos + offset < str.length())
-            return str[pos];
-        return 0;
+    Error AbstractStream::passed_zero() const {
+        return Error("stream error: passed 0 to is_eof()");
     }
     
-    void StringIStream::skip_whitespace()
-    {
-        while(pos < str.length() && isspace(str[pos]))
-            ++pos;
+// InputStream
+
+    void InputStream::set_istream(std::istream* _istream) {
+        istream = _istream;
+        pos = {};
+        is_eof_reached = false;
     }
 
-// FileStream
+    bool InputStream::is_eof(size_t n) const {
+        if (n == 0) throw passed_zero();
+        if (lookahead_buffer.length() >= n) return false;
+        load_to_buf(n);
+        return lookahead_buffer.length() < n
+        && is_eof_reached;
+    }
 
-    void FileIStream::open(std::string_view _path)
-    {
-        file.close();
-        buf.clear();
-        path = _path;
-        bufpos = 0;
+    bool InputStream::good() const noexcept {
+        return istream && istream->good();
+    }
 
-        file.open(path);
-        if(!file.is_open()) {
-            throw Error("couldn't open file" + path);
+    bool InputStream::bad() const noexcept {
+        return istream && istream->bad();
+    }
+
+    void InputStream::check_stream() const {
+        if(!istream) throw stream_empty();
+        if(bad()) throw stream_bad();
+    }
+
+    void InputStream::update_pos(char c) noexcept {
+        ++pos.start;
+        if(c == '\n') {
+            ++pos.line;
+            pos.column = 0;
+        } else ++pos.column;
+    }
+
+    void InputStream::load_to_buf(size_t offset) const {
+        if(is_eof_reached) return;
+        while(lookahead_buffer.length() <= offset) {
+            auto c = istream->get();
+            if(c == EOF) {
+                is_eof_reached = true;
+                return;
+            }
+            lookahead_buffer += static_cast<char>(c);
         }
-        buf = {std::istreambuf_iterator<char>(file), {}};
     }
 
-    bool FileIStream::is_end() const noexcept
-    {
-        return bufpos >= buf.size();
+    Position InputStream::get_pos() const {
+        check_stream();
+        return pos;
     }
 
-    std::string_view FileIStream::read_line()
-    {
-        if(!file.is_open()) throw Error("file isn't open");
-        if(is_end()) return "";
-        
-        // look for '\n' from curr pos
-        size_t start = bufpos;
-        size_t newline_pos = buf.find('\n', bufpos);
-
-        if(newline_pos == std::string::npos) {
-            bufpos = buf.length();
-            return std::string_view(buf).substr(start);
-        }
-        
-        bufpos = newline_pos + 1;
-        return std::string_view(buf).substr(start, newline_pos - start);
+    char InputStream::peek(size_t offset) const {
+        check_stream();
+        if(is_eof(offset + 1)) throw reached_eof();
+        return lookahead_buffer[offset];
     }
 
-    std::string_view FileIStream::read_word()
-    {
-        if(!file.is_open()) throw Error("file isn't open");
-        if(is_end()) return "";
+    char InputStream::advance(size_t offset) {
+        check_stream();
+        if(is_eof(offset + 1)) throw reached_eof();
 
-        size_t wordstart_pos = buf.find_first_not_of(" \t\n", bufpos);
-        if(wordstart_pos == std::string::npos) {
-            bufpos = buf.length();
-            return "";
-        }
+        char c = lookahead_buffer[offset];
 
-        size_t wordend_pos = buf.find_first_of(" \t\n", wordstart_pos);
-        if(wordend_pos == std::string::npos) {
-            bufpos = buf.length();
-            return std::string_view(buf).substr(wordstart_pos);
-        }
+        for(size_t i = 0; i <= offset; ++i)
+            update_pos(lookahead_buffer[i]);
 
-        bufpos = wordend_pos + 1;
-        return std::string_view(buf).substr(wordstart_pos, wordend_pos - wordstart_pos);
+        lookahead_buffer.erase(lookahead_buffer.begin(), lookahead_buffer.begin() + offset + 1);
+        return c;
     }
 
-    bool FileIStream::is_eof() const noexcept
-    {
-        return is_end();
+    void InputStream::skip(size_t n) {
+        if(n == 0) return;
+        advance(n - 1);
     }
 
-    Position FileIStream::get_pos() const
-    {
-        if(!file.is_open()) throw Error("file isn't open");
-        return {
-            .path = path,
-            .line = 0,
-            .column = 0,
-            .start = bufpos
-        };
-    }
-
-    char FileIStream::curr() const
-    {        
-        if(!file.is_open()) throw Error("file isn't open");
-        if(is_end()) return 0;
-        return buf[bufpos];
-    }
-
-    char FileIStream::peak(size_t offset) const
-    {
-        if(!file.is_open()) throw Error("file isn't open");
-        if(is_end()) return 0;
-        if(bufpos + offset < buf.length())
-            return buf[bufpos + offset];
-        return 0;
-    }
-
-    char FileIStream::next(size_t offset)
-    {
-        if(!file.is_open()) throw Error("file isn't open");
-        bufpos += offset;
-        if(is_end()) return 0;
-        if(bufpos + offset < buf.length())
-            return buf[bufpos];
-        return 0;
+    std::string InputStream::read_word() {
+        check_stream();
+        std::string word;
+        for(char c = peek(); 
+            !is_eof() && (isalnum(c) || c == '_'); 
+            c = peek()) word += advance();
+        return std::move(word);
     }
     
-    void FileIStream::skip_whitespace()
-    {
-        if(!file.is_open()) throw Error("file isn't open");
-        while(bufpos < buf.length() && isspace(buf[bufpos]))
-            ++bufpos;
+    void InputStream::skip_whitespace() {
+        check_stream();
+        while(!is_eof() && isspace(peek())) skip();
     }
 
+// OutputStream
+
+    void OutputStream::set_ostream(std::ostream* _stream) {
+        ostream = _stream;
+    }
+
+    template<typename... Args>
+    void OutputStream::write_format_line(std::format_string<Args...> fmt, Args&&... args) noexcept {
+        write_line(std::format(fmt, std::forward<Args>(args)...));
+    }
+
+    template<typename... Args>
+    void OutputStream::write_format_word(std::format_string<Args...> fmt, Args&&... args) noexcept {
+        write_word(std::format(fmt, std::forward<Args>(args)...));
+    }
 }

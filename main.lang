@@ -1,6 +1,15 @@
 module main;
 import std;
 
+// one line comment
+
+/*
+    multi
+    line
+    comment
+    block
+*/
+
 int main() {
     std::println("Hello, World!");
 }

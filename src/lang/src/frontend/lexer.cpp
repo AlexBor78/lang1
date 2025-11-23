@@ -1,19 +1,30 @@
+#include <cstddef>
 #include <print>
 #include <cctype>
 #include <iostream>
-#include <stdexcept>
 
+#include <lang/common.h> //  debug_break()
 #include <lang/utils/error.h>
 #include <lang/frontend/lexer.h>
 
 namespace lang::frontend::lexer
 {
-    std::vector<Token> Lexer::tokenize(utils::InputStream& _stream) {
-        tokens.clear();
+// api
+    std::vector<Token> Lexer::tokenize(utils::InputStream* _stream) {
         stream = _stream;
-        while(!stream.is_eof()) try {
-            if(isspace(stream.curr())) {
-                stream.skip_whitespace();
+        return tokenize();
+    }
+    std::vector<Token> Lexer::tokenize() {
+        debug_break();
+        tokens.clear();
+        while(!is_eof()) try {
+            // for ConsoleIStream:
+            // stop if got ctrl^D on POSIX or ctr+Z on shitdows
+            if (peek() == '\x04' || peek() == '\x1A') {
+                break;
+            }
+            if(isspace(peek())) {
+                skip_whitespace();
                 continue;
             }
             if(is_number()) {
@@ -35,44 +46,104 @@ namespace lang::frontend::lexer
             
             tokenize_punct();
         } catch(const std::exception& e) {
-            std::println(std::cerr, "lexer error: {}", e.what());
-            stream.next();
-        } return tokens;
+            std::println(std::cerr, "{}", e.what());
+            if(!is_eof()) skip();
+            else break;
+        }
+        // tokens.emplace_back(Token{
+        //     .ty = TokenType::END
+        // });
+        tokens.shrink_to_fit();
+        return tokens;
     }
+
+// stream working
+
+    Error Lexer::stream_null() const {
+        return Error("lexer error: stream is null");
+    }
+    Error Lexer::stream_bad() const {
+        return Error("lexer error: stream is bad");
+    }
+    Error Lexer::reached_eof() const {
+        return Error("lexer error: reached eof");
+    }
+    Error Lexer::word_start_num() const {
+        return Error("lexer error: word can not starts from number");
+    }
+    Error Lexer::not_closed_block() const {
+        return Error("lexer error: \"/*\" comment block is not closed");
+    }
+
+    void Lexer::check_stream() const {
+        if(!stream) throw stream_null();
+        if(stream->bad()) throw stream_bad();
+    }
+    void Lexer::check_data() const {
+        if(is_eof()) throw reached_eof();
+    }
+    bool Lexer::is_eof(size_t n) const {
+        check_stream();
+        return stream->is_eof(n);
+    }
+    char Lexer::peek(size_t offset) const {
+        check_data();
+        return stream->peek(offset);
+    }
+    char Lexer::advance(size_t offset) {
+        check_data();
+        return stream->advance(offset);
+    }
+    void Lexer::skip(size_t n) {
+        stream->skip(n);
+    }
+    std::string Lexer::read_word() {
+        check_data();
+        return stream->read_word();
+    }
+    void Lexer::skip_whitespace() {
+        check_data();
+        stream->skip_whitespace();
+    }
+    Position Lexer::get_pos() const {
+        check_stream();
+        return stream->get_pos();
+    }
+
+// tokenizing
 
     void Lexer::add_token(Token tok) {
         tokens.emplace_back(tok);
     }
 
     bool Lexer::is_word() const noexcept {
-        return isalpha(stream.curr()) || stream.curr() == '_';
+        if(is_eof()) return false;
+        return isalnum(peek()) || peek() == '_';
     }
 
     bool Lexer::is_number() const noexcept {
-        return isdigit(stream.curr())
-        ||     stream.curr() == '.' && isdigit(stream.peak());
+        if(is_eof()) return false;
+        return isdigit(peek())
+        ||     peek() == '.' && isdigit(peek(1));
     }
 
     bool Lexer::is_string() const noexcept {
-        return stream.curr() == '"';
+        if(is_eof()) return false;
+        return peek() == '"';
     }
 
     bool Lexer::is_comment() const noexcept {
-        if(stream.curr() != '/') return false;
-        return stream.peak() == '/'
-        ||     stream.peak() == '*';
+        if(is_eof() || peek() != '/') return false;
+        return peek(1) == '/'
+        ||     peek(1) == '*';
     }
 
-    void Lexer::tokenize_word()     {
-        Position pos = stream.get_pos();
-        std::string buf;
-
-        buf += stream.curr();
-        while(!stream.is_eof() && (isalnum(stream.peak()) || stream.peak() == '_'))
-            buf += stream.next();
+    void Lexer::tokenize_word() {
+        debug_break();
+        Position pos = get_pos();
+        std::string buf = read_word();
         
-        stream.next();
-        pos.length = stream.get_pos().start - pos.start;
+        pos.length = get_pos().start - pos.start;
         
         if(auto it = keywords.find(buf); it != keywords.end()) {
             add_token({
@@ -90,43 +161,45 @@ namespace lang::frontend::lexer
     }
 
     void Lexer::tokenize_punct() {
-        Position pos = stream.get_pos();
+        debug_break();
+        Position pos = get_pos();
         std::string buf;
 
         for(int length = 3; length > 0; --length) {
+            if(is_eof(length)) continue;
+
             pos.length = length;
             buf.clear();
 
             for(int i = 0; i < length; ++i)
-                buf += stream.peak(i);
+                buf += peek(i);
 
             if(auto it = keywords.find(buf); it != keywords.end()) {
-                stream.next(length);
+                skip(length);
                 add_token({ 
                     .ty = it->second,
                     .pos = pos,
                     .sym = std::move(buf)
-                });
-                return;
+                }); return;
             }
         }
     }
 
     void Lexer::tokenize_number() {
-        Position pos = stream.get_pos();
+        debug_break();
+        Position pos = get_pos();
         std::string buf;
         bool has_dot{false};
-        if(stream.curr() == '.') {
+        if(peek() == '.') {
             buf += '0';
         }
 
-        while(!stream.is_eof() && is_number()) {
-            if(stream.curr() == '.') {
+        while(!is_eof() && is_number()) {
+            if(peek() == '.') {
                 if(has_dot) throw CompileError("wrong number format", pos);
                 has_dot = true;
-            } buf += stream.curr();
-            stream.next();
-        } pos.length = stream.get_pos().start - pos.start;
+            } buf += advance();
+        } pos.length = get_pos().start - pos.start;
 
         add_token({
             .ty = TokenType::NUMBER,
@@ -136,20 +209,20 @@ namespace lang::frontend::lexer
     }
 
     void Lexer::tokenize_string() {
-        Position pos = stream.get_pos();
+        debug_break();
+        Position pos = get_pos();
         std::string buf;
-        buf += stream.next();
 
-        while(!stream.is_eof() && stream.peak() != '"') {
-            if(stream.peak() == '\\') {
-                stream.next(); // skip previous char
+        skip(); // skip '"'
+        while(!is_eof() && peek() != '"') {
+            if(peek() == '\\') {
+                skip(); // skip '\'
                 buf += tokenize_escape();
-                stream.next(); // skip  '\'
                 continue;
-            } buf += stream.next();
-        } stream.next(2); // skip curr tok(char) and next('"')
+            } buf += advance();
+        } skip(); // skip '"'
 
-        pos.length = stream.get_pos().start - pos.start;
+        pos.length = get_pos().start - pos.start;
 
         add_token({
             .ty = TokenType::STRING,
@@ -159,32 +232,39 @@ namespace lang::frontend::lexer
     }
 
     char Lexer::tokenize_escape() {
-        switch (stream.peak()) {
-            case ('\\'):    return '\\';
-            case ('\"'):    return '\"';
-            case ('n'):     return '\n';
-            case ('t'):     return '\t';
-            case ('u'):     throw CompileError("Unicode is not supported", stream.get_pos());
-            case ('U'):     throw CompileError("Unicode is not supported", stream.get_pos());
-            default:        return stream.curr();
+        debug_break();
+        switch (peek()) {
+            case ('\\'):    skip(); return '\\';
+            case ('\"'):    skip(); return '\"';
+            case ('n'):     skip(); return '\n';
+            case ('t'):     skip(); return '\t';
+            case ('u'):     throw CompileError("Unicode is not supported", get_pos());
+            case ('U'):     throw CompileError("Unicode is not supported", get_pos());
+            default:        return peek();
         }
     }
 
     void Lexer::process_comment(){
-        if(stream.curr() != '/') return;
-        if(stream.peak() == '/') process_comment_line();
-        if(stream.peak() == '*') process_comment_block();
+        if(peek() != '/') return;
+        if(peek(1) == '/') process_comment_line();
+        if(peek(1) == '*') process_comment_block();
     }
 
     void Lexer::process_comment_line() {
-        stream.read_line();
+        debug_break();
+        skip(2); // skip "//"
+        while(!is_eof() && peek() != '\n') skip();
     }
     void Lexer::process_comment_block() {
-        stream.next(2);
-        while(!stream.is_eof()
-        &&    stream.curr() != '*'
-        &&    stream.peak() != '/') {
-            stream.next();
-        } stream.next(2);
+        debug_break();
+        skip(2); // skip "/*"
+        while(!is_eof(2)) {
+            if(peek(0) == '*'
+            && peek(1) == '/') {
+                skip(2); // sip "*/"
+                return;
+            }
+            skip();
+        } throw not_closed_block();
     }
 }

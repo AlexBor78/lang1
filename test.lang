@@ -1,3 +1,9 @@
+// AI generated test
+
+/*
+    multi line comment
+*/
+
 module test;
 import std;
 
@@ -32,35 +38,34 @@ namespace utils {
         i &= 15;
         i |= 8;
         i ^= 3;
-        i = i << 1;
-        i = i >> 1;
+        i <<= 1;
+        i >>= 1;
     }
 }
 
 const int GLOBAL_CONST = 42;
 
 int main() {
+    // Базовые выражения
     std::println("Testing parser...");
     
+    // Арифметика
     int a = 10;
     int b = 20;
-    int c = 123456789;
-    double d1 = 3.14;
-    double d2 = 0.5;
-    double d3 = 123.456;
+    int c = a + b;
+    int d = a - b;
+    int e = a * b;
+    int f = b / a;
+    int g = b % a;
     
-    int e = a + b;
-    int f = a - b;
-    int g = a * b;
-    int h = b / a;
-    int i = b % a;
-    
+    // Логические операции
     bool flag1 = true;
     bool flag2 = false;
     bool result1 = flag1 && flag2;
     bool result2 = flag1 || flag2;
     bool result3 = !flag1;
     
+    // Побитовые операции
     int x = 12;
     int y = 10;
     int bit_and = x & y;
@@ -70,6 +75,7 @@ int main() {
     int shift_left = x << 2;
     int shift_right = x >> 1;
     
+    // Сравнения
     bool cmp1 = a == b;
     bool cmp2 = a != b;
     bool cmp3 = a < b;
@@ -77,9 +83,11 @@ int main() {
     bool cmp5 = a > b;
     bool cmp6 = a >= b;
     
+    // Вызовы функций
     int sum = math::add(5, 7);
     int power = math::pow(2, 8);
     
+    // Составные присваивания
     int counter = 0;
     counter += 5;
     counter -= 2;
@@ -89,19 +97,26 @@ int main() {
     counter &= 15;
     counter |= 8;
     counter ^= 3;
+    counter <<= 1;
+    counter >>= 1;
     
+    // Инкременты/декременты
     int idx = 0;
     idx++;
     ++idx;
     idx--;
     --idx;
     
-    int complex = a + b * c - d1 / e % f;
-    int with_parens = (a + b) * (c - d1);
+    // Приоритет операторов
+    int complex = a + b * c - d / e % f;
+    int with_parens = (a + b) * (c - d);
+    int mixed = a * b + c / d - e % f & g | h;
     
+    // Возврат значения
     return 0;
 }
 
+// Еще один модуль для проверки импортов
 namespace extra {
     const int VALUE = 100;
     
