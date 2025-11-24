@@ -1,5 +1,6 @@
 #pragma once
 
+#include "lang/common.h"
 #include <vector>
 
 #include <lang/utils/error.h>
@@ -26,11 +27,15 @@ namespace lang::frontend::lexer
 
     private: // stream working
 
-        Error stream_null() const;
-        Error stream_bad() const;
-        Error reached_eof() const;
-        Error word_start_num() const;
-        Error not_closed_block() const;
+        errors::LexerError stream_null() const;
+        errors::LexerError stream_bad() const;
+        errors::LexerError reached_eof() const;
+
+        errors::LexerError word_start_num(SourceLocation) const;
+        errors::LexerError not_closed_block(SourceLocation) const;
+        errors::LexerError not_closed_string(SourceLocation) const;
+        errors::LexerError wrong_number_format(SourceLocation) const;
+        errors::LexerError unicode_not_suported(SourceLocation) const;
 
         void check_stream() const;
         void check_data() const;
@@ -40,6 +45,7 @@ namespace lang::frontend::lexer
         char advance(size_t offset = 0);
         void skip(size_t n = 1);
 
+        static SourceLocation update_pos(SourceLocation, char) noexcept;
         SourceLocation get_pos() const;
         std::string read_word();
         void skip_whitespace();

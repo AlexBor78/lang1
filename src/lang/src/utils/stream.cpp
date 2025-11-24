@@ -1,22 +1,22 @@
-#include "lang/common.h"
-#include <lang/utils/stream.h>
+#include <lang/utils/error.h>
 #include <string_view>
+#include <lang/utils/stream.h>
 
 namespace lang::utils
 {
 // AbstractStream
 
-    Error AbstractStream::stream_null() const {
-        return Error("stream error: stream is empty");
+    errors::InterError AbstractStream::stream_null() const {
+        return errors::InterError("stream error: stream is empty");
     }
-    Error AbstractStream::stream_bad() const {
-        return Error("stream error: stream is bad");
+    errors::InterError AbstractStream::stream_bad() const {
+        return errors::InterError("stream error: stream is bad");
     }
-    Error AbstractStream::reached_eof() const {
-        return Error("stream error: reached eof");
+    errors::InterError AbstractStream::reached_eof() const {
+        return errors::InterError("stream error: reached eof");
     }
-    Error AbstractStream::passed_zero() const {
-        return Error("stream error: passed 0 to is_eof()");
+    errors::InterError AbstractStream::passed_zero() const {
+        return errors::InterError("stream error: passed 0 to is_eof()");
     }
     
 // InputStream
@@ -119,11 +119,12 @@ namespace lang::utils
     }
 
     void OutputStream::update_pos(char c) {
-        ++pos.start.column;
-        if(c == '\n') {
-            ++pos.start.line;
-            pos.start.column = 0;
-        } else ++pos.start.column;
+        ++pos.length;
+        ++pos.end.index;
+        if(c == 'n') {
+            ++pos.end.line;
+            pos.end.column = 0;
+        } else ++pos.end.column;
     }
 
     void OutputStream::update_pos(std::string_view str) {
@@ -155,15 +156,5 @@ namespace lang::utils
     void OutputStream::write_line(std::string_view line) {
         write_word(line);
         write_word("\n");
-    }
-
-    template<typename... Args>
-    void OutputStream::write_format_line(std::format_string<Args...> fmt, Args&&... args) noexcept {
-        write_line(std::format(fmt, std::forward<Args>(args)...));
-    }
-
-    template<typename... Args>
-    void OutputStream::write_format_word(std::format_string<Args...> fmt, Args&&... args) noexcept {
-        write_word(std::format(fmt, std::forward<Args>(args)...));
     }
 }

@@ -59,20 +59,29 @@ namespace lang::frontend::lexer
 
 // stream working
 
-    Error Lexer::stream_null() const {
-        return Error("lexer error: stream is null");
+    errors::LexerError Lexer::stream_null() const {
+        return errors::LexerError("lexer error: stream is null");
     }
-    Error Lexer::stream_bad() const {
-        return Error("lexer error: stream is bad");
+    errors::LexerError Lexer::stream_bad() const {
+        return errors::LexerError("lexer error: stream is bad");
     }
-    Error Lexer::reached_eof() const {
-        return Error("lexer error: reached eof");
+    errors::LexerError Lexer::reached_eof() const {
+        return errors::LexerError("lexer error: reached eof");
     }
-    Error Lexer::word_start_num() const {
-        return Error("lexer error: word can not starts from number");
+    errors::LexerError Lexer::word_start_num(SourceLocation pos) const {
+        return errors::LexerError("lexer error: word can not starts from number", pos);
     }
-    Error Lexer::not_closed_block() const {
-        return Error("lexer error: \"/*\" comment block is not closed");
+    errors::LexerError Lexer::not_closed_block(SourceLocation pos) const {
+        return errors::LexerError("lexer error: \"/*\" comment block is not closed", pos);
+    }
+    errors::LexerError Lexer::not_closed_string(SourceLocation pos) const {
+        return errors::LexerError("lexer error: string block is not closed", pos);
+    }
+    errors::LexerError Lexer::wrong_number_format(SourceLocation pos) const {
+        return errors::LexerError("lexer error: wrong number format", pos);
+    }
+    errors::LexerError Lexer::unicode_not_suported(SourceLocation pos) const {
+        return errors::LexerError("lexer error: Unicode is not supported (yet)", pos);
     }
 
     void Lexer::check_stream() const {
@@ -104,6 +113,15 @@ namespace lang::frontend::lexer
     void Lexer::skip_whitespace() {
         check_data();
         stream->skip_whitespace();
+    }
+    SourceLocation Lexer::update_pos(SourceLocation pos, char c) noexcept {
+        ++pos.length;
+        ++pos.end.index;
+        if(c == 'n') {
+            ++pos.end.line;
+            pos.end.column = 0;
+        } else ++pos.end.column;
+        return pos;
     }
     SourceLocation Lexer::get_pos() const {
         check_stream();
@@ -160,6 +178,7 @@ namespace lang::frontend::lexer
         });
     }
 
+    // TODO: right process pos
     void Lexer::tokenize_punct() {
         debug_break();
         SourceLocation pos = get_pos();
@@ -169,6 +188,10 @@ namespace lang::frontend::lexer
             if(is_eof(length)) continue;
 
             pos.length = length;
+            pos.end.line = pos.start.line;
+            pos.end.index = pos.start.index + length;
+            pos.end.column = pos.start.column + length;
+
             buf.clear();
 
             for(int i = 0; i < length; ++i)
@@ -196,10 +219,11 @@ namespace lang::frontend::lexer
 
         while(!is_eof() && is_number()) {
             if(peek() == '.') {
-                if(has_dot) throw CompileError("wrong number format", pos);
+                update_pos(pos, peek());
+                if(has_dot) throw wrong_number_format(pos);
                 has_dot = true;
             } buf += advance();
-        } pos.length = get_pos().start.index - pos.start.index;
+        }
 
         add_token({
             .ty = TokenType::NUMBER,
@@ -215,14 +239,15 @@ namespace lang::frontend::lexer
 
         skip(); // skip '"'
         while(!is_eof() && peek() != '"') {
+            update_pos(pos, peek());
             if(peek() == '\\') {
-                skip(); // skip '\'
                 buf += tokenize_escape();
                 continue;
             } buf += advance();
-        } skip(); // skip '"'
-
-        pos.length = get_pos().start.index - pos.start.index;
+        }
+        if(is_eof()) throw not_closed_string(pos);
+        skip(); // skip '"'
+        
 
         add_token({
             .ty = TokenType::STRING,
@@ -233,19 +258,26 @@ namespace lang::frontend::lexer
 
     char Lexer::tokenize_escape() {
         debug_break();
+        auto pos = get_pos();
+        ++pos.end.column;
+        ++pos.end.index;
+        ++pos.end.line;
+        ++pos.length;
+
+        skip(); // skip '\'
         switch (peek()) {
             case ('\\'):    skip(); return '\\';
             case ('\"'):    skip(); return '\"';
             case ('n'):     skip(); return '\n';
             case ('t'):     skip(); return '\t';
-            case ('u'):     throw CompileError("Unicode is not supported", get_pos());
-            case ('U'):     throw CompileError("Unicode is not supported", get_pos());
-            default:        return peek();
+            case ('u'):     throw unicode_not_suported(pos);
+            case ('U'):     throw unicode_not_suported(pos);
+            default:        return advance(); // skip char
         }
     }
 
     void Lexer::process_comment(){
-        if(peek() != '/') return;
+        if(peek(0) != '/') return;
         if(peek(1) == '/') process_comment_line();
         if(peek(1) == '*') process_comment_block();
     }
@@ -257,14 +289,15 @@ namespace lang::frontend::lexer
     }
     void Lexer::process_comment_block() {
         debug_break();
+        auto pos = get_pos();
         skip(2); // skip "/*"
         while(!is_eof(2)) {
+            update_pos(pos, peek());
             if(peek(0) == '*'
             && peek(1) == '/') {
                 skip(2); // sip "*/"
                 return;
-            }
-            skip();
-        } throw not_closed_block();
+            } skip(); 
+        } throw not_closed_block(pos);
     }
 }

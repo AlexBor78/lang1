@@ -18,37 +18,10 @@ namespace lang::ast
     class BaseNode
     {
     private:
-        SourceLocation source_pos = {
-            .path = "null",
-            .start = {
-                .index = 0,
-                .line = 0,
-                .column = 0
-            },
-            .end = {
-                .index = 0,
-                .line = 0,
-                .column = 0
-            },
-            .length = 0
-        };
+        SourceLocation source_pos = {};
     protected:
-        static constexpr SourceLocation default_pos() noexcept 
-        {
-            return {
-            .path = "null",
-            .start = {
-                .index = 0,
-                .line = 0,
-                .column = 0
-            },
-            .end = {
-                .index = 0,
-                .line = 0,
-                .column = 0
-            },
-            .length = 0
-        };
+        static constexpr inline SourceLocation default_pos() noexcept {
+            return SourceLocation{};
         }
         explicit BaseNode(SourceLocation _pos = default_pos()): 
             source_pos(std::move(_pos))

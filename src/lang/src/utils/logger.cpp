@@ -1,7 +1,27 @@
+#include <lang/utils/error.h>
 #include <lang/utils/logger.h>
 
 namespace lang::utils
 {
+    void Logger::set_prefix(std::string_view _prefix) noexcept {
+        prefix = _prefix;
+    }
+    std::string_view Logger::get_prefix() const noexcept {
+        return prefix;
+    }
+    void Logger::remove_prefix() noexcept {
+        prefix = "";
+    }
+    void Logger::set_name(std::string_view _name) noexcept {
+        name = _name;
+    }
+    std::string_view Logger::get_name() const noexcept {
+        return name;
+    }
+    void Logger::remove_name() noexcept {
+        name = "";
+    }
+
     Logger::LogLevel Logger::get_level() const  noexcept {
         return level;
     }
@@ -16,11 +36,11 @@ namespace lang::utils
             static_cast<uint8_t>(level) & ~static_cast<uint8_t>(lvl));
     }
 
-    Error Logger::stream_null() const {
-        return Error("logger error: stream is null");
+    errors::InterError Logger::stream_null() const {
+        return errors::InterError("logger error: stream is null");
     }
-    Error Logger::stream_bad() const {
-        return Error("logger error: stream is bad");
+    errors::InterError Logger::stream_bad() const {
+        return errors::InterError("logger error: stream is bad");
     }
 
     void Logger::set_infostream(std::unique_ptr<OutputStream> stream) noexcept {
@@ -38,46 +58,30 @@ namespace lang::utils
         return  errstream && !errstream->bad();
     }
     
-    template<typename... Args>
-    void Logger::debug(std::format_string<Args...> fmt, Args&&... args) noexcept {
-        debug(std::format(fmt, std::forward<Args>(args)...));
-    }
     void Logger::debug(const std::string& line) {
         if(!(level & Logger::LogLevel::DEBUG)) return;
         check_infostream();
-        infostream->write_line("[DEBUG]" + line);
-    }
-    template<typename... Args>
-    void Logger::log(std::format_string<Args...> fmt, Args&&... args) noexcept {
-        log(std::format(fmt, std::forward<Args>(args)...));
+        infostream->write_line("{} [{} DEBUG] {}", prefix, name, line);
     }
     void Logger::log(const std::string& line) {
         if(!(level & Logger::LogLevel::INFO)) return;
         check_infostream();
-        infostream->write_line("[INFO]" + line);
-    }
-    template<typename... Args>
-    void Logger::warn(std::format_string<Args...> fmt, Args&&... args) noexcept {
-        warn(std::format(fmt, std::forward<Args>(args)...));
+        infostream->write_line("{} [{} INFO] {}", prefix, name, line);
     }
     void Logger::warn(const std::string& line) {
         if(!(level & Logger::LogLevel::WARN)) return;
-        if(check_errstream()) errstream->write_line("[WARN]" + line);
+        if(check_errstream()) errstream->write_line("{}[{} WARN]", prefix, name, line);
         else {  
             check_infostream();
-            infostream->write_line("[WARN]" + line);  
+            infostream->write_line("{} [{} WARN]", prefix, name, line);  
         } 
-    }
-    template<typename... Args>
-    void Logger::error(std::format_string<Args...> fmt, Args&&... args) noexcept {
-        error(std::format(fmt, std::forward<Args>(args)...));
     }
     void Logger::error(const std::string& line) {
         if(!(level & Logger::LogLevel::ERROR)) return;
-        if(check_errstream()) errstream->write_line("[WARN]" + line);
+        if(check_errstream()) errstream->write_line("{} [{} ERROR]", prefix, name, line);
         else {  
             check_infostream();
-            infostream->write_line("[ERROR]" + line);  
+            infostream->write_line("{} [{} ERROR]", prefix, name, line);  
         } 
     }
 }

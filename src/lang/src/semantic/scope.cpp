@@ -61,7 +61,7 @@ namespace lang::semantic
     }
 
     void Scope::add_identifier(std::unique_ptr<Identifier> identifier) {
-        if(contains_local(identifier->name)) throw Error("Re-addition of identifier to scope");
+        if(contains_local(identifier->name)) throw errors::InterError("Re-addition of identifier to scope");
         identifiers[identifier->name] = std::move(identifier);
     }
 }

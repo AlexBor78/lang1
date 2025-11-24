@@ -1,8 +1,8 @@
 #pragma once
-
 #include <format>
 #include <memory>
-#include <lang/utils/error.h>
+#include <string>
+#include <string_view>
 #include <lang/utils/ostream.h>
 
 #define LOGLEVEL ::lang::utils::Logger::LogLevel::DEBUG
@@ -13,8 +13,12 @@
 
 #endif
 
+namespace lang::errors {
+    class InterError;
+}
 namespace lang::utils
 {
+    class ConsoleOStream;
     class Logger
     {
     public:
@@ -24,20 +28,31 @@ namespace lang::utils
             DEBUG = 1 << 0, // infostream
             INFO  = 1 << 1, // infostream 
             WARN  = 1 << 2, // errsteam
-            ERROR = 1 << 3  // errsteam
+            ERROR = 1 << 3,  // errsteam
+            ALL   = DEBUG | INFO | WARN | ERROR
         };
     private:
         LogLevel level{LogLevel::WARN};
+        std::string prefix;
+        std::string name;
         std::unique_ptr<OutputStream> infostream{nullptr};
         std::unique_ptr<OutputStream> errstream{nullptr};
 
-        Error stream_null() const;
-        Error stream_bad() const;
+        errors::InterError stream_null() const;
+        errors::InterError stream_bad() const;
 
         void check_infostream() const;
         bool check_errstream() const;
 
     public:
+        void set_prefix(std::string_view) noexcept;
+        std::string_view get_prefix() const noexcept;
+        void remove_prefix() noexcept;
+
+        void set_name(std::string_view) noexcept;
+        std::string_view get_name() const noexcept;
+        void remove_name() noexcept;
+
         LogLevel get_level() const  noexcept;
         void set_level(LogLevel) noexcept;
         void add_level(LogLevel) noexcept;
@@ -58,22 +73,30 @@ namespace lang::utils
 
         // debug lvl
         template<typename... Args>
-        void debug(std::format_string<Args...> fmt, Args&&...) noexcept;
+        void debug(std::format_string<Args...> fmt, Args&&... args) noexcept {
+            debug(std::format(fmt, std::forward<Args>(args)...));
+        }
         void debug(const std::string&);
 
         // info lvl
         template<typename... Args>
-        void log(std::format_string<Args...> fmt, Args&&...) noexcept;
+        void log(std::format_string<Args...> fmt, Args&&... args) noexcept {
+            log(std::format(fmt, std::forward<Args>(args)...));
+        }
         void log(const std::string&);
 
         // warn lvl
         template<typename... Args>
-        void warn(std::format_string<Args...> fmt, Args&&...) noexcept;
+        void warn(std::format_string<Args...> fmt, Args&&... args) noexcept {
+            warn(std::format(fmt, std::forward<Args>(args)...));
+        }
         void warn(const std::string&);
 
         // error lvl
         template<typename... Args>
-        void error(std::format_string<Args...> fmt, Args&&...) noexcept;
+        void error(std::format_string<Args...> fmt, Args&&... args) noexcept {
+            error(std::format(fmt, std::forward<Args>(args)...));
+        }
         void error(const std::string&);
     };
 

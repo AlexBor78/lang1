@@ -1,51 +1,75 @@
 #include <format>
-#include <fstream>
-
+#include <vector>
+#include <lang/utils/istream.h>
 #include <lang/utils/error.h>
 
-namespace lang
+namespace lang::errors
 {
     void CompileError::build_error() {
         std::string buf;
+
+        // check if pos is default (empty)
+        if(pos == SourceLocation{}) {
+            msg.shrink_to_fit();
+            return;
+        }
+
         if(pos.path.empty()) buf = std::format("error: {} \n", msg);
         else buf = std::format("error: {} in file {}\n", msg, pos.path); 
 
-        std::fstream file(pos.path);
-        if(!file) {
-            if(!pos.path.empty()) buf += std::format("error opening file {}\n", pos.path);
-            buf += std::format("error start in line {} in column {}\n", pos.start.line, pos.start.column);
-            buf += std::format("error ends in line {} in column {}\n", pos.end.line, pos.end.column);
+        utils::FileIStream file(pos.path);
+        if(!file.is_open()) {
+            if(!pos.path.empty()) buf += std::format("can not open file {}\n", pos.path);
+            if(pos.start.line != pos.end.line) {
+                buf += std::format("error start in line {} in column {}\n", pos.start.line, pos.start.column);
+                buf += std::format("error ends in line {} in column {}\n", pos.end.line, pos.end.column);
+            } else buf += std::format("error in line: {} columns: {}:{}\n", pos.start.line, pos.start.column, pos.end.column);
+            msg = std::move(buf);
+            msg.shrink_to_fit();
+            return;
+        }
+
+        // check is there our token
+        if(file.is_eof(pos.end.index)) {
+            buf += std::format("error: position line: {} column: {} is out of range file {}", pos.end.line, pos.end.column, pos.path);
             buf.shrink_to_fit();
             msg = std::move(buf);
             return;
         }
 
-        std::string source((std::istreambuf_iterator<char>(file)), {});
-        if(pos.start.index >= source.size()) {
-            buf += std::format("error: position {{line: {} column: {}}} is out of range file {}", pos.start.line, pos.start.column, pos.path);
-            buf.shrink_to_fit();
-            msg = std::move(buf);
-            return;
+        // convert file to std::vector<std::string> lines for convenience
+        std::vector<std::string> lines;
+        std::string buffer;
+        while(!file.is_eof() && lines.size() <= pos.end.line + 1) {
+            char c = file.peek();
+            while(!file.is_eof() && c != '\n') {
+                buffer += file.advance();
+                if(!file.is_eof()) c = file.peek();
+            } if(!file.is_eof() && c == '\n') buf += file.advance();
+            
+            buffer.shrink_to_fit();
+            lines.emplace_back(std::move(buffer));
+            buffer.clear();
         }
 
-        // only for one-line tokens
-        if(pos.start.line == pos.end.line) {
-            size_t line_start = source.rfind("\n", pos.start.index);
-            if(line_start == std::string::npos) line_start = 0;
-            else ++line_start;
+        std::string lines_buf;
+        size_t offset;
+        size_t num_width = std::to_string(pos.end.line).length();
+            
+        for (int i = 2; i >= 0; --i) { 
+            if(pos.start.line < i) continue;
+            size_t line_num = pos.start.line - i;
+            if (line_num < lines.size()) {
+                std::string padding(num_width - std::to_string(line_num).length(), ' ');
+                lines_buf += std::format("{}{} | {}", padding, line_num, lines[line_num]);
+            }
+        } logger.debug("build_error(): check is lines processed correct\n{}", lines_buf);
 
-            size_t line_end = source.find("\n", pos.end.index);
-            if(line_end == std::string::npos) line_end = source.size();
-
-            std::string line = source.substr(line_start, line_end - line_start);
-
-            buf += std::format("{}\n", line);
-
-            size_t column = pos.end.column - pos.start.column;
-            if(pos.length >= 3) buf += std::format("{}^{}^\n", std::string(column, ' '), std::string(pos.length - 2, '~'));
-            if(pos.length == 2) buf += std::format("{}^^\n", std::string(column, ' '));
-            if(pos.length == 1) buf += std::format("{}^\n", std::string(column, ' '));
-            msg = std::move(buf);
-        }
+        if(pos.length >= 3) buf += std::format("{}^{}^{}", std::string(pos.start.column, ' '), std::string(pos.length - 2, '~'), msg);
+        if(pos.length == 2) buf += std::format("{}^^{}", std::string(pos.start.column, ' '), msg);
+        if(pos.length == 1) buf += std::format("{}^{}", std::string(pos.start.column, ' '), msg);
+        
+        msg = std::move(buf);
+        msg.shrink_to_fit();
     }
 }

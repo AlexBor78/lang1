@@ -36,12 +36,13 @@
         - [X] set pos.line and pos.column in stream
 
     - [ ] refactor and extend Error
-        - [ ] upgrade output
-        - [ ] handle multi-line tokens
-        - [ ] add FrontendError's <- CompileError
-            - [ ] add StreamError   <- FrontendError
-            - [ ] add LexerError    <- FrontendError
-            - [ ] add ParserError   <- FrontendError
+        - [ ] add colors
+        - [X] upgrade output
+        - [X] handle multi-line tokens
+        - [X] add FrontendError's <- CompileError
+            - [X] add StreamError   <- FrontendError
+            - [X] add LexerError    <- FrontendError
+            - [X] add ParserError   <- FrontendError
         - [ ] add MiddlendError's <- CompileError
             - [ ] add SemanticError's <- MiddlendError
 

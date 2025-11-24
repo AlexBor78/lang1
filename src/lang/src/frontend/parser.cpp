@@ -29,98 +29,101 @@ namespace lang::frontend::parser
         return std::move(buf);
     }
 
-    CompileError Parser::get_error() const noexcept {
+    const errors::ParserError Parser::get_error() const noexcept {
+        return error;
+    }
+    errors::ParserError Parser::get_error() noexcept {
         return error;
     }
 
 // create error
     
-    CompileError Parser::expected_semicolon(size_t offset) const noexcept {
-        return CompileError(std::format("expected ';', got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_semicolon(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected ';', got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_lbrace(size_t offset) const noexcept {
-        return CompileError(std::format("expected '{{', got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_lbrace(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected '{{', got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_rbrace(size_t offset) const noexcept {
-        return CompileError(std::format("expected '}}', got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_rbrace(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected '}}', got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_lparen(size_t offset) const noexcept {
-        return CompileError(std::format("expected '(', got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_lparen(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected '(', got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_rparen(size_t offset) const noexcept {
-        return CompileError(std::format("expected ')', got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_rparen(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected ')', got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_comma(size_t offset) const noexcept {
-        return CompileError(std::format("expected ',', got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_comma(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected ',', got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_doublecolon(size_t offset) const noexcept {
-        return CompileError(std::format("expected '::', got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_doublecolon(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected '::', got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_unary_op(size_t offset) const noexcept {
-        return CompileError(std::format("expected unary operator, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_unary_op(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected unary operator, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_postfix_op(size_t offset) const noexcept {
-        return CompileError(std::format("expected postfix operator, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_postfix_op(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected postfix operator, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_identifier(size_t offset) const noexcept {
-        return CompileError(std::format("expected identifier, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_identifier(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected identifier, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_function_name(size_t offset) const noexcept {
-        return CompileError(std::format("expected function name, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_function_name(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected function name, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_variable_name(size_t offset) const noexcept {
-        return CompileError(std::format("expected variable name, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_variable_name(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected variable name, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_namespace_name(size_t offset) const noexcept {
-        return CompileError(std::format("expected namespace name, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_namespace_name(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected namespace name, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_module_name(size_t offset) const noexcept {
-        return CompileError(std::format("expected module name, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_module_name(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected module name, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_type(size_t offset) const noexcept {
-        return CompileError(std::format("expected type, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_type(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected type, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_number(size_t offset) const noexcept {
-        return CompileError(std::format("expected number, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_number(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected number, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_string(size_t offset) const noexcept {
-        return CompileError(std::format("expected string, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_string(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected string, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::expected_bool(size_t offset) const noexcept {
-        return CompileError(std::format("expected bool, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
+    errors::ParserError Parser::expected_bool(size_t offset) const noexcept {
+        return errors::ParserError(std::format("expected bool, got {}", utils::stringify(peak_tok(offset).ty)), peak_tok(offset).pos);
     }
-    CompileError Parser::tokens_nullptr(size_t offset) const noexcept {
-        return CompileError("tokens = nullptr", SourceLocation());
+    errors::ParserError Parser::tokens_nullptr(size_t offset) const noexcept {
+        return errors::ParserError("tokens = nullptr", SourceLocation());
     }
-    CompileError Parser::strcut_is_not_suported(size_t offset) const noexcept {
-        return CompileError("strcut is currently not suported", SourceLocation());
+    errors::ParserError Parser::strcut_is_not_suported(size_t offset) const noexcept {
+        return errors::ParserError("strcut is currently not suported", SourceLocation());
     }
-    CompileError Parser::enum_is_not_suported(size_t offset) const noexcept {
-        return CompileError("enum is currently not suported", SourceLocation());
+    errors::ParserError Parser::enum_is_not_suported(size_t offset) const noexcept {
+        return errors::ParserError("enum is currently not suported", SourceLocation());
     }
-    CompileError Parser::if_is_not_suported(size_t offset) const noexcept {
-        return CompileError("if is currently not suported", SourceLocation());
+    errors::ParserError Parser::if_is_not_suported(size_t offset) const noexcept {
+        return errors::ParserError("if is currently not suported", SourceLocation());
     }
-    CompileError Parser::else_is_not_suported(size_t offset) const noexcept {
-        return CompileError("else is currently not suported", SourceLocation());
+    errors::ParserError Parser::else_is_not_suported(size_t offset) const noexcept {
+        return errors::ParserError("else is currently not suported", SourceLocation());
     }
-    CompileError Parser::for_is_not_suported(size_t offset) const noexcept {
-        return CompileError("for is currently not suported", SourceLocation());
+    errors::ParserError Parser::for_is_not_suported(size_t offset) const noexcept {
+        return errors::ParserError("for is currently not suported", SourceLocation());
     }
-    CompileError Parser::while_is_not_suported(size_t offset) const noexcept {
-        return CompileError("while is currently not suported", SourceLocation());
+    errors::ParserError Parser::while_is_not_suported(size_t offset) const noexcept {
+        return errors::ParserError("while is currently not suported", SourceLocation());
     }
-    CompileError Parser::break_is_not_suported(size_t offset) const noexcept {
-        return CompileError("break is currently not suported", SourceLocation());
+    errors::ParserError Parser::break_is_not_suported(size_t offset) const noexcept {
+        return errors::ParserError("break is currently not suported", SourceLocation());
     }
-    CompileError Parser::continue_is_not_suported(size_t offset) const noexcept {
-        return CompileError("continue is currently not suported", SourceLocation());
+    errors::ParserError Parser::continue_is_not_suported(size_t offset) const noexcept {
+        return errors::ParserError("continue is currently not suported", SourceLocation());
     }
-    CompileError Parser::multiple_module_decl_in_file(size_t offset) const noexcept {
-        return CompileError("multiple module in one file is not allowed", SourceLocation());
+    errors::ParserError Parser::multiple_module_decl_in_file(size_t offset) const noexcept {
+        return errors::ParserError("multiple module in one file is not allowed", SourceLocation());
     }
-    CompileError Parser::unexpected_token(size_t offset) const noexcept {
-        return CompileError(std::format("unexpected token: {}"
+    errors::ParserError Parser::unexpected_token(size_t offset) const noexcept {
+        return errors::ParserError(std::format("unexpected token: {}"
         ,                       utils::stringify(peak_tok(offset).ty))
         ,                   peak_tok(offset).pos
         );;

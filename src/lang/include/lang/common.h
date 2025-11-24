@@ -22,6 +22,11 @@ namespace lang
         size_t index{0};
         size_t line{0};
         size_t column{0};
+        bool operator==(const FileLocation& other) const noexcept {
+            return index  == other.index
+            &&     line   == other.line
+            &&     column == other.column;
+        }
     };
 
     struct SourceLocation {
@@ -29,5 +34,12 @@ namespace lang
         FileLocation start;
         FileLocation end;
         size_t length{1};
+
+        bool operator==(const SourceLocation& other) const noexcept {
+            return path   == other.path
+            &&     start  == other.start
+            &&     end    == other.end
+            &&     length == other.length;
+        }
     };
 }

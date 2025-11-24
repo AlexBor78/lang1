@@ -6,8 +6,10 @@
 #include <istream>
 #include <string_view>
 #include <lang/common.h>
-#include <lang/utils/error.h>
 
+namespace lang::errors {
+    class InterError;
+}
 namespace lang::utils
 {
     class AbstractStream
@@ -17,10 +19,10 @@ namespace lang::utils
 
     protected:
         AbstractStream() = default;
-        Error stream_null() const;
-        Error stream_bad() const;
-        Error reached_eof() const;
-        Error passed_zero() const;
+        errors::InterError stream_null() const;
+        errors::InterError stream_bad() const;
+        errors::InterError reached_eof() const;
+        errors::InterError passed_zero() const;
         
     public:
         virtual ~AbstractStream() = default;
@@ -90,10 +92,14 @@ namespace lang::utils
         virtual void write_line(std::string_view);
 
         template<typename... Args>
-        void write_format_line(std::format_string<Args...> fmt, Args&&...) noexcept;
-        
+        void write_line(std::format_string<Args...> fmt, Args&&... args) noexcept {
+            write_line(std::format(fmt, std::forward<Args>(args)...));
+        }
+
         template<typename... Args>
-        void write_format_word(std::format_string<Args...> fmt, Args&&...) noexcept;
+        void write_word(std::format_string<Args...> fmt, Args&&... args) noexcept {
+            write_word(std::format(fmt, std::forward<Args>(args)...));
+        }
         // todo: add cursor movements maybe
     };
 

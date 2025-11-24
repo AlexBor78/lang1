@@ -16,7 +16,7 @@ namespace lang::frontend::parser
     private:
         std::vector<std::unique_ptr<ast::BaseNode>> ast;
         const std::vector<Token>* tokens{nullptr};
-        CompileError error = {"", SourceLocation()};
+        errors::ParserError error = errors::ParserError{"", SourceLocation()};
         
         TypeTable typetable;
         bool module_declared{false};
@@ -35,38 +35,38 @@ namespace lang::frontend::parser
         const Token& next_tok(size_t offset = 1);
         const Token& back_tok(size_t offset = 1);
 
-        CompileError tokens_nullptr(size_t offset = 0) const noexcept;
-        CompileError multiple_module_decl_in_file(size_t offset = 0) const noexcept;
-        CompileError strcut_is_not_suported(size_t offset = 0) const noexcept;
-        CompileError enum_is_not_suported(size_t offset = 0) const noexcept;
-        CompileError if_is_not_suported(size_t offset = 0) const noexcept;
-        CompileError else_is_not_suported(size_t offset = 0) const noexcept;
-        CompileError for_is_not_suported(size_t offset = 0) const noexcept;
-        CompileError while_is_not_suported(size_t offset = 0) const noexcept;
-        CompileError break_is_not_suported(size_t offset = 0) const noexcept;
-        CompileError continue_is_not_suported(size_t offset = 0) const noexcept;
+        errors::ParserError tokens_nullptr(size_t offset = 0) const noexcept;
+        errors::ParserError multiple_module_decl_in_file(size_t offset = 0) const noexcept;
+        errors::ParserError strcut_is_not_suported(size_t offset = 0) const noexcept;
+        errors::ParserError enum_is_not_suported(size_t offset = 0) const noexcept;
+        errors::ParserError if_is_not_suported(size_t offset = 0) const noexcept;
+        errors::ParserError else_is_not_suported(size_t offset = 0) const noexcept;
+        errors::ParserError for_is_not_suported(size_t offset = 0) const noexcept;
+        errors::ParserError while_is_not_suported(size_t offset = 0) const noexcept;
+        errors::ParserError break_is_not_suported(size_t offset = 0) const noexcept;
+        errors::ParserError continue_is_not_suported(size_t offset = 0) const noexcept;
 
-        CompileError expected_add_op(size_t offset = 0) const noexcept;
-        CompileError expected_mul_op(size_t offset = 0) const noexcept;
-        CompileError expected_unary_op(size_t offset = 0) const noexcept;
-        CompileError expected_postfix_op(size_t offset = 0) const noexcept;
-        CompileError expected_identifier(size_t offset = 0) const noexcept;
-        CompileError expected_namespace_name(size_t offset = 0) const noexcept;
-        CompileError expected_module_name(size_t offset = 0) const noexcept;
-        CompileError expected_variable_name(size_t offset = 0) const noexcept;
-        CompileError expected_function_name(size_t offset = 0) const noexcept;
-        CompileError expected_doublecolon(size_t offset = 0) const noexcept;
-        CompileError expected_semicolon(size_t offset = 0) const noexcept;
-        CompileError expected_number(size_t offset = 0) const noexcept;
-        CompileError expected_string(size_t offset = 0) const noexcept;
-        CompileError expected_bool(size_t offset = 0) const noexcept;
-        CompileError expected_comma(size_t offset = 0) const noexcept;
-        CompileError expected_type(size_t offset = 0) const noexcept;
-        CompileError expected_lbrace(size_t offset = 0) const noexcept;
-        CompileError expected_rbrace(size_t offset = 0) const noexcept;
-        CompileError expected_lparen(size_t offset = 0) const noexcept;
-        CompileError expected_rparen(size_t offset = 0) const noexcept;
-        CompileError unexpected_token(size_t offset = 0) const noexcept;
+        errors::ParserError expected_add_op(size_t offset = 0) const noexcept;
+        errors::ParserError expected_mul_op(size_t offset = 0) const noexcept;
+        errors::ParserError expected_unary_op(size_t offset = 0) const noexcept;
+        errors::ParserError expected_postfix_op(size_t offset = 0) const noexcept;
+        errors::ParserError expected_identifier(size_t offset = 0) const noexcept;
+        errors::ParserError expected_namespace_name(size_t offset = 0) const noexcept;
+        errors::ParserError expected_module_name(size_t offset = 0) const noexcept;
+        errors::ParserError expected_variable_name(size_t offset = 0) const noexcept;
+        errors::ParserError expected_function_name(size_t offset = 0) const noexcept;
+        errors::ParserError expected_doublecolon(size_t offset = 0) const noexcept;
+        errors::ParserError expected_semicolon(size_t offset = 0) const noexcept;
+        errors::ParserError expected_number(size_t offset = 0) const noexcept;
+        errors::ParserError expected_string(size_t offset = 0) const noexcept;
+        errors::ParserError expected_bool(size_t offset = 0) const noexcept;
+        errors::ParserError expected_comma(size_t offset = 0) const noexcept;
+        errors::ParserError expected_type(size_t offset = 0) const noexcept;
+        errors::ParserError expected_lbrace(size_t offset = 0) const noexcept;
+        errors::ParserError expected_rbrace(size_t offset = 0) const noexcept;
+        errors::ParserError expected_lparen(size_t offset = 0) const noexcept;
+        errors::ParserError expected_rparen(size_t offset = 0) const noexcept;
+        errors::ParserError unexpected_token(size_t offset = 0) const noexcept;
         
     private: // process_ functions
         
@@ -121,6 +121,7 @@ namespace lang::frontend::parser
         bool load_and_parse(const std::vector<Token>&);
 
         std::vector<std::unique_ptr<ast::BaseNode>>  get_program() noexcept;
-        CompileError get_error() const noexcept;
+        const errors::ParserError get_error() const noexcept;
+        errors::ParserError get_error() noexcept;
     };
 }

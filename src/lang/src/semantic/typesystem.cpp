@@ -38,7 +38,7 @@ namespace lang
 // TypeTable
 
     const Type* TypeTable::add_type(std::string_view name) {
-        if(contains(name)) Error("Re-addition of type to typetable");
+        if(contains(name)) errors::InterError("Re-addition of type to typetable");
         
         auto type = std::make_unique<Type>(name);
         table[type->name] = std::move(type);
@@ -46,7 +46,7 @@ namespace lang
     }
 
     const Type* TypeTable::add_type(std::string_view name, TypeInfo info) {
-        if(contains(name)) throw Error("Re-addition of type to typetable");
+        if(contains(name)) throw errors::InterError("Re-addition of type to typetable");
 
         auto type = std::make_unique<Type>(name, info);
         table[type->name] = std::move(type);
