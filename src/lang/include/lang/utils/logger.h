@@ -36,8 +36,8 @@ namespace lang::utils
         std::string prefix;
         std::string name;
 
-        std::unique_ptr<OutputStream> infostream{nullptr};
-        std::unique_ptr<OutputStream> errstream{nullptr};
+        std::shared_ptr<OutputStream> infostream{nullptr};
+        std::shared_ptr<OutputStream> errstream{nullptr};
 
     private:
         errors::InterError stream_null() const;
@@ -66,8 +66,8 @@ namespace lang::utils
         // print to console by default 
         Logger() = delete;
         Logger(LogLevel _level
-        ,      std::unique_ptr<OutputStream> _infostream = std::make_unique<ConsoleOStream>()
-        ,      std::unique_ptr<OutputStream> _errostream = std::make_unique<ConsoleErrOStream>()
+        ,      std::shared_ptr<OutputStream> _infostream = std::make_shared<ConsoleOStream>()
+        ,      std::shared_ptr<OutputStream> _errostream = std::make_shared<ConsoleErrOStream>()
         ):  level(_level)
         ,   infostream(std::move(_infostream))
         ,   errstream(std::move(_errostream))

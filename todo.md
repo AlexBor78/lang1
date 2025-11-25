@@ -25,7 +25,7 @@
 
 - [ ] project code refactor
     - [X] rename src/compiler folder to src/compiler_app
-    - [ ] use shared_ptr instead unique_ptr in logger for streams
+    - [X] use shared_ptr instead unique_ptr in logger for streams
     - [ ] use Logger
         - [X] CompileError: while building error message
         - [X] Lexer
