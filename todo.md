@@ -24,7 +24,7 @@
     - [ ] add colors to logger output
 
 - [ ] project code refactor
-    - [ ] rename src/compiler folder to src/compiler_app
+    - [X] rename src/compiler folder to src/compiler_app
     - [ ] use shared_ptr instead unique_ptr in logger for streams
     - [ ] use Logger
         - [X] CompileError: while building error message
