@@ -35,9 +35,11 @@ namespace lang::utils
         LogLevel level{LogLevel::WARN};
         std::string prefix;
         std::string name;
+
         std::unique_ptr<OutputStream> infostream{nullptr};
         std::unique_ptr<OutputStream> errstream{nullptr};
 
+    private:
         errors::InterError stream_null() const;
         errors::InterError stream_bad() const;
 
@@ -65,39 +67,39 @@ namespace lang::utils
         Logger() = delete;
         Logger(LogLevel _level
         ,      std::unique_ptr<OutputStream> _infostream = std::make_unique<ConsoleOStream>()
-        ,      std::unique_ptr<OutputStream> _errostream = std::make_unique<ConsoleOStream>()
+        ,      std::unique_ptr<OutputStream> _errostream = std::make_unique<ConsoleErrOStream>()
         ):  level(_level)
         ,   infostream(std::move(_infostream))
         ,   errstream(std::move(_errostream))
         {}
 
         // debug lvl
+        void debug(const std::string&);
         template<typename... Args>
         void debug(std::format_string<Args...> fmt, Args&&... args) noexcept {
             debug(std::format(fmt, std::forward<Args>(args)...));
         }
-        void debug(const std::string&);
 
         // info lvl
+        void log(const std::string&);
         template<typename... Args>
         void log(std::format_string<Args...> fmt, Args&&... args) noexcept {
             log(std::format(fmt, std::forward<Args>(args)...));
         }
-        void log(const std::string&);
 
         // warn lvl
+        void warn(const std::string&);
         template<typename... Args>
         void warn(std::format_string<Args...> fmt, Args&&... args) noexcept {
             warn(std::format(fmt, std::forward<Args>(args)...));
         }
-        void warn(const std::string&);
 
         // error lvl
+        void error(const std::string&);
         template<typename... Args>
         void error(std::format_string<Args...> fmt, Args&&... args) noexcept {
             error(std::format(fmt, std::forward<Args>(args)...));
         }
-        void error(const std::string&);
     };
 
 // LogLevel api

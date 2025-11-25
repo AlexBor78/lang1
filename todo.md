@@ -24,10 +24,11 @@
     - [ ] add colors to logger output
 
 - [ ] project code refactor
-    - [ ] rename src/compiler folder to src/app or something similar
+    - [ ] rename src/compiler folder to src/compiler_app
+    - [ ] use shared_ptr instead unique_ptr in logger for streams
     - [ ] use Logger
-        - [ ] maybe stream idk
-        - [ ] Lexer
+        - [X] CompileError: while building error message
+        - [X] Lexer
         - [ ] Parser
 
     - [X] refactor Position

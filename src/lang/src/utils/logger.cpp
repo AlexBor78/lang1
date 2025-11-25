@@ -61,27 +61,27 @@ namespace lang::utils
     void Logger::debug(const std::string& line) {
         if(!(level & Logger::LogLevel::DEBUG)) return;
         check_infostream();
-        infostream->write_line("{} [{} DEBUG] {}", prefix, name, line);
+        infostream->write_line("{}{}[{}{}DEBUG] {}", prefix, std::string(prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
     }
     void Logger::log(const std::string& line) {
         if(!(level & Logger::LogLevel::INFO)) return;
         check_infostream();
-        infostream->write_line("{} [{} INFO] {}", prefix, name, line);
+        infostream->write_line("{}{}[{}{}INFO] {}", prefix, std::string(prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
     }
     void Logger::warn(const std::string& line) {
         if(!(level & Logger::LogLevel::WARN)) return;
-        if(check_errstream()) errstream->write_line("{}[{} WARN]", prefix, name, line);
+        if(check_errstream()) errstream->write_line("{}{}[{}{}WARN] {}", prefix, std::string(prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
         else {  
             check_infostream();
-            infostream->write_line("{} [{} WARN]", prefix, name, line);  
+            infostream->write_line("{}{}[{}{}WARN] {}", prefix, std::string(prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
         } 
     }
     void Logger::error(const std::string& line) {
         if(!(level & Logger::LogLevel::ERROR)) return;
-        if(check_errstream()) errstream->write_line("{} [{} ERROR]", prefix, name, line);
+        if(check_errstream()) errstream->write_line("{}{}[{}{}ERROR] {}", prefix, std::string(prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
         else {  
             check_infostream();
-            infostream->write_line("{} [{} ERROR]", prefix, name, line);  
+            infostream->write_line("{}{}[{}{}ERROR] {}", prefix, std::string(prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
         } 
     }
 }

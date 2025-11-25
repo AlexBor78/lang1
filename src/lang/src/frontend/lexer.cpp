@@ -1,15 +1,14 @@
-#include <cstddef>
-#include <print>
-#include <cctype>
-#include <iostream>
-
 #include <lang/common.h> //  debug_break()
 #include <lang/utils/error.h>
 #include <lang/frontend/lexer.h>
+#include <lang/utils/frontend_utils.h>
 
 namespace lang::frontend::lexer
 {
 // api
+    bool Lexer::is_success() const noexcept {
+        return success;
+    }
     std::vector<Token> Lexer::tokenize(utils::InputStream* _stream) {
         stream = _stream;
         return tokenize();
@@ -17,6 +16,10 @@ namespace lang::frontend::lexer
     std::vector<Token> Lexer::tokenize() {
         debug_break();
         tokens.clear();
+
+        if(stream->get_pos().path.empty()) logger.log("tokenizing new stream");
+        else logger.log("tokenizing file: {}", stream->get_pos().path);
+        
         while(!is_eof()) try {
             // for ConsoleIStream:
             // stop if got ctrl^D on POSIX or ctr+Z on shitdows
@@ -45,8 +48,14 @@ namespace lang::frontend::lexer
             }
             
             tokenize_punct();
+        } catch(const errors::LexerError& e) {
+            success = false;
+            logger.error("{}", e.what());
+            if(!is_eof()) skip();
+            else break;
         } catch(const std::exception& e) {
-            std::println(std::cerr, "{}", e.what());
+            success = false;
+            logger.error("error while lexer working: {}", e.what());
             if(!is_eof()) skip();
             else break;
         }
@@ -57,32 +66,51 @@ namespace lang::frontend::lexer
         return tokens;
     }
 
-// stream working
+// inside api
+
+    // errors creation
+
+    void Lexer::init_logger() noexcept {
+        logger.set_name("Lexer");
+        logger.set_level(utils::Logger::LogLevel::INFO | utils::Logger::LogLevel::WARN | utils::Logger::LogLevel::ERROR);
+    }
+
+    void Lexer::set_logger_infostream(std::unique_ptr<utils::OutputStream> stream) noexcept {
+        logger.set_infostream(std::move(stream));
+    }
+    void Lexer::set_logger_errstream(std::unique_ptr<utils::OutputStream> stream) noexcept {
+        logger.set_errstream(std::move(stream));
+    }
 
     errors::LexerError Lexer::stream_null() const {
-        return errors::LexerError("lexer error: stream is null");
+        return errors::LexerError("stream is null");
     }
     errors::LexerError Lexer::stream_bad() const {
-        return errors::LexerError("lexer error: stream is bad");
+        return errors::LexerError("stream is bad");
     }
     errors::LexerError Lexer::reached_eof() const {
-        return errors::LexerError("lexer error: reached eof");
+        return errors::LexerError("reached eof");
+    }
+    errors::LexerError Lexer::passed_zero_to_eof() const {
+        return errors::LexerError("passed zero to is_eof()");
     }
     errors::LexerError Lexer::word_start_num(SourceLocation pos) const {
-        return errors::LexerError("lexer error: word can not starts from number", pos);
+        return errors::LexerError("word can not starts from number", pos);
     }
-    errors::LexerError Lexer::not_closed_block(SourceLocation pos) const {
-        return errors::LexerError("lexer error: \"/*\" comment block is not closed", pos);
+    errors::LexerError Lexer::not_closed_comment_block(SourceLocation pos) const {
+        return errors::LexerError("\"/*\" comment block is not closed", pos);
     }
     errors::LexerError Lexer::not_closed_string(SourceLocation pos) const {
-        return errors::LexerError("lexer error: string block is not closed", pos);
+        return errors::LexerError("string block is not closed", pos);
     }
     errors::LexerError Lexer::wrong_number_format(SourceLocation pos) const {
-        return errors::LexerError("lexer error: wrong number format", pos);
+        return errors::LexerError("wrong number format", pos);
     }
     errors::LexerError Lexer::unicode_not_suported(SourceLocation pos) const {
-        return errors::LexerError("lexer error: Unicode is not supported (yet)", pos);
+        return errors::LexerError("Unicode is not supported (yet)", pos);
     }
+
+    // stream work
 
     void Lexer::check_stream() const {
         if(!stream) throw stream_null();
@@ -93,6 +121,7 @@ namespace lang::frontend::lexer
     }
     bool Lexer::is_eof(size_t n) const {
         check_stream();
+        if(n == 0) throw passed_zero_to_eof();
         return stream->is_eof(n);
     }
     char Lexer::peek(size_t offset) const {
@@ -104,6 +133,7 @@ namespace lang::frontend::lexer
         return stream->advance(offset);
     }
     void Lexer::skip(size_t n) {
+        check_data();
         stream->skip(n);
     }
     std::string Lexer::read_word() {
@@ -114,7 +144,7 @@ namespace lang::frontend::lexer
         check_data();
         stream->skip_whitespace();
     }
-    SourceLocation Lexer::update_pos(SourceLocation pos, char c) noexcept {
+    [[nodiscard("Lexer::update_pos() RETURN updated pos")]] SourceLocation Lexer::update_pos(SourceLocation pos, char c) noexcept {
         ++pos.length;
         ++pos.end.index;
         if(c == 'n') {
@@ -131,6 +161,7 @@ namespace lang::frontend::lexer
 // tokenizing
 
     void Lexer::add_token(Token tok) {
+        logger.debug("add_token() token: {{tt: {} str:\"{}\"}}", utils::stringify(tok.ty), tok.sym);
         tokens.emplace_back(tok);
     }
 
@@ -158,6 +189,7 @@ namespace lang::frontend::lexer
 
     void Lexer::tokenize_word() {
         debug_break();
+        logger.debug("tokenize_word() keyword");
         SourceLocation pos = get_pos();
         std::string buf = read_word();
         
@@ -178,9 +210,9 @@ namespace lang::frontend::lexer
         });
     }
 
-    // TODO: right process pos
     void Lexer::tokenize_punct() {
         debug_break();
+        logger.debug("tokenize_punct()");
         SourceLocation pos = get_pos();
         std::string buf;
 
@@ -211,6 +243,7 @@ namespace lang::frontend::lexer
     void Lexer::tokenize_number() {
         debug_break();
         SourceLocation pos = get_pos();
+        logger.debug("tokenize_number()");
         std::string buf;
         bool has_dot{false};
         if(peek() == '.') {
@@ -219,7 +252,7 @@ namespace lang::frontend::lexer
 
         while(!is_eof() && is_number()) {
             if(peek() == '.') {
-                update_pos(pos, peek());
+                pos = update_pos(pos, peek());
                 if(has_dot) throw wrong_number_format(pos);
                 has_dot = true;
             } buf += advance();
@@ -234,12 +267,13 @@ namespace lang::frontend::lexer
 
     void Lexer::tokenize_string() {
         debug_break();
+        logger.debug("tokenize_sring()");
         SourceLocation pos = get_pos();
         std::string buf;
 
         skip(); // skip '"'
         while(!is_eof() && peek() != '"') {
-            update_pos(pos, peek());
+            pos = update_pos(pos, peek());
             if(peek() == '\\') {
                 buf += tokenize_escape();
                 continue;
@@ -284,20 +318,23 @@ namespace lang::frontend::lexer
 
     void Lexer::process_comment_line() {
         debug_break();
+        logger.debug("process_coment_line()");
         skip(2); // skip "//"
         while(!is_eof() && peek() != '\n') skip();
     }
     void Lexer::process_comment_block() {
         debug_break();
+        logger.debug("process_coment_block()");
         auto pos = get_pos();
         skip(2); // skip "/*"
-        while(!is_eof(2)) {
-            update_pos(pos, peek());
-            if(peek(0) == '*'
+        while(!is_eof()) {
+            pos = update_pos(pos, peek());
+            if(!is_eof(2)
+            && peek(0) == '*'
             && peek(1) == '/') {
                 skip(2); // sip "*/"
                 return;
             } skip(); 
-        } throw not_closed_block(pos);
+        } throw not_closed_comment_block(pos);
     }
 }

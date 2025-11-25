@@ -6,10 +6,10 @@ namespace lang::utils
 
     void FileIStream::open(std::string_view _path) {
         path = _path;
-        pos.path = path;
         if(file) file->open(path);
         else file = std::make_unique<std::ifstream>(path);
         set_istream(file.get());
+        pos.path = path;
     }
 
     bool FileIStream::is_open() const noexcept {
@@ -23,7 +23,7 @@ namespace lang::utils
         set_istream(str.get());
     }
 
-    // creating new string
+    // creating new string object to return
     std::string StringIStream::get_string() const noexcept {
         if(!str) return "";
         return str->str();

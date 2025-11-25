@@ -1,13 +1,12 @@
 #pragma once
 
-#include "lang/common.h"
+#include <memory>
 #include <vector>
-
 #include <lang/utils/error.h>
+#include <lang/utils/logger.h>
 #include <lang/utils/stream.h>
 #include <lang/frontend/token.h> 
 #include <lang/frontend/keywords.h> 
-
 
 namespace lang::frontend::lexer
 {
@@ -16,23 +15,34 @@ namespace lang::frontend::lexer
     public: // api
         std::vector<Token> tokenize();
         std::vector<Token> tokenize(utils::InputStream*);
+
+        bool is_success() const noexcept;
+
+        void set_logger_infostream(std::unique_ptr<utils::OutputStream>) noexcept;
+        void set_logger_errstream(std::unique_ptr<utils::OutputStream>) noexcept;
+        
+        Lexer() {init_logger();}
         explicit Lexer(utils::InputStream* _stream):
             stream(_stream)
-        {}
+        {init_logger();}
 
     private: // vars
         // not owned
-        utils::InputStream* stream{nullptr};
+        bool success{true};
         std::vector<Token> tokens;
+        utils::InputStream* stream{nullptr};
+        utils::Logger logger{utils::Logger::LogLevel::ALL};
 
-    private: // stream working
+    private: // inside api
+        void init_logger() noexcept;
 
         errors::LexerError stream_null() const;
         errors::LexerError stream_bad() const;
         errors::LexerError reached_eof() const;
+        errors::LexerError passed_zero_to_eof() const;
 
         errors::LexerError word_start_num(SourceLocation) const;
-        errors::LexerError not_closed_block(SourceLocation) const;
+        errors::LexerError not_closed_comment_block(SourceLocation) const;
         errors::LexerError not_closed_string(SourceLocation) const;
         errors::LexerError wrong_number_format(SourceLocation) const;
         errors::LexerError unicode_not_suported(SourceLocation) const;

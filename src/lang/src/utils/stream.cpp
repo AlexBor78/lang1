@@ -84,7 +84,6 @@ namespace lang::utils
         if(is_eof(offset + 1)) throw reached_eof();
 
         char c = lookahead_buffer[offset];
-
         for(size_t i = 0; i <= offset; ++i)
             update_pos(lookahead_buffer[i]);
 

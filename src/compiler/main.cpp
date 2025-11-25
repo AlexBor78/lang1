@@ -20,9 +20,13 @@ int main() {
     // lang::utils::ConsoleIStream istream;
 
     lang::utils::FileIStream istream(path);
-    lang::frontend::lexer::Lexer tokenizer(&istream);
-    auto tokens = tokenizer.tokenize();
-    
+    lang::frontend::lexer::Lexer lexer(&istream);
+    auto tokens = lexer.tokenize();
+    if(!lexer.is_success()) {
+        std::println("error while tokenizing");
+        return -1;
+    }
+
     std::println("Success!");
     lang::utils::print(tokens);
 

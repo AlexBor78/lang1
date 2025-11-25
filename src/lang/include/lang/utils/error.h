@@ -11,24 +11,58 @@ namespace lang::errors
     class Error : public std::exception
     {
     protected:
-        utils::Logger logger{utils::Logger::LogLevel::ALL};
         std::string msg;
-        Error(std::string_view _msg
-        ,              std::string_view name = ""
-        ): msg(_msg)
-        {logger.set_name(name);}
+        Error(std::string_view _msg): 
+            msg(_msg)
+        {}
 
     public:
-        Error(const Error& e): Error(e.what()) {
-            logger.set_name(e.get_name());
-            logger.set_prefix(e.get_prefix());
-            logger.set_level(e.logger.get_level());
-        }
+        Error(const Error& e): 
+            Error(e.what())
+        {}
         virtual Error& operator=(const std::exception& e) noexcept {
             msg = e.what();
             return *this;
         }
         virtual Error& operator=(const Error& e) noexcept {
+            msg = e.msg;
+            return *this;
+        }
+    };
+
+    class InterError : public Error
+    {
+    public:
+        explicit InterError(std::string_view _msg):
+            Error(_msg)
+        {}
+    };
+
+    class CompileError : public Error
+    {
+    private:
+        utils::Logger logger{utils::Logger::LogLevel::ALL};
+        void init_logger(std::string_view name = "");
+        SourceLocation pos;
+        void build_error();
+
+    protected:
+        CompileError(std::string_view _msg
+        ,            SourceLocation   _pos
+        ,            std::string_view name = ""
+        ):  Error(_msg)
+        ,   pos(std::move(_pos)) {
+            init_logger(name);
+            build_error();
+        }
+    public:
+        CompileError(const CompileError& e): Error(e.what()) {
+            logger.set_name(e.get_name());
+            logger.set_prefix(e.get_prefix());
+            logger.set_level(e.logger.get_level());
+        }
+    public: // api
+        virtual CompileError& operator=(const CompileError& e) noexcept {
             msg = e.msg;
             logger.set_name(e.get_name());
             logger.set_prefix(e.get_prefix());
@@ -46,48 +80,16 @@ namespace lang::errors
         }
     };
 
-    class InterError : public Error
-    {
-    public:
-        virtual Error& operator=(const std::exception& e) noexcept override {
-            msg = e.what();
-            return *this;
-        }
-        explicit InterError(std::string_view _msg
-        ,                   std::string_view _name = ""
-        ):  Error(_msg
-        ,         _name
-        ) {}
-    };
-
-    class CompileError : public Error
-    {
-    private:
-        SourceLocation pos;
-        void build_error();
-
-    protected:
-        CompileError(std::string_view _msg
-        ,            SourceLocation   _pos
-        ,            std::string_view name = ""
-        ):  Error(_msg
-            ,     name
-            )
-        ,   pos(std::move(_pos))
-        {build_error();}
-    };
-
     class FrontendError : public CompileError
     {
     protected:
         FrontendError(std::string_view _msg
         ,             SourceLocation _pos = {}
-        ,             std::string_view name = ""
+        ,             std::string_view _name = "FrontendError"
         ):  CompileError(_msg
         ,                std::move(_pos)
-        ,                "Frontend"
-        )
-        {}
+        ,                _name
+        ) {}
     };
 
     class LexerError : public FrontendError
@@ -101,9 +103,8 @@ namespace lang::errors
         ,                   SourceLocation _pos = {}
         ):  FrontendError(_msg
         ,                 std::move(_pos)
-        ,                 "Lexer"
-        )
-        {}
+        ,                 "LexerError"
+        ) {}
     };
 
     class ParserError : public FrontendError
@@ -117,9 +118,8 @@ namespace lang::errors
         ,                    SourceLocation   _pos = {}
         ):  FrontendError(_msg
         ,                 std::move(_pos)
-        ,                 "Parser"
-        )
-        {}
+        ,                 "ParserError"
+        ) {}
     };
     
     // unused for now
