@@ -1,2 +1,2 @@
 #!/usr/bin/bash
-./build/src/compiler/Compiler
+./build/src/compiler_app/Compiler
