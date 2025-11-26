@@ -23,7 +23,7 @@ int main() {
     lang::frontend::lexer::Lexer lexer(&istream);
     auto tokens = lexer.tokenize();
     if(!lexer.is_success()) {
-        std::println("error while tokenizing");
+        // std::println("error while tokenizing");
         return -1;
     }
 
@@ -33,13 +33,12 @@ int main() {
     std::println("\n\n\n");
     std::println("Parsing...");
     lang::frontend::parser::Parser parser;
-    if(parser.load_and_parse(tokens)) {
-        std::println("error while parsing file");
-        auto e = parser.get_error();
-        std::println("{}", e.what());
+    auto ast = parser.parse(tokens);
+    if(parser.had_errors()) {
+        // std::println("error building ast");
+        return -1;
     } else std::println("success parsed file {}", path);
 
-    auto ast = parser.get_program();
     std::println("\n\n\n");
     lang::utils::print(ast);
 

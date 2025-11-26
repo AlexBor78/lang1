@@ -26,10 +26,13 @@
 - [ ] project code refactor
     - [X] rename src/compiler folder to src/compiler_app
     - [X] use shared_ptr instead unique_ptr in logger for streams
-    - [ ] use Logger
+    - [ ] standardization api (private and public)
+        - [ ] rename Lexer::is_success() -> Lexer::had_errors()
+
+    - [X] use Logger
         - [X] CompileError: while building error message
         - [X] Lexer
-        - [ ] Parser
+        - [X] Parser
 
     - [X] refactor Position
         - [X] rename Position to SourceLocation 
@@ -37,6 +40,7 @@
         - [X] set pos.line and pos.column in stream
 
     - [ ] refactor and extend Error
+        - [ ] add warns
         - [ ] add colors
         - [X] upgrade output
         - [X] handle multi-line tokens
@@ -47,23 +51,23 @@
         - [ ] add MiddlendError's <- CompileError
             - [ ] add SemanticError's <- MiddlendError
 
-    - [ ] update api
-        - [ ] add and use match() function
+    - [X] update api
+        - [X] add and use match() function
             - Stream - doesn't need
             - Lexer - doesn't need
-            - [ ] Parser
-        - [ ] change peak -> peek
+            - [X] Parser
+        - [X] change peak -> peek
             - [X] in Stream
             - [X] in Lexer
-            - [ ] in Parser
-        - [ ] change next -> advance
+            - [X] in Parser
+        - [X] change next -> advance
             - [X] in Stream
             - [X] in Lexer
-            - [ ] in Parser
-        - [ ] add skip
+            - [X] in Parser
+        - [X] add skip
             - [X] in Stream
             - [X] in Lexer
-            - [ ] in Parser
+            - [X] in Parser
 
     - [X] upgrade build.sh script
         - [X] add build arg (debug)

@@ -16,7 +16,7 @@ namespace lang::utils
     void print(const std::vector<std::unique_ptr<ast::BaseNode>>&) noexcept;
     void print(const ast::BaseNode*) noexcept;
 
-    constexpr bool is_unary(ast::OperatorExpr::OperatorKind) noexcept;
+    constexpr bool is_unary_op(ast::OperatorExpr::OperatorKind) noexcept;
     constexpr bool is_prefix_op(ast::OperatorExpr::OperatorKind) noexcept;
     constexpr bool is_postfix_op(ast::OperatorExpr::OperatorKind) noexcept;
     constexpr bool is_mul_op(ast::OperatorExpr::OperatorKind) noexcept;
@@ -28,7 +28,7 @@ namespace lang::utils
 
 // constexpr implementations ---------------------------------------------------
 
-    constexpr const char* stringify(ast::OperatorExpr::OperatorKind op) noexcept{
+    constexpr const char* stringify(ast::OperatorExpr::OperatorKind op) noexcept {
         switch (op) {
             case ast::OperatorExpr::OperatorKind::ASSIGN:     return "ASSIGN";
             case ast::OperatorExpr::OperatorKind::PLUS:       return "PLUS";
@@ -110,10 +110,10 @@ namespace lang::utils
         }
     }
 
-    constexpr bool is_unary(ast::OperatorExpr::OperatorKind op) noexcept {
+    constexpr bool is_unary_op(ast::OperatorExpr::OperatorKind op) noexcept {
     switch(op) {
-        case ast::OperatorExpr::OperatorKind::BANG:
-        case ast::OperatorExpr::OperatorKind::TILDE:
+        case ast::OperatorExpr::OperatorKind::BANG:      // LOGIC_NOT
+        case ast::OperatorExpr::OperatorKind::TILDE:     // BIT_NOT
         case ast::OperatorExpr::OperatorKind::AMPERSAND: // address-of
         case ast::OperatorExpr::OperatorKind::STAR:      // deref
         case ast::OperatorExpr::OperatorKind::PLUS:      // unary +
