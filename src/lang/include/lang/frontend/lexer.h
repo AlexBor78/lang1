@@ -34,6 +34,7 @@ namespace lang::frontend::lexer
         utils::Logger logger{utils::Logger::LogLevel::ALL};
 
     private: // inside api
+        void breakpoint() noexcept;
         void init_logger() noexcept;
 
         errors::LexerError stream_null() const;

@@ -1,4 +1,4 @@
-#include <lang/common.h> //  debug_break()
+#include <lang/common.h> // LEXER_DEBUG
 #include <lang/utils/error.h>
 #include <lang/frontend/lexer.h>
 #include <lang/utils/frontend_utils.h>
@@ -14,7 +14,7 @@ namespace lang::frontend::lexer
         return tokenize();
     }
     std::vector<Token> Lexer::tokenize() {
-        debug_break();
+        breakpoint();
         tokens.clear();
 
         if(stream->get_pos().path.empty()) logger.log("tokenizing new stream");
@@ -72,7 +72,17 @@ namespace lang::frontend::lexer
 
     void Lexer::init_logger() noexcept {
         logger.set_name("Lexer");
-        logger.set_level(utils::Logger::LogLevel::INFO | utils::Logger::LogLevel::WARN | utils::Logger::LogLevel::ERROR);
+        #ifdef LEXER_DEBUG            
+            logger.set_level(utils::Logger::LogLevel::ALL);
+        #else
+            logger.set_level(utils::Logger::LogLevel::INFO | utils::Logger::LogLevel::WARN | utils::Logger::LogLevel::ERROR);
+        #endif 
+    }
+
+    void Lexer::breakpoint() noexcept {
+        #ifdef LEXER_DEBUG
+            debug_break();
+        #endif
     }
 
     void Lexer::set_logger_infostream(std::unique_ptr<utils::OutputStream> stream) noexcept {
@@ -188,8 +198,7 @@ namespace lang::frontend::lexer
     }
 
     void Lexer::tokenize_word() {
-        debug_break();
-        logger.debug("tokenize_word() keyword");
+        breakpoint(); logger.debug("tokenize_word() keyword");
         SourceLocation pos = get_pos();
         std::string buf = read_word();
         
@@ -211,8 +220,7 @@ namespace lang::frontend::lexer
     }
 
     void Lexer::tokenize_punct() {
-        debug_break();
-        logger.debug("tokenize_punct()");
+        breakpoint(); logger.debug("tokenize_punct()");
         SourceLocation pos = get_pos();
         std::string buf;
 
@@ -241,9 +249,8 @@ namespace lang::frontend::lexer
     }
 
     void Lexer::tokenize_number() {
-        debug_break();
+        breakpoint(); logger.debug("tokenize_number()");
         SourceLocation pos = get_pos();
-        logger.debug("tokenize_number()");
         std::string buf;
         bool has_dot{false};
         if(peek() == '.') {
@@ -266,8 +273,7 @@ namespace lang::frontend::lexer
     }
 
     void Lexer::tokenize_string() {
-        debug_break();
-        logger.debug("tokenize_sring()");
+        breakpoint(); logger.debug("tokenize_sring()");
         SourceLocation pos = get_pos();
         std::string buf;
 
@@ -291,7 +297,7 @@ namespace lang::frontend::lexer
     }
 
     char Lexer::tokenize_escape() {
-        debug_break();
+        breakpoint();
         auto pos = get_pos();
         ++pos.end.column;
         ++pos.end.index;
@@ -317,14 +323,12 @@ namespace lang::frontend::lexer
     }
 
     void Lexer::process_comment_line() {
-        debug_break();
-        logger.debug("process_coment_line()");
+        breakpoint(); logger.debug("process_coment_line()");
         skip(2); // skip "//"
         while(!is_eof() && peek() != '\n') skip();
     }
     void Lexer::process_comment_block() {
-        debug_break();
-        logger.debug("process_coment_block()");
+        breakpoint(); logger.debug("process_coment_block()");
         auto pos = get_pos();
         skip(2); // skip "/*"
         while(!is_eof()) {

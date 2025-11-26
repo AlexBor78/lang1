@@ -3,6 +3,14 @@
 #include <cstddef>
 #include <string>
 
+// Debug flags for different components
+#ifdef DEBUGGING
+    // #define LEXER_DEBUG
+    #define PARSER_DEBUG
+    // #define SEMANTIC_DEBUG
+    // #define CODEGEN_DEBUG
+#endif
+
 namespace lang
 {
     inline void debug_break() {
