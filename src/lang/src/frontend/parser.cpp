@@ -1,7 +1,11 @@
+#include "lang/ast/ast.h"
+#include "lang/ast/stmt.h"
+#include "lang/frontend/token.h"
 #include <lang/common.h>
 // #define PARSER_DEBUG
 
 #include <format>
+#include <memory>
 #include <string>
 #include <lang/utils/frontend_utils.h>
 #include <lang/utils/ast_utils.h>
@@ -132,10 +136,10 @@ namespace lang::frontend::parser
         if(!is_end() && match(TokenType::ENUM)) throw enum_is_not_suported();
 
         // control flow
-        if(!is_end() && match(TokenType::IF)) throw if_is_not_suported();
-        if(!is_end() && match(TokenType::ELSE)) throw else_is_not_suported();
-        if(!is_end() && match(TokenType::FOR)) throw for_is_not_suported();
-        if(!is_end() && match(TokenType::WHILE)) throw while_is_not_suported();
+        if(!is_end() && match(TokenType::IF)) return process_if_stmt();
+        if(!is_end() && match(TokenType::ELSE)) return process_else_stmt();
+        if(!is_end() && match(TokenType::FOR)) return process_for_stmt();
+        if(!is_end() && match(TokenType::WHILE)) return process_while_stmt();
 
         // other stmt's
         if(!is_end() && match(TokenType::LBRACE)) return process_scope();
@@ -181,6 +185,89 @@ namespace lang::frontend::parser
 
     // control flow stmt's unsupported for now
 
+    std::unique_ptr<ast::IfStmt> Parser::process_if_stmt() {
+        breakpoint(); logger.debug("proccess_if_stmt()");
+        skip(); // skip IF tok
+
+        // condition
+        if(!(!is_end() && match(TokenType::LPAREN))) throw expected_lparen();
+        skip(); // skip '('
+        auto cond = process_expr();
+
+        if(!(!is_end() && match(TokenType::RPAREN))) throw expected_rparen();
+        skip(); // skip ')'
+
+        // body
+        ast::StmtPtr body{nullptr};
+        if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
+        else body = process_token();
+
+        return std::make_unique<ast::IfStmt>(std::move(cond), std::move(body));
+    }
+
+    std::unique_ptr<ast::ElseStmt> Parser::process_else_stmt() {
+        breakpoint(); logger.debug("proccess_else_stmt()");
+        skip(); // skip IF tok
+
+        // body
+        ast::StmtPtr body{nullptr};
+        if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
+        else body = process_token();
+
+        return std::make_unique<ast::ElseStmt>(std::move(body));
+    }
+
+    std::unique_ptr<ast::ForStmt> Parser::process_for_stmt() {
+        breakpoint(); logger.debug("proccess_for_stmt()");
+        skip(); // skip IF tok
+
+        if(!(!is_end() && match(TokenType::LPAREN))) throw expected_lparen();
+        skip(); // skip '('
+
+        // decl
+        ast::StmtPtr decl{nullptr};
+        if(!is_end() && !match(TokenType::SEMICOLON)) decl = process_variable_decl();
+        process_semicolon();
+
+        // condition
+        ast::ExprPtr cond{nullptr};
+        if(!is_end() && !match(TokenType::SEMICOLON)) cond = process_expr();
+        process_semicolon();
+
+        // incr/decr
+        ast::StmtPtr incr = process_expr();
+
+        if(!(!is_end() && match(TokenType::RPAREN))) throw expected_rparen();
+        skip(); // skip ')'
+
+        // body
+        ast::StmtPtr body{nullptr};
+        if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
+        else body = process_token();
+
+        return std::make_unique<ast::ForStmt>(std::move(decl), std::move(cond), std::move(incr), std::move(body));
+    }
+
+    std::unique_ptr<ast::WhileStmt> Parser::process_while_stmt() {
+        breakpoint(); logger.debug("proccess_while_stmt()");
+        skip(); // skip IF tok
+
+        // condition
+        if(!(!is_end() && match(TokenType::LPAREN))) throw expected_lparen();
+        skip(); // skip '('
+        auto cond = process_expr();
+
+        if(!(!is_end() && match(TokenType::RPAREN))) throw expected_rparen();
+        skip(); // skip ')'
+
+        // body
+        ast::StmtPtr body;
+        if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
+        else body = process_token();
+
+        return std::make_unique<ast::WhileStmt>(std::move(cond), std::move(body));
+    }
+
     // other stmt's
 
     std::unique_ptr<ast::BlockStmt> Parser::process_scope() {
@@ -203,6 +290,18 @@ namespace lang::frontend::parser
 
         if(!is_end() && match(TokenType::SEMICOLON)) return std::make_unique<ast::ReturnStmt>();
         return std::make_unique<ast::ReturnStmt>(process_expr());
+    }
+
+    std::unique_ptr<ast::BreakStmt> Parser::process_break_stmt() {
+        breakpoint(); logger.debug("proccess_break_stmt()");
+        skip(); // skip BREAK tok
+        return std::make_unique<ast::BreakStmt>();
+    }
+
+    std::unique_ptr<ast::ContinueStmt> Parser::process_continue_stmt() {
+        breakpoint(); logger.debug("proccess_continue_stmt()");
+        skip(); // skip BREAK tok
+        return std::make_unique<ast::ContinueStmt>();
     }
 
     // declare stmt's
@@ -360,7 +459,7 @@ namespace lang::frontend::parser
         while(utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_logical_op(op)) { skip(); // skip op
-                left = std::make_unique<ast::BinOpExpr>(op, std::move(left), process_compare_expr(), QualType(nullptr));
+                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_compare_expr(), QualType(nullptr));
             } else break;
         } return std::move(left);
     }
@@ -370,7 +469,7 @@ namespace lang::frontend::parser
         while(utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_compare_op(op)) { skip(); // skip op
-                left = std::make_unique<ast::BinOpExpr>(op, std::move(left), process_additive_expr(), QualType(nullptr));
+                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_additive_expr(), QualType(nullptr));
             } else break;
         } return std::move(left);
     }
@@ -380,7 +479,7 @@ namespace lang::frontend::parser
         while(utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_add_op(op)) { skip(); // skip op
-                left = std::make_unique<ast::BinOpExpr>(op, std::move(left), process_multiple_expr(), QualType(nullptr));
+                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_multiple_expr(), QualType(nullptr));
             } else break;
         } return std::move(left);
     }
@@ -390,7 +489,7 @@ namespace lang::frontend::parser
         while(utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_mul_op(op)) { skip(); // skip op
-                left = std::make_unique<ast::BinOpExpr>(op, std::move(left), process_unary_expr(), QualType(nullptr));
+                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_unary_expr(), QualType(nullptr));
             } else break;
         } return std::move(left);
     }

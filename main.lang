@@ -12,4 +12,13 @@ import std;
 
 int main() {
     std::println("Hello, World!");
+    if(a == 0) {
+        std::println("IfStmt is work");
+    } 
+    else std::println("ElseStmt is also work");
+
+    for(int i = 0; i < n; ++i) {
+        std::println("i={}", i);
+    }
+    
 }

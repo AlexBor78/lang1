@@ -24,10 +24,24 @@
     - [ ] add colors to logger output
 
 - [ ] project code refactor
+    - [ ] maybe change file structure (mv src/lang/include/lang/semantic -> .../lang/frontend, etc)
     - [X] rename src/compiler folder to src/compiler_app
     - [X] use shared_ptr instead unique_ptr in logger for streams
+    - [X] refactor PrintAST
+        - [X] rename some nodes (e.g. CallExpr -> FunctionExpr)
+        - [ ] check if // WTF?
+
     - [ ] standardization api (private and public)
         - [ ] rename Lexer::is_success() -> Lexer::had_errors()
+
+    - [ ] refactor Parser
+        - [X] first iteration
+            - [X] adapt to new api
+            - [X] clean up code a little bit
+        - [ ] second iteration
+            - [ ] clean up code
+            - [ ] add pos to errors and nodes
+            - [ ] maybe(would be perfect) fix issue with last's tokens (peek(): out of range)
 
     - [ ] use warns
         - [ ] Lexer
@@ -79,11 +93,11 @@
         - [X] pass DEBUGING through flags
 
 - [ ] extend parser
-    - [ ] extend AST(BreakStmt, ContinueStmt)
-    - [ ] add END token
+    - [X] extend AST(BreakStmt, ContinueStmt)
+    - [X] add END token 
     - [ ] save node pos
-    - [ ] add if-else for while
-    - [ ] allow stmt without {} for if-else, for, while, stmt
+    - [X] add if-else for while
+    - [X] allow stmt without {} for if-else, for, while, stmt
 
 - [ ] add user-api to compiler app
     - [ ] multi-file handling (import module, than use module.lang file)

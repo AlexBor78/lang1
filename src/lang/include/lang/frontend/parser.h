@@ -63,14 +63,15 @@ namespace lang::frontend::parser
         std::unique_ptr<ast::ImportStmt>        process_import_stmt();
 
         // control flow
-        // std::unique_ptr<ast::IfStmt>         process_if_stmt();
-        // std::unique_ptr<ast::ForStmt>        process_for_stmt();
-        // std::unique_ptr<ast::WhileStmt>      process_while_stmt();
+        std::unique_ptr<ast::IfStmt>            process_if_stmt();
+        std::unique_ptr<ast::ElseStmt>          process_else_stmt();
+        std::unique_ptr<ast::ForStmt>           process_for_stmt();
+        std::unique_ptr<ast::WhileStmt>         process_while_stmt();
 
         // other stmt's
         std::unique_ptr<ast::BlockStmt>         process_scope();
-        // std::unique_ptr<ast::BreakStmt>      process_break_stmt();
-        // std::unique_ptr<ast::ContinueStmt>   process_continue_stmt();
+        std::unique_ptr<ast::BreakStmt>         process_break_stmt();
+        std::unique_ptr<ast::ContinueStmt>      process_continue_stmt();
         std::unique_ptr<ast::ReturnStmt>        process_return_stmt();
 
         // declare
