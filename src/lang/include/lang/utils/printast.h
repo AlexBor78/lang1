@@ -1,5 +1,6 @@
 #pragma once
 
+#include "lang/ast/stmt.h"
 #include <format>
 #include <string>
 #include <string_view>
@@ -27,6 +28,7 @@ namespace lang::utils
     public:
         virtual void visit_block_stmt(const ast::BlockStmt&) noexcept override;
         virtual void visit_if_stmt(const ast::IfStmt&) noexcept override;
+        virtual void visit_else_stmt(const ast::ElseStmt&) noexcept override;
         virtual void visit_for_stmt(const ast::ForStmt&) noexcept override;
         virtual void visit_while_stmt(const ast::WhileStmt&) noexcept override;
         virtual void visit_decl_var(const ast::DeclVariable&) noexcept override;

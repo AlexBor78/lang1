@@ -29,13 +29,18 @@ namespace lang::ast
 
 // StructureStmt
 
-    const ExprNode* StructureStmt::get_cond() const
-    {
+    const StmtNode* StructureStmt::get_body() const {
+        return body.get();
+    }
+
+// StructureStmtWithCond
+    
+    const ExprNode* StructureStmtWithCond::get_cond() const {
         return cond.get();
     }
-    const StmtNode* StructureStmt::get_body() const
-    {
-        return body.get();
+
+    ExprNode* StructureStmtWithCond::get_cond() {
+        return cond.get();
     }
 
 // IfStmt
@@ -47,6 +52,17 @@ namespace lang::ast
     void IfStmt::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_if_stmt(*this);
+    }
+
+// ElseStmt
+
+    void ElseStmt::accept(ConstASTVisitor& visitor) const noexcept
+    {
+        visitor.visit_else_stmt(*this);
+    }
+    void ElseStmt::accept(ASTVisitor& visitor) noexcept
+    {
+        visitor.visit_else_stmt(*this);
     }
 
 // ForStmt

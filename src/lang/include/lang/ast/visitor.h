@@ -14,6 +14,7 @@ namespace lang::ast
     public:
         virtual void visit_block_stmt(const BlockStmt&) noexcept = 0;
         virtual void visit_if_stmt(const IfStmt&) noexcept = 0;
+        virtual void visit_else_stmt(const ElseStmt&) noexcept = 0;
         virtual void visit_for_stmt(const ForStmt&) noexcept = 0;
         virtual void visit_while_stmt(const WhileStmt&) noexcept = 0;
         virtual void visit_decl_var(const DeclVariable&) noexcept = 0;
@@ -44,6 +45,7 @@ namespace lang::ast
     public:
         virtual void visit_block_stmt(BlockStmt&) noexcept = 0;
         virtual void visit_if_stmt(IfStmt&) noexcept = 0;
+        virtual void visit_else_stmt(ElseStmt&) noexcept = 0;
         virtual void visit_for_stmt(ForStmt&) noexcept = 0;
         virtual void visit_while_stmt(WhileStmt&) noexcept = 0;
         virtual void visit_decl_var(DeclVariable&) noexcept = 0;

@@ -1,3 +1,4 @@
+#include "lang/ast/stmt.h"
 #include <print>
 #include <utility>
 #include <lang/utils/printast.h>
@@ -68,6 +69,17 @@ namespace lang::utils
         else println("null");
         remove_from_prefix();
 
+        print("Body:");
+        add_to_prefix();
+        if(node.get_body()) node.get_body()->accept(*this);
+        else println("null");
+        remove_from_prefix(4);
+    }
+    void PrintAST::visit_else_stmt(const ast::ElseStmt& node) noexcept
+    {
+        println("ElseStmt:");
+        add_to_prefix();
+        
         print("Body:");
         add_to_prefix();
         if(node.get_body()) node.get_body()->accept(*this);

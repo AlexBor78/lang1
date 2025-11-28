@@ -43,15 +43,12 @@ namespace lang::ast
     class StructureStmt : public StmtNode
     {
     private:
-        ExprPtr cond;
         StmtPtr body;
 
     protected:
-        StructureStmt(ExprPtr _cond
-        ,             StmtPtr _body
-        ,             SourceLocation _pos = default_pos()
+        explicit StructureStmt(StmtPtr _body
+        ,                      SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
-        ,   cond(std::move(_cond))
         ,   body(std::move(_body))
         {}
 
@@ -59,18 +56,55 @@ namespace lang::ast
         virtual void accept(ConstASTVisitor&) const noexcept override = 0;
         virtual void accept(ASTVisitor&) noexcept override = 0;
 
-        const ExprNode* get_cond() const;
         const StmtNode* get_body() const;
+        StmtNode* get_body();
     };
 
-    class IfStmt : public StructureStmt
+    class StructureStmtWithCond : public StructureStmt
+    {
+    private:
+        ExprPtr cond;
+
+    protected:
+        StructureStmtWithCond(ExprPtr _cond
+        ,                     StmtPtr _body
+        ,                     SourceLocation _pos = default_pos()
+        ):  StructureStmt(std::move(_body)
+            ,             std::move(_pos)
+            )
+        ,   cond(std::move(_cond))
+        {}
+
+    public:
+        virtual void accept(ConstASTVisitor&) const noexcept override = 0;
+        virtual void accept(ASTVisitor&) noexcept override = 0;
+
+        const ExprNode* get_cond() const;
+        ExprNode* get_cond();
+    };
+
+    class IfStmt : public StructureStmtWithCond
     {
     public:
         IfStmt(ExprPtr _cond
         ,      StmtPtr _body
         ,      SourceLocation _pos = default_pos()
-        ):  StructureStmt(std::move(_cond)
-            ,             std::move(_body)
+        ):  StructureStmtWithCond(std::move(_cond)
+            ,                     std::move(_body)
+            ,                     std::move(_pos)
+            )
+        {}
+
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
+    };
+
+    class ElseStmt : public StructureStmt
+    {
+    public:
+        explicit ElseStmt(StmtPtr _body
+        ,                 SourceLocation _pos = default_pos()
+        ):  StructureStmt(std::move(_body)
             ,             std::move(_pos)
             )
         {}
@@ -79,7 +113,7 @@ namespace lang::ast
         virtual void accept(ASTVisitor&) noexcept override;
     };
 
-    class ForStmt : public StructureStmt
+    class ForStmt : public StructureStmtWithCond
     {
     private:
         StmtPtr decl;
@@ -91,7 +125,7 @@ namespace lang::ast
         ,       StmtPtr _incr
         ,       StmtPtr _body
         ,       SourceLocation _pos = default_pos()
-        ):  StructureStmt(std::move(_cond)
+        ):  StructureStmtWithCond(std::move(_cond)
             ,             std::move(_body)
             ,             std::move(_pos)
             )
@@ -106,13 +140,13 @@ namespace lang::ast
         const StmtNode* get_incr() const;
     };
 
-    class WhileStmt : public StructureStmt
+    class WhileStmt : public StructureStmtWithCond
     {
     public:
         WhileStmt(ExprPtr _cond
         ,         StmtPtr _body
         ,         SourceLocation _pos = default_pos()
-        ):  StructureStmt(std::move(_cond)
+        ):  StructureStmtWithCond(std::move(_cond)
             ,             std::move(_body)
             ,             std::move(_pos)
             )
