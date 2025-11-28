@@ -107,6 +107,7 @@ namespace lang::frontend::parser
     }
     
     void Parser::process_semicolon() {
+        if(is_end()) return;
         if(!is_end() && match(TokenType::SEMICOLON)) skip();
         else throw expected_semicolon();
     }

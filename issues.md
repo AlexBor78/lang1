@@ -1,0 +1,1 @@
+- [ ] parser don't process last symbols right if code is wrong (e.g. missed ';')
