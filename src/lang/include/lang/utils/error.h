@@ -1,33 +1,19 @@
 #pragma once
 
 #include <string>
-#include <exception>
 #include <string_view>
 #include <lang/common.h>
-#include <lang/utils/logger.h>
+#include <lang/utils/diagnostic.h> // Diagnostic and DiagnosticBuilder
 
 namespace lang::errors
 {
-    class Error : public std::exception
+    class Error: public Diagnostic
     {
     protected:
-        std::string msg;
-        Error(std::string_view _msg): 
-            msg(_msg)
+        Error() = default;
+        explicit Error(std::string_view _msg):
+            Diagnostic(_msg)
         {}
-
-    public:
-        Error(const Error& e): 
-            Error(e.what())
-        {}
-        virtual Error& operator=(const std::exception& e) noexcept {
-            msg = e.what();
-            return *this;
-        }
-        virtual Error& operator=(const Error& e) noexcept {
-            msg = e.msg;
-            return *this;
-        }
     };
 
     class InterError : public Error
@@ -41,43 +27,22 @@ namespace lang::errors
     class CompileError : public Error
     {
     private:
-        utils::Logger logger{utils::Logger::LogLevel::ALL};
-        void init_logger(std::string_view name = "");
-        SourceLocation pos;
-        void build_error();
+        DiagnosticBuilder builder;
 
     protected:
         CompileError(std::string_view _msg
         ,            SourceLocation   _pos
         ,            std::string_view name = ""
         ):  Error(_msg)
-        ,   pos(std::move(_pos)) {
-            init_logger(name);
-            build_error();
+        ,   builder(name, _pos) {
+            msg = builder.build(_msg);
         }
-    public:
-        CompileError(const CompileError& e): Error(e.what()) {
-            logger.set_name(e.get_name());
-            logger.set_prefix(e.get_prefix());
-            logger.set_level(e.logger.get_level());
-        }
+
     public: // api
-        virtual CompileError& operator=(const CompileError& e) noexcept {
-            msg = e.msg;
-            logger.set_name(e.get_name());
-            logger.set_prefix(e.get_prefix());
-            logger.set_level(e.logger.get_level());
-            return *this;
-        }
-        std::string_view get_name() const noexcept {
-            return logger.get_name();
-        }
-        std::string_view get_prefix() const noexcept {
-            return logger.get_prefix();
-        }
-        virtual const char* what() const noexcept override {
-            return msg.c_str();   
-        }
+        // virtual CompileError& operator=(const CompileError& e) noexcept {
+        //     // todo
+        //     return *this;
+        // }
     };
 
     class FrontendError : public CompileError
@@ -95,10 +60,6 @@ namespace lang::errors
     class LexerError : public FrontendError
     {
     public:
-        virtual Error& operator=(const std::exception& e) noexcept override {
-            msg = e.what();
-            return *this;
-        }
         explicit LexerError(std::string_view _msg
         ,                   SourceLocation _pos = {}
         ):  FrontendError(_msg
@@ -110,10 +71,6 @@ namespace lang::errors
     class ParserError : public FrontendError
     {
     public:
-        virtual Error& operator=(const std::exception& e) noexcept override {
-            msg = e.what();
-            return *this;
-        }
         explicit ParserError(std::string_view _msg
         ,                    SourceLocation   _pos = {}
         ):  FrontendError(_msg
@@ -135,4 +92,72 @@ namespace lang::errors
     //     )
     //     {}
     // };
+
+    class Warn : public Diagnostic
+    {
+    protected: // vars
+        Warn(std::string_view _msg): 
+            Diagnostic(_msg)
+        {}
+
+    public: // part of future api (will impl in inheritors)
+        Warn(const Warn& e): 
+            Warn(e.what())
+        {}
+    };
+
+    class CompileWarn : public Warn
+    {
+    private:
+        DiagnosticBuilder builder;
+
+    protected:
+        CompileWarn(std::string_view _msg
+        ,            SourceLocation   _pos
+        ,            std::string_view name = ""
+        ):  Warn(_msg)
+        ,   builder(name, _pos) {
+            msg = builder.build(_msg);
+        }
+
+    public: // api
+        virtual CompileWarn& operator=(const CompileWarn& e) noexcept {
+            // todo
+            return *this;
+        }
+    };
+
+    class FrontendWarn : public CompileWarn
+    {
+    protected:
+        FrontendWarn(std::string_view _msg
+        ,             SourceLocation _pos = {}
+        ,             std::string_view _name = "FrontendWarn"
+        ):  CompileWarn(_msg
+        ,                std::move(_pos)
+        ,                _name
+        ) {}
+    };
+
+    class LexerWarn : public FrontendWarn
+    {
+    public:
+        explicit LexerWarn(std::string_view _msg
+        ,                   SourceLocation _pos = {}
+        ):  FrontendWarn(_msg
+        ,                 std::move(_pos)
+        ,                 "LexerWarn"
+        ) {}
+    };
+
+    class ParserWarn : public FrontendWarn
+    {
+    public:
+        explicit ParserWarn(std::string_view _msg
+        ,                    SourceLocation   _pos = {}
+        ):  FrontendWarn(_msg
+        ,                 std::move(_pos)
+        ,                 "ParserWarn"
+        ) {}
+    };
 }

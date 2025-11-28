@@ -29,6 +29,10 @@
     - [ ] standardization api (private and public)
         - [ ] rename Lexer::is_success() -> Lexer::had_errors()
 
+    - [ ] use warns
+        - [ ] Lexer
+        - [ ] Parser
+
     - [X] use Logger
         - [X] CompileError: while building error message
         - [X] Lexer

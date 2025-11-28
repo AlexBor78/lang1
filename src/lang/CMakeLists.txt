@@ -27,6 +27,7 @@ set(sources
     src/semantic/scope.cpp
     
     # utils
+    src/utils/diagnostic.cpp
     src/utils/printast.cpp
     src/utils/istream.cpp
     src/utils/ostream.cpp
