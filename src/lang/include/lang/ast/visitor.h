@@ -22,6 +22,8 @@ namespace lang::ast
         virtual void visit_decl_namespace(const DeclNamespace&) noexcept = 0;
         virtual void visit_import_stmt(const ImportStmt&) noexcept = 0;
         virtual void visit_return_stmt(const ReturnStmt&) noexcept = 0;
+        virtual void visit_break_stmt(const BreakStmt&) noexcept = 0;
+        virtual void visit_continue_stmt(const ContinueStmt&) noexcept = 0;
         virtual void visit_number_literal(const NumberLiteral&) noexcept = 0;
         virtual void visit_string_literal(const StringLiteral&) noexcept = 0;
         virtual void visit_bool_literal(const BoolLiteral&) noexcept = 0;
@@ -50,6 +52,8 @@ namespace lang::ast
         virtual void visit_decl_namespace(DeclNamespace&) noexcept = 0;
         virtual void visit_import_stmt(ImportStmt&) noexcept = 0;
         virtual void visit_return_stmt(ReturnStmt&) noexcept = 0;
+        virtual void visit_break_stmt(BreakStmt&) noexcept = 0;
+        virtual void visit_continue_stmt(ContinueStmt&) noexcept = 0;
         virtual void visit_number_literal(NumberLiteral&) noexcept = 0;
         virtual void visit_string_literal(StringLiteral&) noexcept = 0;
         virtual void visit_bool_literal(BoolLiteral&) noexcept = 0;

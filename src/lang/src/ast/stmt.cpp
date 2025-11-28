@@ -182,4 +182,27 @@ namespace lang::ast
     {
         return ret_expr.get();
     }
+
+// BreakStmt
+
+    void BreakStmt::accept(ConstASTVisitor& visitor) const noexcept
+    {
+        visitor.visit_break_stmt(*this);
+    }
+    void BreakStmt::accept(ASTVisitor& visitor) noexcept
+    {
+        visitor.visit_break_stmt(*this);
+    }
+
+// ContinueStmt
+
+    void ContinueStmt::accept(ConstASTVisitor& visitor) const noexcept
+    {
+        visitor.visit_continue_stmt(*this);
+    }
+    void ContinueStmt::accept(ASTVisitor& visitor) noexcept
+    {
+        visitor.visit_continue_stmt(*this);
+    }
+    
 }

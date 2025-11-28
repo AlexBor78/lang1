@@ -291,17 +291,17 @@ namespace lang::ast
     };
 
 // TODO: 
-    // class BreakStmt : public StmtNode
-    // {
-    // public:
-    //     virtual void accept(ConstASTVisitor&) const noexcept override;
-    //     virtual void accept(ASTVisitor&) noexcept override;
-    // };
+    class BreakStmt : public StmtNode
+    {
+    public:
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
+    };
     
-    // class ContinueStmt : public StmtNode
-    // {
-    // public:
-    //     virtual void accept(ConstASTVisitor&) const noexcept override;
-    //     virtual void accept(ASTVisitor&) noexcept override;
-    // };
+    class ContinueStmt : public StmtNode
+    {
+    public:
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
+    };
 }

@@ -192,6 +192,12 @@ namespace lang::utils
         else println("null");
         remove_from_prefix(4);
     }
+    void PrintAST::visit_break_stmt(const ast::BreakStmt&) noexcept {
+        println("BreakStmt:");
+    }
+    void PrintAST::visit_continue_stmt(const ast::ContinueStmt&) noexcept {
+        println("ContinueStmt:");
+    }
     void PrintAST::visit_number_literal(const ast::NumberLiteral& node) noexcept
     {
         println("NumberLiteral:");

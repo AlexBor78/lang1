@@ -35,6 +35,8 @@ namespace lang::utils
         virtual void visit_decl_namespace(const ast::DeclNamespace&) noexcept override;
         virtual void visit_import_stmt(const ast::ImportStmt&) noexcept override;
         virtual void visit_return_stmt(const ast::ReturnStmt&) noexcept override;
+        virtual void visit_break_stmt(const ast::BreakStmt&) noexcept override;
+        virtual void visit_continue_stmt(const ast::ContinueStmt&) noexcept override;
         virtual void visit_number_literal(const ast::NumberLiteral&) noexcept override;
         virtual void visit_string_literal(const ast::StringLiteral&) noexcept override;
         virtual void visit_bool_literal(const ast::BoolLiteral&) noexcept override;
