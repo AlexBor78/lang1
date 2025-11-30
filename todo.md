@@ -20,7 +20,7 @@
 
 - [ ] done Logger
     - [X] add .log to gitignore
-    - [x] implement logger
+    - [X] implement logger
     - [ ] add colors to logger output
 
 - [ ] project code refactor
@@ -31,8 +31,11 @@
         - [X] rename some nodes (e.g. CallExpr -> FunctionExpr)
         - [ ] check if // WTF?
 
-    - [ ] standardization api (private and public)
-        - [ ] rename Lexer::is_success() -> Lexer::had_errors()
+    - [ ] make naming(classes, args, api, etc) more consistence
+        - [ ] use AST alias type instead of `std::vector<ast::BaseNode>` 
+        - [ ] maybe rename ASTVisitor -> Visitor (and with const variation)
+        - [ ] standardization api (private and public)
+            - [ ] rename Lexer::is_success() -> Lexer::had_errors()
 
     - [ ] refactor Parser
         - [X] first iteration
@@ -58,7 +61,7 @@
         - [X] set pos.line and pos.column in stream
 
     - [ ] refactor and extend Error
-        - [ ] add warns
+        - [X] add warns
         - [ ] add colors
         - [X] upgrade output
         - [X] handle multi-line tokens
@@ -104,6 +107,13 @@
     - [ ] pass insert files in args
     - [ ] pass paths to find modules
 
+
+- [ ] preparation to semantic
+    - [X] add state type
+    - [ ] remove types from AST and add type context
+    - [ ] add SyntaxType and SyntaxTypeContext (use in parser)
+
+
 - [ ] semantic...
     - [X] create semantic types
         - [X] identifier
@@ -111,8 +121,40 @@
         - [X] module
         - [X] program
 
+    - Semantic phases:
+        1. Modules - process imports, collect all names from modules, (without body)
+        2. Names - check if name exist
+        3. types - fill TypeTable with types, check if types exists, replace temporary faketypes in nodes to real from table
+        4. Optimize
+
     - [ ] create semantic analysts
-        - [ ] types creator
-        - [ ] identifier checker
-        - [ ] type checker
-        - [ ] optimizer
+        - [ ] ProgramInitializer (Program name, global_scope, etc)
+        - Modules phase
+            - [ ] ModuleProcessor - process modules import (btw will check if file starts from ModuleDecl node)
+        - [ ] Names phase
+            - [ ] NameChecker check if identifier exists (var and functions)
+        - [ ] Types phase
+            - [ ] TypeBuilder - fill TypeTable with types (not supported for now, in future: aliases, structs, enum)
+            - [ ] TypeInitializer - create QualType from SyntaxType (BTW check if  type exists)
+            - [ ] TypeResolver - resolve types (e.g. bool -> int, uint -> int, etc)
+        - [ ] optimize phase
+            - [ ] Optimizers (e.g. increment, blockstmt->one-stmt(if possible), etc)
+
+- [ ] todo some day, wrote just to not forget
+    - [ ] design module (files and logic)
+    
+- [ ] design module (files and logic)
+    - [ ] check if file was edited (by hash)
+        - [ ] crypto library
+        - [ ] maybe some data structure's
+
+    - [ ] file format (some JSON stuff)
+        - [ ] needs JSON lib
+        - [ ] serialization (and serializer)
+            - [ ] AST serializer (ConstVisitor BTW)
+            - [ ] Module(data structure) serializer (TypeTable, Scope, Identifier, etc)
+            - [ ] main Serializer class
+        - [ ] deserialization (and deserializer)
+            - [ ] AST deserializer (ConstVisitor BTW)
+            - [ ] Module(data structure) deserializer (TypeTable, Scope, Identifier, etc)
+            - [ ] main DeSerializer class

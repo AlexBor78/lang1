@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include <lang/common.h>
 #include <lang/semantic/typesystem.h>
 
@@ -11,9 +12,11 @@ namespace lang::ast
     class StmtNode;
     class ExprNode;
     class DeclStmt;
+    class BaseNode;
 
     using StmtPtr = std::unique_ptr<StmtNode>;
     using ExprPtr = std::unique_ptr<ExprNode>;
+    using AST = std::vector<std::unique_ptr<BaseNode>>;
 
     class BaseNode
     {

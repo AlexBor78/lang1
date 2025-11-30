@@ -80,7 +80,15 @@ namespace lang::ast
     {
         return decl.get();
     }
+    StmtNode* ForStmt::get_decl()
+    {
+        return decl.get();
+    }
     const StmtNode* ForStmt::get_incr() const
+    {
+        return incr.get();
+    }
+    StmtNode* ForStmt::get_incr()
     {
         return incr.get();
     }

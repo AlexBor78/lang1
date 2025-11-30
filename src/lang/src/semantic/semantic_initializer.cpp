@@ -1,7 +1,19 @@
-#include <lang/semantic/program.h>
+#include <lang/semantic/semantic_types.h>
 
 namespace lang::semantic
 {
+
+    SemanticState SemanticInitializer::init_state(std::string_view name) {
+        SemanticState state;
+
+        // program
+        state.program.name = name;
+        state.program.global_scope = init_global_scope();
+        state.curr_scope = state.program.global_scope.get();
+
+        return state;
+    }
+
 /*
 Types table:
 
@@ -14,10 +26,7 @@ half    - float16
 float   - float32
 double  - float64
 */
-
-    Program::~Program() = default;
-
-    std::unique_ptr<Scope> Program::init_global_scope() noexcept {
+    std::unique_ptr<Scope> SemanticInitializer::init_global_scope() {
         auto scope = std::make_unique<Scope>();
         
         TypeInfo int_info = TypeInfo{

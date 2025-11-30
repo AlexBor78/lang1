@@ -20,9 +20,9 @@ set(sources
     src/ast/ast.cpp
 
     # semantic
+    src/semantic/semantic_initializer.cpp
     src/semantic/typesystem.cpp
     src/semantic/identifier.cpp
-    src/semantic/program.cpp
     src/semantic/module.cpp
     src/semantic/scope.cpp
     
@@ -38,6 +38,4 @@ set(sources
 )
 
 add_library(${PROJECT_NAME} STATIC ${sources})
-
 target_include_directories(${PROJECT_NAME} PUBLIC include)
-

@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include <lang/semantic/typesystem.h>
+#include <vector>
 
 namespace lang::semantic 
 {
@@ -14,6 +15,7 @@ namespace lang::semantic
     private:
         Scope* parent{nullptr};
         std::unordered_map<std::string, std::unique_ptr<Identifier>> identifiers;
+        std::vector<std::unique_ptr<Scope>> child_scopes;
         TypeTable typetable;
 
     public:
@@ -33,6 +35,8 @@ namespace lang::semantic
 
         const Scope* get_parent() const noexcept;
         Scope* get_parent() noexcept;
+
+        Scope* add_child();
 
         const TypeTable& get_typetable() const noexcept;
         TypeTable& get_typetable() noexcept;

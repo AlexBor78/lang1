@@ -1,5 +1,6 @@
 #pragma once
 
+#include "lang/semantic/typesystem.h"
 #include <memory>
 #include <vector>
 #include <string_view>
@@ -137,7 +138,9 @@ namespace lang::ast
         virtual void accept(ASTVisitor&) noexcept override;
 
         const StmtNode* get_decl() const;
+        StmtNode* get_decl();
         const StmtNode* get_incr() const;
+        StmtNode* get_incr();
     };
 
     class WhileStmt : public StructureStmtWithCond
@@ -174,7 +177,7 @@ namespace lang::ast
 
         std::string_view get_name() const noexcept;
     };
-
+    
     class DeclName : public DeclStmt
     {
     private:
@@ -197,6 +200,8 @@ namespace lang::ast
         virtual void accept(ASTVisitor&) noexcept override = 0;
 
         bool is_extern() const noexcept;
+        const QualType& get_type() const;
+        QualType& get_type();
     };
 
     class DeclVariable : public DeclName
