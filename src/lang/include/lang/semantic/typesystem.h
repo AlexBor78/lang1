@@ -26,44 +26,69 @@ namespace lang
         ,   info(_info)
         {}
     };
-    
-    class QualType
+
+    class TypeFlagsAPI
     {
     public: enum class Flags : uint8_t {
             NONE        = 0,
             CONST       = 1 << 0,
             POINTER     = 1 << 1,
             REFERENCE   = 1 << 2,
-            FUNCTOIN    = 1 << 3
+            FUNCTOIN    = 1 << 3 // unused for now (not supported by syntax)
         };
+    protected: // var
+        Flags flags;
+
+    public: // api
+        TypeFlagsAPI(Flags _flags):
+            flags(_flags)
+        {}
+        
+        Flags get_flags() const noexcept;
+        bool is_reference() const noexcept;
+        bool is_function() const noexcept;
+        bool is_pointer() const noexcept;
+        bool is_const() const noexcept;
+    };
+
+    // alternative name - DeclNotes
+    // temporary container with full semantic info of declaration
+    struct SemanticBag : public TypeFlagsAPI{
+        bool is_extern{false};
+        std::string name;
+
+        SemanticBag(): TypeFlagsAPI(TypeFlagsAPI::Flags::NONE) {}
+        SemanticBag(std::string_view _name
+        ,           Flags _flags
+        ,           bool _is_extern = false
+        ):  TypeFlagsAPI(_flags)
+        ,   name(_name)
+        ,   is_extern(_is_extern)
+        {}
+    };
     
+    class QualType : public TypeFlagsAPI
+    {
     private:
         const Type* type;
-        Flags flags{0};
 
     public:
-        QualType() = delete;
-        explicit QualType(const Type* _type = nullptr
+        explicit QualType(const Type* _type
         ,                 Flags _flags = Flags::NONE
-        ):  type(_type)
-        ,   flags(_flags)
+        ):  TypeFlagsAPI(_flags)
+        ,   type(_type)   
         {}
 
         const Type* get_raw_type() const noexcept;
         bool is_equal(const Type*) const noexcept;
         bool is_equal(QualType) const noexcept;
-        bool is_reference() const noexcept;
-        bool is_function() const noexcept;
-        bool is_pointer() const noexcept;
-        bool is_const() const noexcept;
 
         std::string_view get_name() const noexcept;
     };
     
-    constexpr QualType::Flags operator|(QualType::Flags, QualType::Flags) noexcept;
-    constexpr QualType::Flags& operator|=(QualType::Flags&, QualType::Flags) noexcept;
-    constexpr bool operator&(QualType::Flags, QualType::Flags) noexcept;
-
+    constexpr TypeFlagsAPI::Flags operator|(TypeFlagsAPI::Flags, TypeFlagsAPI::Flags) noexcept;
+    constexpr TypeFlagsAPI::Flags& operator|=(TypeFlagsAPI::Flags&, TypeFlagsAPI::Flags) noexcept;
+    constexpr bool operator&(TypeFlagsAPI::Flags, TypeFlagsAPI::Flags) noexcept;
 
     class TypeTable
     {
@@ -93,19 +118,19 @@ namespace lang
     };
 
 
-    constexpr QualType::Flags operator|(QualType::Flags a, QualType::Flags b) noexcept {
-        return static_cast<QualType::Flags>(
+    constexpr TypeFlagsAPI::Flags operator|(TypeFlagsAPI::Flags a, TypeFlagsAPI::Flags b) noexcept {
+        return static_cast<TypeFlagsAPI::Flags>(
             static_cast<uint8_t>(a) | static_cast<uint8_t>(b)
         );
     }
 
-    constexpr QualType::Flags& operator|=(QualType::Flags& a, QualType::Flags b) noexcept {
-        return a = static_cast<QualType::Flags>(
+    constexpr TypeFlagsAPI::Flags& operator|=(TypeFlagsAPI::Flags& a, TypeFlagsAPI::Flags b) noexcept {
+        return a = static_cast<TypeFlagsAPI::Flags>(
             static_cast<uint8_t>(a) | static_cast<uint8_t>(b)
         );
     }
 
-    constexpr bool operator&(QualType::Flags a, QualType::Flags b) noexcept {
+    constexpr bool operator&(TypeFlagsAPI::Flags a, TypeFlagsAPI::Flags b) noexcept {
         return (static_cast<uint8_t>(a) & static_cast<uint8_t>(b)) != 0;
     }
 }

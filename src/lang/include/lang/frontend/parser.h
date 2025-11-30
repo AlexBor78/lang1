@@ -1,8 +1,7 @@
 #pragma once
 
-#include <cstddef>
 #include <memory>
-#include <vector>
+#include <unordered_map>
 
 #include <lang/ast/ast.h>
 #include <lang/ast/expr.h>
@@ -15,34 +14,33 @@
 namespace lang::frontend::parser
 {
     class Parser {
-    public: // public api
+    public: // api
         Parser() {
             init_logger();
         }
 
-        // return ast
-        std::vector<std::unique_ptr<ast::BaseNode>> parse(const std::vector<Token>&);
-
-        // is_success
+        ast::AST parse(const std::vector<Token>&);
         bool had_errors() const noexcept;
-
-        // free memory that contains temporary types
-        void clear_typecontext() noexcept;
+        
+        std::unordered_map<ast::BaseNode*, SemanticBag> get_semantic_context() const;
+        void clear_semantic_context() noexcept;
 
     private: // vars
         utils::Logger logger{utils::Logger::LogLevel::ALL};
-        std::vector<std::unique_ptr<Type>> type_context;
+        std::unordered_map<ast::BaseNode*, SemanticBag> semantic_context;
+
         const std::vector<Token>* tokens{nullptr};    
         bool module_declared{false};
         bool success{true};
         size_t pos{0};
     
-    private: // private api
+    private: // api
+        // don't clear semantic_context
         void reset_state();
         void init_logger();
         void breakpoint();
 
-        const Type* add_type(std::unique_ptr<Type>) noexcept;
+        void add_semantic_info(ast::BaseNode*, SemanticBag) noexcept;
 
         bool         is_end(size_t n = 1) const;
         bool         match(TokenType, size_t offset = 0) const;
@@ -75,7 +73,7 @@ namespace lang::frontend::parser
         std::unique_ptr<ast::ReturnStmt>        process_return_stmt();
 
         // declare
-        QualType process_type();
+        SemanticBag process_type();
         std::unique_ptr<ast::DeclStmt>          process_declare();
         std::unique_ptr<ast::DeclNamespace>     process_namespace_decl();
         std::unique_ptr<ast::DeclVariable>      process_variable_decl();

@@ -108,10 +108,10 @@
     - [ ] pass paths to find modules
 
 
-- [ ] preparation to semantic
+- [X] preparation for semantic
     - [X] add state type
-    - [ ] remove types from AST and add type context
-    - [ ] add SyntaxType and SyntaxTypeContext (use in parser)
+    - [X] remove types from AST and add type context
+    - [X] add SyntaxType and SyntaxTypeContext (use in parser)
 
 
 - [ ] semantic...

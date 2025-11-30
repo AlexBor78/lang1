@@ -1,6 +1,5 @@
 #pragma once
 
-#include "lang/semantic/typesystem.h"
 #include <memory>
 #include <vector>
 #include <string_view>
@@ -180,19 +179,11 @@ namespace lang::ast
     
     class DeclName : public DeclStmt
     {
-    private:
-        QualType type;
-        bool it_extern;
-
     protected:
         DeclName(std::string_view _name
-        ,        QualType _type
-        ,        bool _extern = false
         ,        SourceLocation _pos = default_pos()
         ):  DeclStmt(_name
             ,        std::move(_pos))
-        ,   type(_type)
-        ,   it_extern(_extern)
         {}
 
     public:
@@ -200,8 +191,6 @@ namespace lang::ast
         virtual void accept(ASTVisitor&) noexcept override = 0;
 
         bool is_extern() const noexcept;
-        const QualType& get_type() const;
-        QualType& get_type();
     };
 
     class DeclVariable : public DeclName
@@ -211,13 +200,9 @@ namespace lang::ast
 
     public:
         explicit DeclVariable(std::string_view _name
-        ,                QualType _type
         ,                ExprPtr _init = nullptr
-        ,                bool _extern = false
         ,                SourceLocation _pos = default_pos()
         ):  DeclName(_name
-            ,        _type
-            ,        _extern
             ,        std::move(_pos)
             )
         ,   init_expr(std::move(_init))
@@ -238,14 +223,10 @@ namespace lang::ast
 
     public:
         DeclFunction(std::string_view _name
-        ,        QualType _type
         ,        std::vector<std::unique_ptr<DeclVariable>> _args = {}
         ,        StmtPtr _body = nullptr
-        ,        bool _extern = false
         ,        SourceLocation _pos = default_pos()
         ):  DeclName(_name
-            ,        _type
-            ,        _extern
             ,        std::move(_pos)
             )
         ,   args(std::move(_args))
@@ -329,7 +310,6 @@ namespace lang::ast
         const ExprNode* get_ret_expr() const noexcept;
     };
 
-// TODO: 
     class BreakStmt : public StmtNode
     {
     public:

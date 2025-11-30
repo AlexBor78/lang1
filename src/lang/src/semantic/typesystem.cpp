@@ -3,36 +3,42 @@
 
 namespace lang
 {
-// QualType
+// TypeFlagsAPI
 
-    const Type* QualType::get_raw_type() const noexcept {
-        return type;
+    TypeFlagsAPI::Flags TypeFlagsAPI::get_flags() const noexcept {
+        return flags;
     }
 
-    bool QualType::is_equal(const Type* other) const noexcept {
-        return type == other;
-    }
-    bool QualType::is_equal(QualType other) const noexcept {
-        return type == other.type && flags == other.flags;
-    }
-    bool QualType::is_reference() const noexcept {
+    bool TypeFlagsAPI::is_reference() const noexcept {
         return flags & Flags::REFERENCE;
     }
 
-    bool QualType::is_function() const noexcept {
+    bool TypeFlagsAPI::is_function() const noexcept {
         return flags & Flags::FUNCTOIN;
     }
 
-    bool QualType::is_pointer() const noexcept {
+    bool TypeFlagsAPI::is_pointer() const noexcept {
         return flags & Flags::POINTER;
     }
 
-    bool QualType::is_const() const noexcept {
+    bool TypeFlagsAPI::is_const() const noexcept {
         return flags & Flags::CONST;
     }
 
     std::string_view QualType::get_name() const noexcept {
         return type->name;
+    }
+
+// QualType
+
+    const Type* QualType::get_raw_type() const noexcept {
+        return type;
+    }
+    bool QualType::is_equal(const Type* other) const noexcept {
+        return type == other;
+    }
+    bool QualType::is_equal(QualType other) const noexcept {
+        return type == other.type && flags == other.flags;
     }
 
 // TypeTable

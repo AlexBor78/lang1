@@ -11,12 +11,4 @@ namespace lang::ast
         source_pos = _pos;
     }
 
-    const QualType& ExprNode::get_type() const noexcept
-    {
-        return type;
-    }
-    void ExprNode::set_type(const QualType& _type) noexcept
-    {
-        type = _type;
-    }
 }

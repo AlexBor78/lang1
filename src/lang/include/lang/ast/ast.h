@@ -3,7 +3,6 @@
 #include <memory>
 #include <vector>
 #include <lang/common.h>
-#include <lang/semantic/typesystem.h>
 
 namespace lang::ast
 {
@@ -52,20 +51,13 @@ namespace lang::ast
 
     class ExprNode : public StmtNode
     {
-    private:
-        QualType type;
-        
     protected:
-        explicit ExprNode(QualType _type
-        ,                 SourceLocation _pos = default_pos()
-        ):  StmtNode(std::move(_pos))
-        ,    type(_type)
+        explicit ExprNode(SourceLocation _pos = default_pos()):
+            StmtNode(std::move(_pos))
         {}
 
     public:
         virtual void accept(ConstASTVisitor&) const noexcept override = 0;
         virtual void accept(ASTVisitor&) noexcept override = 0;
-        const QualType& get_type() const noexcept;
-        void set_type(const QualType&) noexcept;
     };
 }

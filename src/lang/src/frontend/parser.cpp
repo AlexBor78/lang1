@@ -1,6 +1,3 @@
-#include "lang/ast/ast.h"
-#include "lang/ast/stmt.h"
-#include "lang/frontend/token.h"
 #include <lang/common.h>
 // #define PARSER_DEBUG
 
@@ -36,8 +33,12 @@ namespace lang::frontend::parser
         return !success;
     }
 
-    void Parser::clear_typecontext() noexcept {
-        type_context.clear();
+    std::unordered_map<ast::BaseNode*, SemanticBag> Parser::get_semantic_context() const {
+        return std::move(semantic_context);
+    }
+
+    void Parser::clear_semantic_context() noexcept {
+        semantic_context.clear();
     }
 
 // private api
@@ -52,9 +53,9 @@ namespace lang::frontend::parser
     void Parser::init_logger() {
         logger.set_name("Parser");
         #ifdef PARSER_DEBUG            
-            logger.set_level(utils::Logger::LogLevel::INFO | utils::Logger::LogLevel::WARN | utils::Logger::LogLevel::ERROR);
-        #else
             logger.set_level(utils::Logger::LogLevel::ALL);
+        #else
+            logger.set_level(utils::Logger::LogLevel::INFO | utils::Logger::LogLevel::WARN | utils::Logger::LogLevel::ERROR);
         #endif 
         // logger.set_level(utils::Logger::LogLevel::ALL); // just for now
     }
@@ -74,10 +75,8 @@ namespace lang::frontend::parser
         return pos + n >= tokens->size();
     }
 
-    const Type* Parser::add_type(std::unique_ptr<Type> _type) noexcept {
-        type_context.emplace_back(std::move(_type));
-        const Type* type = type_context.back().get();
-        return type;
+    void Parser::add_semantic_info(ast::BaseNode* node, SemanticBag context) noexcept {
+        semantic_context[node] = context;
     }
 
     bool Parser::match(TokenType tt, size_t offset) const {
@@ -348,10 +347,16 @@ namespace lang::frontend::parser
         return std::make_unique<ast::DeclNamespace>(name, process_scope());;
     }
 
-    QualType Parser::process_type() {
+    SemanticBag Parser::process_type() {
         breakpoint(); logger.debug("process_type()");
 
         QualType::Flags flags{QualType::Flags::NONE};
+        bool is_extern{false};
+
+        if(!is_end() && match(TokenType::EXTERN)) {
+            is_extern = true;
+            skip();
+        }
 
         if(!is_end() && match(TokenType::CONST)) {
             flags |= QualType::Flags::CONST;
@@ -360,7 +365,8 @@ namespace lang::frontend::parser
         
         // save type name
         if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_type();
-        const Type* type = add_type(std::make_unique<Type>(advance().sym));
+        // const Type* type = add_type(std::make_unique<Type>(advance().sym));
+        auto name = advance().sym;
 
         if(!is_end() && match(TokenType::STAR)) { 
             flags | QualType::Flags::POINTER;
@@ -371,46 +377,41 @@ namespace lang::frontend::parser
             skip();
         }
 
-        return QualType(type, flags);
+        return SemanticBag(name, flags, is_extern);
     }
 
     std::unique_ptr<ast::DeclVariable> Parser::process_variable_decl() {
         breakpoint(); logger.debug("process_variable_decl()");
 
-        bool is_extern{false};
-        if(!is_end() && match(TokenType::EXTERN)) {
-            is_extern = true;
-            skip();
-        }
-
         // get type of variable
-        QualType type = process_type();
+        auto semantic = process_type();
 
         // save variable name
         if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_variable_name();
         auto name = advance().sym;
 
         // if variable has initialization
+        
         if(!is_end() && match(TokenType::ASSIGN)) {
             skip(); // skip =
             auto expr = process_expr();
-            return std::make_unique<ast::DeclVariable>(name, type, std::move(expr), is_extern);
+            auto node = std::make_unique<ast::DeclVariable>(name, std::move(expr));
+            add_semantic_info(node.get(), semantic);
+            return std::move(node);
         }
-        return std::make_unique<ast::DeclVariable>(name, type);
+
+        auto node = std::make_unique<ast::DeclVariable>(name);
+        add_semantic_info(node.get(), semantic);
+        return std::move(node);
     }
 
     std::unique_ptr<ast::DeclFunction> Parser::process_function_decl() {
         breakpoint(); logger.debug("process_function_decl()");
-        bool is_extern{false};
-        if(!is_end() && match(TokenType::EXTERN)) {
-            is_extern = true;
-            skip();
-        }
         
-        QualType type = process_type();
+        auto semantic = process_type();
 
+        // save name
         if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_function_name();
-
         auto name = advance().sym;
 
         
@@ -429,8 +430,14 @@ namespace lang::frontend::parser
 
         // if forward declaration
         if(!is_end() && match(TokenType::SEMICOLON)) { skip(); // skip ';'
-            return std::make_unique<ast::DeclFunction>(name, type, std::move(args), nullptr);
-        } return std::make_unique<ast::DeclFunction>(name, type, std::move(args), process_scope(), is_extern);
+            auto node = std::make_unique<ast::DeclFunction>(name, std::move(args), nullptr);
+            add_semantic_info(node.get(), semantic);
+            return std::move(node);
+        } 
+        
+        auto node = std::make_unique<ast::DeclFunction>(name, std::move(args), process_scope());
+        add_semantic_info(node.get(), semantic);
+        return std::move(node);
     }
 
     // expr's
@@ -449,7 +456,7 @@ namespace lang::frontend::parser
         if(utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_assign_op(op)) { skip(); // skip op
-                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_assign_expr(), QualType(nullptr));
+                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_assign_expr());
             }   
         } return std::move(left);
     }
@@ -459,7 +466,7 @@ namespace lang::frontend::parser
         while(utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_logical_op(op)) { skip(); // skip op
-                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_compare_expr(), QualType(nullptr));
+                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_compare_expr());
             } else break;
         } return std::move(left);
     }
@@ -469,7 +476,7 @@ namespace lang::frontend::parser
         while(utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_compare_op(op)) { skip(); // skip op
-                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_additive_expr(), QualType(nullptr));
+                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_additive_expr());
             } else break;
         } return std::move(left);
     }
@@ -479,7 +486,7 @@ namespace lang::frontend::parser
         while(utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_add_op(op)) { skip(); // skip op
-                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_multiple_expr(), QualType(nullptr));
+                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_multiple_expr());
             } else break;
         } return std::move(left);
     }
@@ -489,7 +496,7 @@ namespace lang::frontend::parser
         while(utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_mul_op(op)) { skip(); // skip op
-                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_unary_expr(), QualType(nullptr));
+                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_unary_expr());
             } else break;
         } return std::move(left);
     }
@@ -500,7 +507,7 @@ namespace lang::frontend::parser
         if(utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_prefix_op(op)) { skip(); // skip op
-                return std::make_unique<ast::PrefixUnaryOpExpr>(op, process_primary_expr(), QualType(nullptr));
+                return std::make_unique<ast::PrefixUnaryOpExpr>(op, process_primary_expr());
             } throw expected_unary_op(); // bcs only prefix operator can be here
         }
 
@@ -509,7 +516,7 @@ namespace lang::frontend::parser
         // POSTfix op
         if(utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
-            if(utils::is_postfix_op(op)) return std::make_unique<ast::PostfixUnaryOpExpr>(utils::token_to_op(advance().ty), std::move(node), QualType(nullptr));
+            if(utils::is_postfix_op(op)) return std::make_unique<ast::PostfixUnaryOpExpr>(utils::token_to_op(advance().ty), std::move(node));
             // throw expected_postfix_op(); conflict with binary operators
         } return std::move(node);
     }
@@ -545,7 +552,7 @@ namespace lang::frontend::parser
         // if(!is_end() && !match(TokenType::DOUBLECOLON)) throw expected_doublecolon();
         skip(); // skip '::'
 
-        return std::make_unique<ast::NamespaceExpr>(name, process_name(), QualType(nullptr));
+        return std::make_unique<ast::NamespaceExpr>(name, process_name());
     }
 
     std::unique_ptr<ast::FunctionExpr> Parser::process_function_expr() {
@@ -566,14 +573,14 @@ namespace lang::frontend::parser
             skip(); // skip comma
         } if(is_end()) throw expected_rparen();
         skip(); // skip ')'
-        return std::make_unique<ast::FunctionExpr>(name, std::move(args), QualType(nullptr));
+        return std::make_unique<ast::FunctionExpr>(name, std::move(args));
     }
 
     std::unique_ptr<ast::VariableExpr> Parser::process_variable_expr() {
         breakpoint(); logger.debug("process_variable_expr()");
         // if(!match(TokenT!match(TokenType::RPAREN ype::IDENTIFIER) throw expected_variable_name();
         std::string name = advance().sym;
-        return std::make_unique<ast::VariableExpr>(name, QualType(nullptr));;
+        return std::make_unique<ast::VariableExpr>(name);;
     }
 
     // literals
@@ -593,21 +600,21 @@ namespace lang::frontend::parser
         breakpoint(); logger.debug("process_number_literal()");
         // useless - already checked by process_literal() to call this
         // if(!is_end() && !match(TokenType::NUMBER)) throw expected_number();
-        return std::make_unique<ast::NumberLiteral>(advance().sym, QualType(nullptr));
+        return std::make_unique<ast::NumberLiteral>(advance().sym);
     }
 
     std::unique_ptr<ast::StringLiteral> Parser::process_string_literal() {
         breakpoint(); logger.debug("process_string_literal()");
         // useless - already checked by process_literal() to call this
         // if(!is_end() && !match(TokenType::STRING)) throw expected_string();
-        return std::make_unique<ast::StringLiteral>(advance().sym, QualType(nullptr));
+        return std::make_unique<ast::StringLiteral>(advance().sym);
     }
 
     std::unique_ptr<ast::BoolLiteral> Parser::process_bool_literal() {
         breakpoint(); logger.debug("process_bool_literal()");
         // useless - already checked by process_literal() to call this
         // if(!is_end() && !match(TokenType::TRUE) || !match(TokenType::FALSE)) throw expected_bool();
-        return std::make_unique<ast::BoolLiteral>(advance().sym, QualType(nullptr));
+        return std::make_unique<ast::BoolLiteral>(advance().sym);
     }
 
 // errors creating
