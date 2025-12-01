@@ -24,7 +24,9 @@
     - [ ] add colors to logger output
 
 - [ ] project code refactor
-    - [ ] maybe change file structure (mv src/lang/include/lang/semantic -> .../lang/frontend, etc)
+    - [ ] rename .../lang/frontend -> .../lang/syntax (and utils btw)
+    - [ ] make src/common dir and move logger and streams, maybe some utils to this
+    <!-- NO - [ ] maybe change file structure (mv .../lang/(semantic, syntax) -> .../lang/frontend/..., etc) -->
     - [X] rename src/compiler folder to src/compiler_app
     - [X] use shared_ptr instead unique_ptr in logger for streams
     - [X] refactor PrintAST
@@ -103,10 +105,10 @@
     - [X] allow stmt without {} for if-else, for, while, stmt
 
 - [ ] add user-api to compiler app
-    - [ ] multi-file handling (import module, than use module.lang file)
-    - [ ] pass insert files in args
-    - [ ] pass paths to find modules
-
+    - [X] CLIParser
+    - [X] CompileDriver - control process of compilation
+    - [ ] update build.sh to make symlink to compiler in project-root dir (and update clean.sh to remove link)
+    - [ ] remove run.sh
 
 - [X] preparation for semantic
     - [X] add state type
@@ -124,24 +126,30 @@
     - Semantic phases:
         1. Modules - process imports, collect all names from modules, (without body)
         2. Names - check if name exist
-        3. types - fill TypeTable with types, check if types exists, replace temporary faketypes in nodes to real from table
+        3. types - fill TypeTable with types, check if types exists, fill types context
         4. Optimize
 
     - [ ] create semantic analysts
         - [ ] ProgramInitializer (Program name, global_scope, etc)
-        - Modules phase
-            - [ ] ModuleProcessor - process modules import (btw will check if file starts from ModuleDecl node)
+        - [ ] Modules phase
+            - [ ] ModuleProcessor - check if file starts from ModuleDecl node
+            - [ ] ImportProcessor - process modules import
+
         - [ ] Names phase
             - [ ] NameChecker check if identifier exists (var and functions)
+
         - [ ] Types phase
             - [ ] TypeBuilder - fill TypeTable with types (not supported for now, in future: aliases, structs, enum)
             - [ ] TypeInitializer - create QualType from SyntaxType (BTW check if  type exists)
             - [ ] TypeResolver - resolve types (e.g. bool -> int, uint -> int, etc)
+
         - [ ] optimize phase
             - [ ] Optimizers (e.g. increment, blockstmt->one-stmt(if possible), etc)
 
-- [ ] todo some day, wrote just to not forget
-    - [ ] design module (files and logic)
+- [ ] todo some day(after v0 version), wrote just to not forget
+    - [ ] use precompiled headers
+    - [ ] design module (for increment compilation)
+    - [ ] multi-threading
     
 - [ ] design module (files and logic)
     - [ ] check if file was edited (by hash)

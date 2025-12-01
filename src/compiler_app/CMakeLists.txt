@@ -9,10 +9,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(sources
-    main.cpp
+    src/main.cpp
+    src/cliparser.cpp
+    src/compiledriver.cpp
 )
 
 add_executable(${PROJECT_NAME} ${sources})
+target_include_directories(${PROJECT_NAME} PRIVATE include)
 target_link_libraries(${PROJECT_NAME} PUBLIC Lang)
 
 # for breakpoints in code for debug
