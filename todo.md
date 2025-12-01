@@ -26,6 +26,7 @@
 - [ ] project code refactor
     - [X] rename .../lang/frontend -> .../lang/syntax (and utils btw) // frontend -> syntax
     - [ ] make src/common dir and move errors, logger streams, maybe some utils to this
+    - [ ] rename lang::errors -> lang::diagnostics (add diagnostics::errors, diagnostics::warns)
     <!-- NO - [ ] maybe change file structure (mv .../lang/(semantic, syntax) -> .../lang/frontend/..., etc) -->
     - [X] rename src/compiler folder to src/compiler_app
     - [X] use shared_ptr instead unique_ptr in logger for streams
@@ -46,7 +47,7 @@
         - [ ] second iteration
             - [ ] clean up code
             - [ ] add pos to errors and nodes
-            - [ ] maybe(would be perfect) fix issue with last's tokens (peek(): out of range)
+            - [ ] maybe(would be perfect) fix issue with last's tokens (peek(): out of range, if token missed)
 
     - [ ] use warns
         - [ ] Lexer
@@ -67,12 +68,14 @@
         - [ ] add colors
         - [X] upgrade output
         - [X] handle multi-line tokens
-        - [X] add FrontendError's <- CompileError
-            - [X] add StreamError   <- FrontendError
-            - [X] add LexerError    <- FrontendError
-            - [X] add ParserError   <- FrontendError
-        - [ ] add MiddlendError's <- CompileError
-            - [ ] add SemanticError's <- MiddlendError
+        - [X] add SyntaxError's <- CompileError
+            - [X] add StreamError   <- SyntaxError
+            - [X] add LexerError    <- SyntaxError
+            - [X] add ParserError   <- SyntaxError
+        - [ ] add SemanticError's <- CompileError
+            - [ ] add TypeError <- SemanticError
+            - [ ] add LogicError <- SemanticError
+            - [ ] add etc <- SemanticError
 
     - [X] update api
         - [X] add and use match() function
@@ -146,7 +149,7 @@
         - [ ] optimize phase
             - [ ] Optimizers (e.g. increment, blockstmt->one-stmt(if possible), etc)
 
-- [ ] todo some day(after v0 version), wrote just to not forget
+- [ ] todo some day(after 0:0 version), wrote just to not forget
     - [ ] use precompiled headers
     - [ ] design module (for increment compilation)
     - [ ] multi-threading

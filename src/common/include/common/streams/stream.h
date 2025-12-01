@@ -5,12 +5,12 @@
 #include <ostream>
 #include <istream>
 #include <string_view>
-#include <lang/common.h>
+#include <common/common.h>
 
-namespace lang::errors {
+namespace common::diagnostic {
     class InterError;
 }
-namespace lang::utils
+namespace common::streams
 {
     class AbstractStream
     {
@@ -19,10 +19,10 @@ namespace lang::utils
 
     protected:
         AbstractStream() = default;
-        errors::InterError stream_null() const;
-        errors::InterError stream_bad() const;
-        errors::InterError reached_eof() const;
-        errors::InterError passed_zero() const;
+        diagnostic::InterError stream_null() const;
+        diagnostic::InterError stream_bad() const;
+        diagnostic::InterError reached_eof() const;
+        diagnostic::InterError passed_zero() const;
         
     public:
         virtual ~AbstractStream() = default;

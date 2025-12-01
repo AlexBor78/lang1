@@ -1,22 +1,21 @@
-#include <lang/utils/error.h>
-#include <string_view>
-#include <lang/utils/stream.h>
+#include <common/diagnostic/diagnostic.h>
+#include <common/streams/stream.h>
 
-namespace lang::utils
+namespace common::streams
 {
 // AbstractStream
 
-    errors::InterError AbstractStream::stream_null() const {
-        return errors::InterError("stream error: stream is empty");
+    diagnostic::InterError AbstractStream::stream_null() const {
+        return diagnostic::InterError("stream error: stream is empty");
     }
-    errors::InterError AbstractStream::stream_bad() const {
-        return errors::InterError("stream error: stream is bad");
+    diagnostic::InterError AbstractStream::stream_bad() const {
+        return diagnostic::InterError("stream error: stream is bad");
     }
-    errors::InterError AbstractStream::reached_eof() const {
-        return errors::InterError("stream error: reached eof");
+    diagnostic::InterError AbstractStream::reached_eof() const {
+        return diagnostic::InterError("stream error: reached eof");
     }
-    errors::InterError AbstractStream::passed_zero() const {
-        return errors::InterError("stream error: passed 0 to is_eof()");
+    diagnostic::InterError AbstractStream::passed_zero() const {
+        return diagnostic::InterError("stream error: passed 0 to is_eof()");
     }
     
 // InputStream

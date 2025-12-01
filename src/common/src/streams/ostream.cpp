@@ -1,6 +1,6 @@
-#include <lang/utils/ostream.h>
+#include <common/streams/ostream.h>
 
-namespace lang::utils
+namespace common::streams
 {
 // FileOStream
 

@@ -1,14 +1,14 @@
 #include <format>
 #include <vector>
-#include <lang/utils/error.h>
-#include <lang/utils/istream.h>
-#include <lang/utils/diagnostic.h>
+#include <common/streams/istream.h>
+#include <common/diagnostic/diagnostic.h>
+#include <common/diagnostic//diagnostic_builder.h>
 
-namespace lang::errors
+namespace common::diagnostic
 {
-    void DiagnosticBuilder::init_logger(std::string_view name, utils::Logger::LogLevel) {
-        // logger.set_level(utils::Logger::LogLevel::ALL);
-        logger.set_level(utils::Logger::LogLevel::INFO | utils::Logger::LogLevel::WARN | utils::Logger::LogLevel::ERROR);
+    void DiagnosticBuilder::init_logger(std::string_view name, common::utils::Logger::LogLevel) {
+        // logger.set_level(common::utils::Logger::LogLevel::ALL);
+        logger.set_level(common::utils::Logger::LogLevel::INFO | common::utils::Logger::LogLevel::WARN | common::utils::Logger::LogLevel::ERROR);
         logger.set_name(name);
     }
     std::string DiagnosticBuilder::build(std::string_view msg) { try {
@@ -16,13 +16,13 @@ namespace lang::errors
         std::string buf;
 
         // check if pos is default (empty)
-        if(pos == SourceLocation{}) {
+        if(pos == common::SourceLocation{}) {
             return std::string(msg);
         }
         if(pos.path.empty()) buf = std::format("{} \n", msg);
         else buf = std::format("in file {} {}\n", pos.path, msg); 
 
-        utils::FileIStream file(pos.path);
+        common::streams::FileIStream file(pos.path);
         if(!file.is_open()) {
             if(!pos.path.empty()) {
                 logger.log("cant open file {}", pos.path);
@@ -88,7 +88,7 @@ namespace lang::errors
     } catch(const std::exception& e) {
         logger.error("error while generating error message: {}", e.what());        
         std::string buf(msg);
-        if(pos != SourceLocation{}) {
+        if(pos != common::SourceLocation{}) {
             buf = std::format("in file {} at {}:{} {} (failed to generate detailed context)", pos.path, pos.start.line, pos.start.column, buf);
         } else buf += " (failed to generate detailed context, and position is empty)";
         buf.shrink_to_fit();

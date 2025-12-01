@@ -2,11 +2,11 @@
 
 namespace lang::ast
 {
-    SourceLocation BaseNode::get_source_pos() const noexcept
+    common::SourceLocation BaseNode::get_source_pos() const noexcept
     {
         return source_pos;
     }
-    void BaseNode::set_source_pos(const SourceLocation& _pos) noexcept
+    void BaseNode::set_source_pos(const common::SourceLocation& _pos) noexcept
     {
         source_pos = _pos;
     }

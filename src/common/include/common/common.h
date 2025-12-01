@@ -11,7 +11,7 @@
     // #define CODEGEN_DEBUG
 #endif
 
-namespace lang
+namespace common
 {
     inline void debug_break() {
         #ifdef DEBUGGING

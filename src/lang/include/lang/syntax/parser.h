@@ -6,8 +6,8 @@
 #include <lang/ast/ast.h>
 #include <lang/ast/expr.h>
 #include <lang/ast/stmt.h>
-#include <lang/utils/error.h>
-#include <lang/utils/logger.h>
+#include <lang/utils/diagnostic.h>
+#include <common/utils/logger.h>
 #include <lang/syntax/token.h>
 #include <lang/semantic/typesystem.h>
 
@@ -26,7 +26,7 @@ namespace lang::syntax::parser
         void clear_semantic_context() noexcept;
 
     private: // vars
-        utils::Logger logger{utils::Logger::LogLevel::ALL};
+        common::utils::Logger logger{common::utils::Logger::LogLevel::ALL};
         std::unordered_map<ast::BaseNode*, SemanticBag> semantic_context;
 
         const std::vector<Token>* tokens{nullptr};    

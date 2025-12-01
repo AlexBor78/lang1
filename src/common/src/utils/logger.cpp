@@ -1,7 +1,7 @@
-#include <lang/utils/error.h>
-#include <lang/utils/logger.h>
+#include <common/diagnostic/diagnostic.h>
+#include <common/utils/logger.h>
 
-namespace lang::utils
+namespace common::utils
 {
     void Logger::set_prefix(std::string_view _prefix) noexcept {
         prefix = _prefix;
@@ -36,17 +36,17 @@ namespace lang::utils
             static_cast<uint8_t>(level) & ~static_cast<uint8_t>(lvl));
     }
 
-    errors::InterError Logger::stream_null() const {
-        return errors::InterError("logger error: stream is null");
+    diagnostic::InterError Logger::stream_null() const {
+        return diagnostic::InterError("logger error: stream is null");
     }
-    errors::InterError Logger::stream_bad() const {
-        return errors::InterError("logger error: stream is bad");
+    diagnostic::InterError Logger::stream_bad() const {
+        return diagnostic::InterError("logger error: stream is bad");
     }
 
-    void Logger::set_infostream(std::unique_ptr<OutputStream> stream) noexcept {
+    void Logger::set_infostream(std::unique_ptr<streams::OutputStream> stream) noexcept {
         infostream = std::move(stream);
     }
-    void Logger::set_errstream(std::unique_ptr<OutputStream> stream) noexcept {
+    void Logger::set_errstream(std::unique_ptr<streams::OutputStream> stream) noexcept {
         errstream = std::move(stream);
     }
 

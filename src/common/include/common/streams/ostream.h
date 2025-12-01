@@ -4,9 +4,9 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
-#include <lang/utils/stream.h>
+#include <common/streams/stream.h>
 
-namespace lang::utils
+namespace common::streams
 {
     class ConsoleOStream : public OutputStream
     {

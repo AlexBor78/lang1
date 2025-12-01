@@ -1,5 +1,5 @@
 #include <lang/semantic/identifier.h>
-#include <lang/utils/error.h>
+#include <lang/utils/diagnostic.h>
 #include <lang/semantic/scope.h>
 
 namespace lang::semantic
@@ -61,7 +61,7 @@ namespace lang::semantic
     }
 
     void Scope::add_identifier(std::unique_ptr<Identifier> identifier) {
-        if(contains_local(identifier->name)) throw errors::InterError("Re-addition of identifier to scope");
+        if(contains_local(identifier->name)) throw common::diagnostic::InterError("Re-addition of identifier to scope");
         identifiers[identifier->name] = std::move(identifier);
     }
 }

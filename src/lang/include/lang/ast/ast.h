@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <vector>
-#include <lang/common.h>
+#include <common/common.h>
 
 namespace lang::ast
 {
@@ -20,12 +20,12 @@ namespace lang::ast
     class BaseNode
     {
     private:
-        SourceLocation source_pos = {};
+        common::SourceLocation source_pos = {};
     protected:
-        static constexpr inline SourceLocation default_pos() noexcept {
-            return SourceLocation{};
+        static constexpr inline common::SourceLocation default_pos() noexcept {
+            return common::SourceLocation{};
         }
-        explicit BaseNode(SourceLocation _pos = default_pos()): 
+        explicit BaseNode(common::SourceLocation _pos = default_pos()): 
             source_pos(std::move(_pos))
         {}
 
@@ -33,14 +33,14 @@ namespace lang::ast
         virtual void accept(ConstASTVisitor&) const noexcept = 0;
         virtual void accept(ASTVisitor&) noexcept = 0;
         virtual ~BaseNode() = default;
-        SourceLocation get_source_pos() const noexcept;
-        void set_source_pos(const SourceLocation& pos) noexcept;
+        common::SourceLocation get_source_pos() const noexcept;
+        void set_source_pos(const common::SourceLocation& pos) noexcept;
     };
 
     class StmtNode : public BaseNode
     {
     protected:
-        explicit StmtNode(SourceLocation _pos = default_pos()):
+        explicit StmtNode(common::SourceLocation _pos = default_pos()):
             BaseNode(std::move(_pos))
         {}
     
@@ -52,7 +52,7 @@ namespace lang::ast
     class ExprNode : public StmtNode
     {
     protected:
-        explicit ExprNode(SourceLocation _pos = default_pos()):
+        explicit ExprNode(common::SourceLocation _pos = default_pos()):
             StmtNode(std::move(_pos))
         {}
 

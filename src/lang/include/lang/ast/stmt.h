@@ -13,20 +13,20 @@ namespace lang::ast
         std::vector<StmtPtr> m_body;
         
     public:
-        explicit BlockStmt(SourceLocation _pos = default_pos()):
+        explicit BlockStmt(common::SourceLocation _pos = default_pos()):
             StmtNode(std::move(_pos))
         {}
 
         explicit BlockStmt(
             std::vector<StmtPtr>& _body
-        ,   SourceLocation _pos = default_pos()
+        ,   common::SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
         ,   m_body(std::move(_body))
         {}
 
         explicit BlockStmt(
             std::vector<StmtPtr> _body
-        ,   SourceLocation _pos = default_pos()
+        ,   common::SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
         ,   m_body(std::move(_body))
         {}
@@ -47,7 +47,7 @@ namespace lang::ast
 
     protected:
         explicit StructureStmt(StmtPtr _body
-        ,                      SourceLocation _pos = default_pos()
+        ,                      common::SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
         ,   body(std::move(_body))
         {}
@@ -68,7 +68,7 @@ namespace lang::ast
     protected:
         StructureStmtWithCond(ExprPtr _cond
         ,                     StmtPtr _body
-        ,                     SourceLocation _pos = default_pos()
+        ,                     common::SourceLocation _pos = default_pos()
         ):  StructureStmt(std::move(_body)
             ,             std::move(_pos)
             )
@@ -88,7 +88,7 @@ namespace lang::ast
     public:
         IfStmt(ExprPtr _cond
         ,      StmtPtr _body
-        ,      SourceLocation _pos = default_pos()
+        ,      common::SourceLocation _pos = default_pos()
         ):  StructureStmtWithCond(std::move(_cond)
             ,                     std::move(_body)
             ,                     std::move(_pos)
@@ -103,7 +103,7 @@ namespace lang::ast
     {
     public:
         explicit ElseStmt(StmtPtr _body
-        ,                 SourceLocation _pos = default_pos()
+        ,                 common::SourceLocation _pos = default_pos()
         ):  StructureStmt(std::move(_body)
             ,             std::move(_pos)
             )
@@ -124,7 +124,7 @@ namespace lang::ast
         ,       ExprPtr _cond
         ,       StmtPtr _incr
         ,       StmtPtr _body
-        ,       SourceLocation _pos = default_pos()
+        ,       common::SourceLocation _pos = default_pos()
         ):  StructureStmtWithCond(std::move(_cond)
             ,             std::move(_body)
             ,             std::move(_pos)
@@ -147,7 +147,7 @@ namespace lang::ast
     public:
         WhileStmt(ExprPtr _cond
         ,         StmtPtr _body
-        ,         SourceLocation _pos = default_pos()
+        ,         common::SourceLocation _pos = default_pos()
         ):  StructureStmtWithCond(std::move(_cond)
             ,             std::move(_body)
             ,             std::move(_pos)
@@ -165,7 +165,7 @@ namespace lang::ast
 
     protected:
         DeclStmt(std::string_view _name
-        ,        SourceLocation _pos = default_pos()
+        ,        common::SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
         ,   name(_name)
         {}
@@ -181,7 +181,7 @@ namespace lang::ast
     {
     protected:
         DeclName(std::string_view _name
-        ,        SourceLocation _pos = default_pos()
+        ,        common::SourceLocation _pos = default_pos()
         ):  DeclStmt(_name
             ,        std::move(_pos))
         {}
@@ -201,7 +201,7 @@ namespace lang::ast
     public:
         explicit DeclVariable(std::string_view _name
         ,                ExprPtr _init = nullptr
-        ,                SourceLocation _pos = default_pos()
+        ,                common::SourceLocation _pos = default_pos()
         ):  DeclName(_name
             ,        std::move(_pos)
             )
@@ -225,7 +225,7 @@ namespace lang::ast
         DeclFunction(std::string_view _name
         ,        std::vector<std::unique_ptr<DeclVariable>> _args = {}
         ,        StmtPtr _body = nullptr
-        ,        SourceLocation _pos = default_pos()
+        ,        common::SourceLocation _pos = default_pos()
         ):  DeclName(_name
             ,        std::move(_pos)
             )
@@ -244,7 +244,7 @@ namespace lang::ast
     {
     public:
         explicit DeclModule(std::string_view _name
-        ,                   SourceLocation _pos = default_pos()
+        ,                   common::SourceLocation _pos = default_pos()
         ):  DeclStmt(_name
             ,        std::move(_pos)
             )
@@ -262,7 +262,7 @@ namespace lang::ast
     public:
         explicit DeclNamespace(std::string_view _name
         ,                      StmtPtr _body
-        ,                      SourceLocation _pos = default_pos()
+        ,                      common::SourceLocation _pos = default_pos()
         ):  DeclStmt(_name
             ,        std::move(_pos)
             )
@@ -282,7 +282,7 @@ namespace lang::ast
         
     public:
         explicit ImportStmt(std::string_view _imported
-        ,                   SourceLocation _pos = default_pos()
+        ,                   common::SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
         ,   imported(_imported)
         {}
@@ -299,7 +299,7 @@ namespace lang::ast
         ExprPtr ret_expr{nullptr};
     public:
         explicit ReturnStmt(ExprPtr _ret = nullptr
-        ,                   SourceLocation _pos = default_pos()
+        ,                   common::SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
         ,   ret_expr(std::move(_ret))
         {}

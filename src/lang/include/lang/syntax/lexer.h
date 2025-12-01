@@ -2,9 +2,10 @@
 
 #include <memory>
 #include <vector>
-#include <lang/utils/error.h>
-#include <lang/utils/logger.h>
-#include <lang/utils/stream.h>
+#include <common/common.h>
+#include <common/utils/logger.h>
+#include <lang/utils/diagnostic.h> 
+#include <common/streams/stream.h>
 #include <lang/syntax/token.h> 
 #include <lang/syntax/keywords.h> 
 
@@ -14,15 +15,15 @@ namespace lang::syntax::lexer
     {
     public: // api
         std::vector<Token> tokenize();
-        std::vector<Token> tokenize(utils::InputStream*);
+        std::vector<Token> tokenize(common::streams::InputStream*);
 
         bool is_success() const noexcept;
 
-        void set_logger_infostream(std::unique_ptr<utils::OutputStream>) noexcept;
-        void set_logger_errstream(std::unique_ptr<utils::OutputStream>) noexcept;
+        void set_logger_infostream(std::unique_ptr<common::streams::OutputStream>) noexcept;
+        void set_logger_errstream(std::unique_ptr<common::streams::OutputStream>) noexcept;
         
         Lexer() {init_logger();}
-        explicit Lexer(utils::InputStream* _stream):
+        explicit Lexer(common::streams::InputStream* _stream):
             stream(_stream)
         {init_logger();}
 
@@ -30,8 +31,8 @@ namespace lang::syntax::lexer
         // not owned
         bool success{true};
         std::vector<Token> tokens;
-        utils::InputStream* stream{nullptr};
-        utils::Logger logger{utils::Logger::LogLevel::ALL};
+        common::streams::InputStream* stream{nullptr};
+        common::utils::Logger logger{common::utils::Logger::LogLevel::ALL};
 
     private: // inside api
         void breakpoint() noexcept;
@@ -42,11 +43,11 @@ namespace lang::syntax::lexer
         errors::LexerError reached_eof() const;
         errors::LexerError passed_zero_to_eof() const;
 
-        errors::LexerError word_start_num(SourceLocation) const;
-        errors::LexerError not_closed_comment_block(SourceLocation) const;
-        errors::LexerError not_closed_string(SourceLocation) const;
-        errors::LexerError wrong_number_format(SourceLocation) const;
-        errors::LexerError unicode_not_suported(SourceLocation) const;
+        errors::LexerError word_start_num(common::SourceLocation) const;
+        errors::LexerError not_closed_comment_block(common::SourceLocation) const;
+        errors::LexerError not_closed_string(common::SourceLocation) const;
+        errors::LexerError wrong_number_format(common::SourceLocation) const;
+        errors::LexerError unicode_not_suported(common::SourceLocation) const;
 
         void check_stream() const;
         void check_data() const;
@@ -56,8 +57,8 @@ namespace lang::syntax::lexer
         char advance(size_t offset = 0);
         void skip(size_t n = 1);
 
-        static SourceLocation update_pos(SourceLocation, char) noexcept;
-        SourceLocation get_pos() const;
+        static common::SourceLocation update_pos(common::SourceLocation, char) noexcept;
+        common::SourceLocation get_pos() const;
         std::string read_word();
         void skip_whitespace();
 

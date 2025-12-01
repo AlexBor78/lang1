@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <lang/common.h>
+#include <common/common.h>
 
 namespace lang::syntax
 {
@@ -106,7 +106,7 @@ namespace lang::syntax
     struct Token
     {
         TokenType ty{TokenType::ILLEGAL};
-        SourceLocation pos;
+        common::SourceLocation pos;
         std::string sym;
     };
 }

@@ -1,4 +1,4 @@
-#include <lang/common.h>
+#include <common/common.h>
 // #define PARSER_DEBUG
 
 #include <format>
@@ -53,11 +53,11 @@ namespace lang::syntax::parser
     void Parser::init_logger() {
         logger.set_name("Parser");
         #ifdef PARSER_DEBUG            
-            logger.set_level(utils::Logger::LogLevel::ALL);
+            logger.set_level(common::utils::Logger::LogLevel::ALL);
         #else
-            logger.set_level(utils::Logger::LogLevel::INFO | utils::Logger::LogLevel::WARN | utils::Logger::LogLevel::ERROR);
+            logger.set_level(common::utils::Logger::LogLevel::INFO | common::utils::Logger::LogLevel::WARN | common::utils::Logger::LogLevel::ERROR);
         #endif 
-        // logger.set_level(utils::Logger::LogLevel::ALL); // just for now
+        // logger.set_level(common::utils::Logger::LogLevel::ALL); // just for now
     }
 
     void Parser::breakpoint() {
@@ -620,46 +620,46 @@ namespace lang::syntax::parser
 // errors creating
     
     errors::ParserError Parser::tokens_nullptr(size_t offset) const noexcept {
-        return errors::ParserError("tokens = nullptr", SourceLocation());
+        return errors::ParserError("tokens = nullptr", common::SourceLocation());
     }
     errors::ParserError Parser::is_end_with_zero(size_t offset) const noexcept {
-        return errors::ParserError("is_end() called with 0", SourceLocation());
+        return errors::ParserError("is_end() called with 0", common::SourceLocation());
     }
     errors::ParserError Parser::peek_out_of_range(size_t offset) const noexcept {
-        return errors::ParserError("peek(): out of range", SourceLocation());
+        return errors::ParserError("peek(): out of range", common::SourceLocation());
     }
     errors::ParserError Parser::putback_out_of_range(size_t offset) const noexcept {
-        return errors::ParserError("putback(): out of range", SourceLocation());
+        return errors::ParserError("putback(): out of range", common::SourceLocation());
     }
     errors::ParserError Parser::end_reached(size_t offset) const noexcept {
-        return errors::ParserError("end reached", SourceLocation());
+        return errors::ParserError("end reached", common::SourceLocation());
     }
     errors::ParserError Parser::strcut_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("strcut is currently not suported", SourceLocation());
+        return errors::ParserError("strcut is currently not suported", common::SourceLocation());
     }
     errors::ParserError Parser::enum_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("enum is currently not suported", SourceLocation());
+        return errors::ParserError("enum is currently not suported", common::SourceLocation());
     }
     errors::ParserError Parser::if_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("if is currently not suported", SourceLocation());
+        return errors::ParserError("if is currently not suported", common::SourceLocation());
     }
     errors::ParserError Parser::else_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("else is currently not suported", SourceLocation());
+        return errors::ParserError("else is currently not suported", common::SourceLocation());
     }
     errors::ParserError Parser::for_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("for is currently not suported", SourceLocation());
+        return errors::ParserError("for is currently not suported", common::SourceLocation());
     }
     errors::ParserError Parser::while_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("while is currently not suported", SourceLocation());
+        return errors::ParserError("while is currently not suported", common::SourceLocation());
     }
     errors::ParserError Parser::break_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("break is currently not suported", SourceLocation());
+        return errors::ParserError("break is currently not suported", common::SourceLocation());
     }
     errors::ParserError Parser::continue_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("continue is currently not suported", SourceLocation());
+        return errors::ParserError("continue is currently not suported", common::SourceLocation());
     }
     errors::ParserError Parser::multiple_module_decl_in_file(size_t offset) const noexcept {
-        return errors::ParserError("multiple module in one file is not allowed", SourceLocation());
+        return errors::ParserError("multiple module in one file is not allowed", common::SourceLocation());
     }
 
     errors::ParserError Parser::expected_semicolon(size_t offset) const noexcept {

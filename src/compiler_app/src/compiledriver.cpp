@@ -1,7 +1,7 @@
 #include <format>
 #include <stdexcept>
 
-#include <lang/utils/istream.h>
+#include <common/streams/istream.h>
 #include <lang/syntax/lexer.h>
 #include <lang/syntax/parser.h>
 #include <lang/utils/ast_utils.h>
@@ -18,7 +18,7 @@ namespace compiler_app {
 
     void CompileDriver::run() {
         // open main file
-        lang::utils::FileIStream file(options.main_file);
+        common::streams::FileIStream file(options.main_file);
         if(!file.is_open()) {
             throw std::runtime_error(std::format("can not open file: {}", options.main_file));
         }

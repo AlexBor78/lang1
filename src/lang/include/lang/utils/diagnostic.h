@@ -1,60 +1,133 @@
 #pragma once
 
-#include <string>
-#include <exception>
 #include <string_view>
-#include <lang/utils/logger.h>
+#include <common/common.h>
+#include <common/diagnostic/diagnostic.h> // Diagnostic, Error, InterError, Warn
+#include <common/diagnostic/diagnostic_builder.h> // DiagnosticBuilder
 
 namespace lang::errors
 {
-    class Diagnostic : public std::exception
+    class CompileError : public common::diagnostic::Error
+    {
+    private:
+        common::diagnostic::DiagnosticBuilder builder;
+
+    protected:
+        CompileError(std::string_view _msg
+        ,            common::SourceLocation   _pos
+        ,            std::string_view name = ""
+        ):  Error(_msg)
+        ,   builder(name, _pos) {
+            msg = builder.build(_msg);
+        }
+
+    public: // api
+        // virtual CompileError& operator=(const CompileError& e) noexcept {
+        //     // todo
+        //     return *this;
+        // }
+    };
+
+    class SyntaxError : public CompileError
     {
     protected:
-        std::string msg;
+        SyntaxError(std::string_view _msg
+        ,             common::SourceLocation _pos = {}
+        ,             std::string_view _name = "FrontendError"
+        ):  CompileError(_msg
+        ,                std::move(_pos)
+        ,                _name
+        ) {}
+    };
 
-        Diagnostic() = default;
-        explicit Diagnostic(std::string_view _msg):
-            msg(_msg)
-        {}
+    class LexerError : public SyntaxError
+    {
+    public:
+        explicit LexerError(std::string_view _msg
+        ,                   common::SourceLocation _pos = {}
+        ):  SyntaxError(_msg
+        ,                 std::move(_pos)
+        ,                 "LexerError"
+        ) {}
+    };
+
+    class ParserError : public SyntaxError
+    {
+    public:
+        explicit ParserError(std::string_view _msg
+        ,                    common::SourceLocation   _pos = {}
+        ):  SyntaxError(_msg
+        ,                 std::move(_pos)
+        ,                 "ParserError"
+        ) {}
+    };
     
-    public: // part of future api (will impl in inheritors)
-        virtual ~Diagnostic() = default;
-        Diagnostic(const Diagnostic& other) {
-            msg = other.msg;
+    // unused for now
+    // class SemanticError : public CompileError
+    // {
+    // protected:
+    //     MiddlendError(std::string_view _msg
+    //     ,             common::SourceLocation _pos = {}
+    //     ,             std::string_view name = ""
+    //     ):  CompileError(_msg
+    //     ,                std::move(_pos)
+    //     ,                "Middle"
+    //     )
+    //     {}
+    // };
+
+    class CompileWarn : public common::diagnostic::Warn
+    {
+    private:
+        common::diagnostic::DiagnosticBuilder builder;
+
+    protected:
+        CompileWarn(std::string_view _msg
+        ,            common::SourceLocation   _pos
+        ,            std::string_view name = ""
+        ):  Warn(_msg)
+        ,   builder(name, _pos) {
+            msg = builder.build(_msg);
         }
-        Diagnostic(const std::exception& e) {
-            msg = e.what();
-        }
-        virtual const char* what() const noexcept override {
-            return msg.c_str();
+
+    public: // api
+        virtual CompileWarn& operator=(const CompileWarn& e) noexcept {
+            // todo
+            return *this;
         }
     };
 
-    class DiagnosticBuilder
+    class SyntaxWarn : public CompileWarn
     {
-    private: // vars
-        utils::Logger logger{utils::Logger::LogLevel::ALL};
-        std::string builded_msg;
-        bool is_builded{false}; 
-        SourceLocation pos;
-    
-    private: // api
-        void init_logger(std::string_view name = ""
-        ,                utils::Logger::LogLevel level = utils::Logger::LogLevel::ALL);
+    protected:
+        SyntaxWarn(std::string_view _msg
+        ,             common::SourceLocation _pos = {}
+        ,             std::string_view _name = "FrontendWarn"
+        ):  CompileWarn(_msg
+        ,                std::move(_pos)
+        ,                _name
+        ) {}
+    };
 
-    public: // api
-        std::string build(std::string_view);
-        explicit DiagnosticBuilder(std::string_view name = ""
-        ,                          const SourceLocation& _pos = {}
-        ,                          utils::Logger::LogLevel level = utils::Logger::LogLevel::ALL
-        ): pos(_pos) {
-            init_logger(name, level);
-        }
-        DiagnosticBuilder(const DiagnosticBuilder& other) {
-            pos = other.pos;
-            logger = other.logger;
-            is_builded = other.is_builded;
-            if(is_builded) builded_msg = other.builded_msg;
-        }
+    class LexerWarn : public SyntaxWarn
+    {
+    public:
+        explicit LexerWarn(std::string_view _msg
+        ,                   common::SourceLocation _pos = {}
+        ):  SyntaxWarn(_msg
+        ,                 std::move(_pos)
+        ,                 "LexerWarn"
+        ) {}
+    };
+
+    class ParserWarn : public SyntaxWarn
+    {
+    public:
+        explicit ParserWarn(std::string_view _msg
+        ,                    common::SourceLocation   _pos = {}
+        ):  SyntaxWarn(_msg
+        ,                 std::move(_pos)
+        ,                 "ParserWarn"
+        ) {}
     };
 }

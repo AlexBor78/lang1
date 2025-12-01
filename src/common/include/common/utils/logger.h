@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
-#include <lang/utils/ostream.h>
+#include <common/streams/ostream.h>
 
 #define LOGLEVEL ::lang::utils::Logger::LogLevel::DEBUG
 
@@ -13,12 +13,11 @@
 
 #endif
 
-namespace lang::errors {
+namespace common::diagnostic {
     class InterError;
 }
-namespace lang::utils
+namespace common::utils
 {
-    class ConsoleOStream;
     class Logger
     {
     public:
@@ -36,12 +35,12 @@ namespace lang::utils
         std::string prefix;
         std::string name;
 
-        std::shared_ptr<OutputStream> infostream{nullptr};
-        std::shared_ptr<OutputStream> errstream{nullptr};
+        std::shared_ptr<streams::OutputStream> infostream{nullptr};
+        std::shared_ptr<streams::OutputStream> errstream{nullptr};
 
     private:
-        errors::InterError stream_null() const;
-        errors::InterError stream_bad() const;
+        diagnostic::InterError stream_null() const;
+        diagnostic::InterError stream_bad() const;
 
         void check_infostream() const;
         bool check_errstream() const;
@@ -60,14 +59,14 @@ namespace lang::utils
         void add_level(LogLevel) noexcept;
         void sub_level(LogLevel) noexcept;
 
-        void set_infostream(std::unique_ptr<OutputStream>) noexcept;
-        void set_errstream(std::unique_ptr<OutputStream>) noexcept;
+        void set_infostream(std::unique_ptr<streams::OutputStream>) noexcept;
+        void set_errstream(std::unique_ptr<streams::OutputStream>) noexcept;
 
         // print to console by default 
         Logger() = delete;
         Logger(LogLevel _level
-        ,      std::shared_ptr<OutputStream> _infostream = std::make_shared<ConsoleOStream>()
-        ,      std::shared_ptr<OutputStream> _errostream = std::make_shared<ConsoleErrOStream>()
+        ,      std::shared_ptr<streams::OutputStream> _infostream = std::make_shared<streams::ConsoleOStream>()
+        ,      std::shared_ptr<streams::OutputStream> _errostream = std::make_shared<streams::ConsoleErrOStream>()
         ):  level(_level)
         ,   infostream(std::move(_infostream))
         ,   errstream(std::move(_errostream))

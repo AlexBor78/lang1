@@ -12,7 +12,7 @@ namespace lang::ast
 
     protected:
         explicit LiteralExpr(std::string_view _literal
-        ,                    SourceLocation _pos = default_pos()
+        ,                    common::SourceLocation _pos = default_pos()
         ):  ExprNode(std::move(_pos))
         ,   literal(_literal)
         {}
@@ -29,7 +29,7 @@ namespace lang::ast
     {
     public:
         explicit NumberLiteral(std::string_view _literal
-        ,                      SourceLocation _pos = default_pos()
+        ,                      common::SourceLocation _pos = default_pos()
         ):  LiteralExpr(_literal
             ,           std::move(_pos)
             )
@@ -43,7 +43,7 @@ namespace lang::ast
     {
     public:
         explicit StringLiteral(std::string_view _literal
-        ,                      SourceLocation _pos = default_pos()
+        ,                      common::SourceLocation _pos = default_pos()
         ):  LiteralExpr(_literal
             ,           std::move(_pos)
             )
@@ -57,7 +57,7 @@ namespace lang::ast
     {
     public:
         explicit BoolLiteral(std::string_view _literal
-        ,                    SourceLocation _pos = default_pos()
+        ,                    common::SourceLocation _pos = default_pos()
         ):  LiteralExpr(_literal
             ,           std::move(_pos)
             )
@@ -74,7 +74,7 @@ namespace lang::ast
 
     public:
         explicit IdentifierExpr(std::string_view _name
-        ,                       SourceLocation _pos = default_pos()
+        ,                       common::SourceLocation _pos = default_pos()
         ):  ExprNode(std::move(_pos))
         ,   name(_name)
         {}
@@ -89,7 +89,7 @@ namespace lang::ast
     {
     public:
         explicit VariableExpr(std::string_view _name
-        ,                     SourceLocation _pos = default_pos()
+        ,                     common::SourceLocation _pos = default_pos()
         ):  IdentifierExpr(_name
             ,              std::move(_pos)
             )
@@ -106,7 +106,7 @@ namespace lang::ast
     public:
         NamespaceExpr(std::string_view _name
         ,             ExprPtr _identifier
-        ,             SourceLocation _pos = default_pos()
+        ,             common::SourceLocation _pos = default_pos()
         ):  IdentifierExpr(_name
             ,              std::move(_pos)
             )
@@ -129,7 +129,7 @@ namespace lang::ast
     public:
         FunctionExpr(std::string_view _callee
         ,        std::vector<ExprPtr>& _args
-        ,        SourceLocation _pos = default_pos()
+        ,        common::SourceLocation _pos = default_pos()
         ):  ExprNode(std::move(_pos))
         ,   args(std::move(_args))
         ,   callee(_callee)
@@ -137,7 +137,7 @@ namespace lang::ast
 
         FunctionExpr(std::string_view _callee
         ,        std::vector<ExprPtr> _args
-        ,        SourceLocation _pos = default_pos()
+        ,        common::SourceLocation _pos = default_pos()
         ):  ExprNode(std::move(_pos))
         ,   args(std::move(_args))
         ,   callee(_callee)
@@ -209,7 +209,7 @@ namespace lang::ast
         
     protected:
         explicit OperatorExpr(OperatorKind _op
-        ,                    SourceLocation _pos = default_pos()
+        ,                    common::SourceLocation _pos = default_pos()
         ):  ExprNode(std::move(_pos))
         ,   op(_op)
         {}
@@ -230,7 +230,7 @@ namespace lang::ast
         BinOpExpr(OperatorKind _op
         ,         ExprPtr _left
         ,         ExprPtr _right
-        ,         SourceLocation _pos = default_pos()
+        ,         common::SourceLocation _pos = default_pos()
         ):  OperatorExpr(_op
             ,           std::move(_pos)
             )
@@ -257,7 +257,7 @@ namespace lang::ast
     protected:
         UnaryOpExpr(OperatorKind _op
         ,           ExprPtr _operand
-        ,           SourceLocation _pos = default_pos()
+        ,           common::SourceLocation _pos = default_pos()
         ):  OperatorExpr(_op
             ,           std::move(_pos)
             )
@@ -277,7 +277,7 @@ namespace lang::ast
     public:
         PrefixUnaryOpExpr(OperatorKind _op
         ,                 ExprPtr _operand
-        ,                 SourceLocation _pos = default_pos()
+        ,                 common::SourceLocation _pos = default_pos()
         ):  UnaryOpExpr(_op
             ,           std::move(_operand)
             ,           std::move(_pos)
@@ -293,7 +293,7 @@ namespace lang::ast
     public:
         PostfixUnaryOpExpr(OperatorKind _op
         ,                  ExprPtr _operand
-        ,                  SourceLocation _pos = default_pos()
+        ,                  common::SourceLocation _pos = default_pos()
         ):  UnaryOpExpr(_op
             ,           std::move(_operand)
             ,           std::move(_pos)

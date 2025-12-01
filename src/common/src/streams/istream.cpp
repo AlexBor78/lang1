@@ -1,6 +1,6 @@
-#include <lang/utils/istream.h>
+#include <common/streams/istream.h>
 
-namespace lang::utils
+namespace common::streams
 {
 // FileStream
 

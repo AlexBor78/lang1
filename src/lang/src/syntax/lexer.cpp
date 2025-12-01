@@ -1,5 +1,5 @@
-#include <lang/common.h> // LEXER_DEBUG
-#include <lang/utils/error.h>
+#include <common/common.h> // LEXER_DEBUG
+#include <lang/utils/diagnostic.h>
 #include <lang/syntax/lexer.h>
 #include <lang/utils/syntax_utils.h>
 
@@ -9,7 +9,7 @@ namespace lang::syntax::lexer
     bool Lexer::is_success() const noexcept {
         return success;
     }
-    std::vector<Token> Lexer::tokenize(utils::InputStream* _stream) {
+    std::vector<Token> Lexer::tokenize(common::streams::InputStream* _stream) {
         stream = _stream;
         return tokenize();
     }
@@ -73,9 +73,9 @@ namespace lang::syntax::lexer
     void Lexer::init_logger() noexcept {
         logger.set_name("Lexer");
         #ifdef LEXER_DEBUG            
-            logger.set_level(utils::Logger::LogLevel::ALL);
+            logger.set_level(common::utils::Logger::LogLevel::ALL);
         #else
-            logger.set_level(utils::Logger::LogLevel::INFO | utils::Logger::LogLevel::WARN | utils::Logger::LogLevel::ERROR);
+            logger.set_level(common::utils::Logger::LogLevel::INFO | common::utils::Logger::LogLevel::WARN | common::utils::Logger::LogLevel::ERROR);
         #endif 
     }
 
@@ -85,10 +85,10 @@ namespace lang::syntax::lexer
         #endif
     }
 
-    void Lexer::set_logger_infostream(std::unique_ptr<utils::OutputStream> stream) noexcept {
+    void Lexer::set_logger_infostream(std::unique_ptr<common::streams::OutputStream> stream) noexcept {
         logger.set_infostream(std::move(stream));
     }
-    void Lexer::set_logger_errstream(std::unique_ptr<utils::OutputStream> stream) noexcept {
+    void Lexer::set_logger_errstream(std::unique_ptr<common::streams::OutputStream> stream) noexcept {
         logger.set_errstream(std::move(stream));
     }
 
@@ -104,19 +104,19 @@ namespace lang::syntax::lexer
     errors::LexerError Lexer::passed_zero_to_eof() const {
         return errors::LexerError("passed zero to is_eof()");
     }
-    errors::LexerError Lexer::word_start_num(SourceLocation pos) const {
+    errors::LexerError Lexer::word_start_num(common::SourceLocation pos) const {
         return errors::LexerError("word can not starts from number", pos);
     }
-    errors::LexerError Lexer::not_closed_comment_block(SourceLocation pos) const {
+    errors::LexerError Lexer::not_closed_comment_block(common::SourceLocation pos) const {
         return errors::LexerError("\"/*\" comment block is not closed", pos);
     }
-    errors::LexerError Lexer::not_closed_string(SourceLocation pos) const {
+    errors::LexerError Lexer::not_closed_string(common::SourceLocation pos) const {
         return errors::LexerError("string block is not closed", pos);
     }
-    errors::LexerError Lexer::wrong_number_format(SourceLocation pos) const {
+    errors::LexerError Lexer::wrong_number_format(common::SourceLocation pos) const {
         return errors::LexerError("wrong number format", pos);
     }
-    errors::LexerError Lexer::unicode_not_suported(SourceLocation pos) const {
+    errors::LexerError Lexer::unicode_not_suported(common::SourceLocation pos) const {
         return errors::LexerError("Unicode is not supported (yet)", pos);
     }
 
@@ -154,7 +154,7 @@ namespace lang::syntax::lexer
         check_data();
         stream->skip_whitespace();
     }
-    [[nodiscard("Lexer::update_pos() RETURN updated pos")]] SourceLocation Lexer::update_pos(SourceLocation pos, char c) noexcept {
+    [[nodiscard("Lexer::update_pos() RETURN updated pos")]] common::SourceLocation Lexer::update_pos(common::SourceLocation pos, char c) noexcept {
         ++pos.length;
         ++pos.end.index;
         if(c == 'n') {
@@ -163,7 +163,7 @@ namespace lang::syntax::lexer
         } else ++pos.end.column;
         return pos;
     }
-    SourceLocation Lexer::get_pos() const {
+    common::SourceLocation Lexer::get_pos() const {
         check_stream();
         return stream->get_pos();
     }
@@ -199,7 +199,7 @@ namespace lang::syntax::lexer
 
     void Lexer::tokenize_word() {
         breakpoint(); logger.debug("tokenize_word() keyword");
-        SourceLocation pos = get_pos();
+        common::SourceLocation pos = get_pos();
         std::string buf = read_word();
         
         pos.length = get_pos().start.index - pos.start.index;
@@ -221,7 +221,7 @@ namespace lang::syntax::lexer
 
     void Lexer::tokenize_punct() {
         breakpoint(); logger.debug("tokenize_punct()");
-        SourceLocation pos = get_pos();
+        common::SourceLocation pos = get_pos();
         std::string buf;
 
         for(int length = 3; length > 0; --length) {
@@ -250,7 +250,7 @@ namespace lang::syntax::lexer
 
     void Lexer::tokenize_number() {
         breakpoint(); logger.debug("tokenize_number()");
-        SourceLocation pos = get_pos();
+        common::SourceLocation pos = get_pos();
         std::string buf;
         bool has_dot{false};
         if(peek() == '.') {
@@ -274,7 +274,7 @@ namespace lang::syntax::lexer
 
     void Lexer::tokenize_string() {
         breakpoint(); logger.debug("tokenize_sring()");
-        SourceLocation pos = get_pos();
+        common::SourceLocation pos = get_pos();
         std::string buf;
 
         skip(); // skip '"'
