@@ -25,8 +25,8 @@
 
 - [ ] project code refactor
     - [X] rename .../lang/frontend -> .../lang/syntax (and utils btw) // frontend -> syntax
-    - [ ] make src/common dir and move errors, logger streams, maybe some utils to this
-    - [ ] rename lang::errors -> lang::diagnostics (add diagnostics::errors, diagnostics::warns)
+    - [X] make src/common dir and move errors, logger streams, maybe some utils to this
+    - [X] rename lang::errors -> lang::diagnostics (add diagnostics::errors, diagnostics::warns)
     <!-- NO - [ ] maybe change file structure (mv .../lang/(semantic, syntax) -> .../lang/frontend/..., etc) -->
     - [X] rename src/compiler folder to src/compiler_app
     - [X] use shared_ptr instead unique_ptr in logger for streams
@@ -136,7 +136,7 @@
         - [ ] ProgramInitializer (Program name, global_scope, etc)
         - [ ] Modules phase
             - [ ] ModuleProcessor - check if file starts from ModuleDecl node
-            - [ ] ImportProcessor - process modules import
+            - [ ] ImportProcessor - process modules import (save every name to scopes, without body procession)
 
         - [ ] Names phase
             - [ ] NameChecker check if identifier exists (var and functions)

@@ -38,16 +38,16 @@ namespace lang::syntax::lexer
         void breakpoint() noexcept;
         void init_logger() noexcept;
 
-        errors::LexerError stream_null() const;
-        errors::LexerError stream_bad() const;
-        errors::LexerError reached_eof() const;
-        errors::LexerError passed_zero_to_eof() const;
+        diagnostic::LexerError stream_null() const;
+        diagnostic::LexerError stream_bad() const;
+        diagnostic::LexerError reached_eof() const;
+        diagnostic::LexerError passed_zero_to_eof() const;
 
-        errors::LexerError word_start_num(common::SourceLocation) const;
-        errors::LexerError not_closed_comment_block(common::SourceLocation) const;
-        errors::LexerError not_closed_string(common::SourceLocation) const;
-        errors::LexerError wrong_number_format(common::SourceLocation) const;
-        errors::LexerError unicode_not_suported(common::SourceLocation) const;
+        diagnostic::LexerError word_start_num(common::SourceLocation) const;
+        diagnostic::LexerError not_closed_comment_block(common::SourceLocation) const;
+        diagnostic::LexerError not_closed_string(common::SourceLocation) const;
+        diagnostic::LexerError wrong_number_format(common::SourceLocation) const;
+        diagnostic::LexerError unicode_not_suported(common::SourceLocation) const;
 
         void check_stream() const;
         void check_data() const;

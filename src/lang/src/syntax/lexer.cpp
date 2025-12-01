@@ -48,7 +48,7 @@ namespace lang::syntax::lexer
             }
             
             tokenize_punct();
-        } catch(const errors::LexerError& e) {
+        } catch(const diagnostic::LexerError& e) {
             success = false;
             logger.error("{}", e.what());
             if(!is_eof()) skip();
@@ -92,32 +92,32 @@ namespace lang::syntax::lexer
         logger.set_errstream(std::move(stream));
     }
 
-    errors::LexerError Lexer::stream_null() const {
-        return errors::LexerError("stream is null");
+    diagnostic::LexerError Lexer::stream_null() const {
+        return diagnostic::LexerError("stream is null");
     }
-    errors::LexerError Lexer::stream_bad() const {
-        return errors::LexerError("stream is bad");
+    diagnostic::LexerError Lexer::stream_bad() const {
+        return diagnostic::LexerError("stream is bad");
     }
-    errors::LexerError Lexer::reached_eof() const {
-        return errors::LexerError("reached eof");
+    diagnostic::LexerError Lexer::reached_eof() const {
+        return diagnostic::LexerError("reached eof");
     }
-    errors::LexerError Lexer::passed_zero_to_eof() const {
-        return errors::LexerError("passed zero to is_eof()");
+    diagnostic::LexerError Lexer::passed_zero_to_eof() const {
+        return diagnostic::LexerError("passed zero to is_eof()");
     }
-    errors::LexerError Lexer::word_start_num(common::SourceLocation pos) const {
-        return errors::LexerError("word can not starts from number", pos);
+    diagnostic::LexerError Lexer::word_start_num(common::SourceLocation pos) const {
+        return diagnostic::LexerError("word can not starts from number", pos);
     }
-    errors::LexerError Lexer::not_closed_comment_block(common::SourceLocation pos) const {
-        return errors::LexerError("\"/*\" comment block is not closed", pos);
+    diagnostic::LexerError Lexer::not_closed_comment_block(common::SourceLocation pos) const {
+        return diagnostic::LexerError("\"/*\" comment block is not closed", pos);
     }
-    errors::LexerError Lexer::not_closed_string(common::SourceLocation pos) const {
-        return errors::LexerError("string block is not closed", pos);
+    diagnostic::LexerError Lexer::not_closed_string(common::SourceLocation pos) const {
+        return diagnostic::LexerError("string block is not closed", pos);
     }
-    errors::LexerError Lexer::wrong_number_format(common::SourceLocation pos) const {
-        return errors::LexerError("wrong number format", pos);
+    diagnostic::LexerError Lexer::wrong_number_format(common::SourceLocation pos) const {
+        return diagnostic::LexerError("wrong number format", pos);
     }
-    errors::LexerError Lexer::unicode_not_suported(common::SourceLocation pos) const {
-        return errors::LexerError("Unicode is not supported (yet)", pos);
+    diagnostic::LexerError Lexer::unicode_not_suported(common::SourceLocation pos) const {
+        return diagnostic::LexerError("Unicode is not supported (yet)", pos);
     }
 
     // stream work

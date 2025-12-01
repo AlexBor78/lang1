@@ -5,7 +5,7 @@
 #include <common/diagnostic/diagnostic.h> // Diagnostic, Error, InterError, Warn
 #include <common/diagnostic/diagnostic_builder.h> // DiagnosticBuilder
 
-namespace lang::errors
+namespace lang::diagnostic
 {
     class CompileError : public common::diagnostic::Error
     {

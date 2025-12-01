@@ -104,47 +104,47 @@ namespace lang::syntax::parser
         std::unique_ptr<ast::StringLiteral>     process_string_literal();
         std::unique_ptr<ast::BoolLiteral>       process_bool_literal();
 
-    private: // errors creating
+    private: // diagnostic creating
 
-        // Inter errors
-        errors::ParserError tokens_nullptr(size_t offset = 0) const noexcept;
-        errors::ParserError peek_out_of_range(size_t offset = 0) const noexcept;
-        errors::ParserError putback_out_of_range(size_t offset = 0) const noexcept;
-        errors::ParserError end_reached(size_t offset = 0) const noexcept;
+        // Inter diagnostic
+        diagnostic::ParserError tokens_nullptr(size_t offset = 0) const noexcept;
+        diagnostic::ParserError peek_out_of_range(size_t offset = 0) const noexcept;
+        diagnostic::ParserError putback_out_of_range(size_t offset = 0) const noexcept;
+        diagnostic::ParserError end_reached(size_t offset = 0) const noexcept;
 
-        // other errors
-        errors::ParserError multiple_module_decl_in_file(size_t offset = 0) const noexcept;
-        errors::ParserError is_end_with_zero(size_t offset = 0) const noexcept;
-        errors::ParserError strcut_is_not_suported(size_t offset = 0) const noexcept;
-        errors::ParserError enum_is_not_suported(size_t offset = 0) const noexcept;
-        errors::ParserError if_is_not_suported(size_t offset = 0) const noexcept;
-        errors::ParserError else_is_not_suported(size_t offset = 0) const noexcept;
-        errors::ParserError for_is_not_suported(size_t offset = 0) const noexcept;
-        errors::ParserError while_is_not_suported(size_t offset = 0) const noexcept;
-        errors::ParserError break_is_not_suported(size_t offset = 0) const noexcept;
-        errors::ParserError continue_is_not_suported(size_t offset = 0) const noexcept;
+        // other diagnostic
+        diagnostic::ParserError multiple_module_decl_in_file(size_t offset = 0) const noexcept;
+        diagnostic::ParserError is_end_with_zero(size_t offset = 0) const noexcept;
+        diagnostic::ParserError strcut_is_not_suported(size_t offset = 0) const noexcept;
+        diagnostic::ParserError enum_is_not_suported(size_t offset = 0) const noexcept;
+        diagnostic::ParserError if_is_not_suported(size_t offset = 0) const noexcept;
+        diagnostic::ParserError else_is_not_suported(size_t offset = 0) const noexcept;
+        diagnostic::ParserError for_is_not_suported(size_t offset = 0) const noexcept;
+        diagnostic::ParserError while_is_not_suported(size_t offset = 0) const noexcept;
+        diagnostic::ParserError break_is_not_suported(size_t offset = 0) const noexcept;
+        diagnostic::ParserError continue_is_not_suported(size_t offset = 0) const noexcept;
 
         // expected X
-        errors::ParserError expected_add_op(size_t offset = 0) const noexcept;
-        errors::ParserError expected_mul_op(size_t offset = 0) const noexcept;
-        errors::ParserError expected_unary_op(size_t offset = 0) const noexcept;
-        errors::ParserError expected_postfix_op(size_t offset = 0) const noexcept;
-        errors::ParserError expected_identifier(size_t offset = 0) const noexcept;
-        errors::ParserError expected_namespace_name(size_t offset = 0) const noexcept;
-        errors::ParserError expected_module_name(size_t offset = 0) const noexcept;
-        errors::ParserError expected_variable_name(size_t offset = 0) const noexcept;
-        errors::ParserError expected_function_name(size_t offset = 0) const noexcept;
-        errors::ParserError expected_doublecolon(size_t offset = 0) const noexcept;
-        errors::ParserError expected_semicolon(size_t offset = 0) const noexcept;
-        errors::ParserError expected_number(size_t offset = 0) const noexcept;
-        errors::ParserError expected_string(size_t offset = 0) const noexcept;
-        errors::ParserError expected_bool(size_t offset = 0) const noexcept;
-        errors::ParserError expected_comma(size_t offset = 0) const noexcept;
-        errors::ParserError expected_type(size_t offset = 0) const noexcept;
-        errors::ParserError expected_lbrace(size_t offset = 0) const noexcept;
-        errors::ParserError expected_rbrace(size_t offset = 0) const noexcept;
-        errors::ParserError expected_lparen(size_t offset = 0) const noexcept;
-        errors::ParserError expected_rparen(size_t offset = 0) const noexcept;
-        errors::ParserError unexpected_token(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_add_op(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_mul_op(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_unary_op(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_postfix_op(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_identifier(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_namespace_name(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_module_name(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_variable_name(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_function_name(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_doublecolon(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_semicolon(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_number(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_string(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_bool(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_comma(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_type(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_lbrace(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_rbrace(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_lparen(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_rparen(size_t offset = 0) const noexcept;
+        diagnostic::ParserError unexpected_token(size_t offset = 0) const noexcept;
     };
 }

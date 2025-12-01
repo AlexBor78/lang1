@@ -18,7 +18,7 @@ namespace lang::syntax::parser
         std::vector<std::unique_ptr<ast::BaseNode>> ast;
         while(!is_end()) { try {
             ast.emplace_back(process_token());
-        } catch(const errors::ParserError& e) {
+        } catch(const diagnostic::ParserError& e) {
             success = false;
             logger.error("{}", e.what());
             return {};
@@ -617,107 +617,107 @@ namespace lang::syntax::parser
         return std::make_unique<ast::BoolLiteral>(advance().sym);
     }
 
-// errors creating
+// diagnostic creating
     
-    errors::ParserError Parser::tokens_nullptr(size_t offset) const noexcept {
-        return errors::ParserError("tokens = nullptr", common::SourceLocation());
+    diagnostic::ParserError Parser::tokens_nullptr(size_t offset) const noexcept {
+        return diagnostic::ParserError("tokens = nullptr", common::SourceLocation());
     }
-    errors::ParserError Parser::is_end_with_zero(size_t offset) const noexcept {
-        return errors::ParserError("is_end() called with 0", common::SourceLocation());
+    diagnostic::ParserError Parser::is_end_with_zero(size_t offset) const noexcept {
+        return diagnostic::ParserError("is_end() called with 0", common::SourceLocation());
     }
-    errors::ParserError Parser::peek_out_of_range(size_t offset) const noexcept {
-        return errors::ParserError("peek(): out of range", common::SourceLocation());
+    diagnostic::ParserError Parser::peek_out_of_range(size_t offset) const noexcept {
+        return diagnostic::ParserError("peek(): out of range", common::SourceLocation());
     }
-    errors::ParserError Parser::putback_out_of_range(size_t offset) const noexcept {
-        return errors::ParserError("putback(): out of range", common::SourceLocation());
+    diagnostic::ParserError Parser::putback_out_of_range(size_t offset) const noexcept {
+        return diagnostic::ParserError("putback(): out of range", common::SourceLocation());
     }
-    errors::ParserError Parser::end_reached(size_t offset) const noexcept {
-        return errors::ParserError("end reached", common::SourceLocation());
+    diagnostic::ParserError Parser::end_reached(size_t offset) const noexcept {
+        return diagnostic::ParserError("end reached", common::SourceLocation());
     }
-    errors::ParserError Parser::strcut_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("strcut is currently not suported", common::SourceLocation());
+    diagnostic::ParserError Parser::strcut_is_not_suported(size_t offset) const noexcept {
+        return diagnostic::ParserError("strcut is currently not suported", common::SourceLocation());
     }
-    errors::ParserError Parser::enum_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("enum is currently not suported", common::SourceLocation());
+    diagnostic::ParserError Parser::enum_is_not_suported(size_t offset) const noexcept {
+        return diagnostic::ParserError("enum is currently not suported", common::SourceLocation());
     }
-    errors::ParserError Parser::if_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("if is currently not suported", common::SourceLocation());
+    diagnostic::ParserError Parser::if_is_not_suported(size_t offset) const noexcept {
+        return diagnostic::ParserError("if is currently not suported", common::SourceLocation());
     }
-    errors::ParserError Parser::else_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("else is currently not suported", common::SourceLocation());
+    diagnostic::ParserError Parser::else_is_not_suported(size_t offset) const noexcept {
+        return diagnostic::ParserError("else is currently not suported", common::SourceLocation());
     }
-    errors::ParserError Parser::for_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("for is currently not suported", common::SourceLocation());
+    diagnostic::ParserError Parser::for_is_not_suported(size_t offset) const noexcept {
+        return diagnostic::ParserError("for is currently not suported", common::SourceLocation());
     }
-    errors::ParserError Parser::while_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("while is currently not suported", common::SourceLocation());
+    diagnostic::ParserError Parser::while_is_not_suported(size_t offset) const noexcept {
+        return diagnostic::ParserError("while is currently not suported", common::SourceLocation());
     }
-    errors::ParserError Parser::break_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("break is currently not suported", common::SourceLocation());
+    diagnostic::ParserError Parser::break_is_not_suported(size_t offset) const noexcept {
+        return diagnostic::ParserError("break is currently not suported", common::SourceLocation());
     }
-    errors::ParserError Parser::continue_is_not_suported(size_t offset) const noexcept {
-        return errors::ParserError("continue is currently not suported", common::SourceLocation());
+    diagnostic::ParserError Parser::continue_is_not_suported(size_t offset) const noexcept {
+        return diagnostic::ParserError("continue is currently not suported", common::SourceLocation());
     }
-    errors::ParserError Parser::multiple_module_decl_in_file(size_t offset) const noexcept {
-        return errors::ParserError("multiple module in one file is not allowed", common::SourceLocation());
+    diagnostic::ParserError Parser::multiple_module_decl_in_file(size_t offset) const noexcept {
+        return diagnostic::ParserError("multiple module in one file is not allowed", common::SourceLocation());
     }
 
-    errors::ParserError Parser::expected_semicolon(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected ';', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_semicolon(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected ';', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_lbrace(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected '{{', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_lbrace(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected '{{', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_rbrace(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected '}}', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_rbrace(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected '}}', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_lparen(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected '(', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_lparen(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected '(', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_rparen(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected ')', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_rparen(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected ')', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_comma(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected ',', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_comma(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected ',', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_doublecolon(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected '::', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_doublecolon(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected '::', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_unary_op(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected unary operator, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_unary_op(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected unary operator, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_postfix_op(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected postfix operator, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_postfix_op(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected postfix operator, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_identifier(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected identifier, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_identifier(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected identifier, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_function_name(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected function name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_function_name(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected function name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_variable_name(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected variable name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_variable_name(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected variable name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_namespace_name(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected namespace name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_namespace_name(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected namespace name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_module_name(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected module name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_module_name(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected module name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_type(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected type, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_type(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected type, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_number(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected number, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_number(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected number, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_string(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected string, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_string(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected string, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::expected_bool(size_t offset) const noexcept {
-        return errors::ParserError(std::format("expected bool, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    diagnostic::ParserError Parser::expected_bool(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected bool, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    errors::ParserError Parser::unexpected_token(size_t offset) const noexcept {
-        return errors::ParserError(std::format("unexpected token: {}"
+    diagnostic::ParserError Parser::unexpected_token(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("unexpected token: {}"
         ,                       utils::stringify(peek(offset).ty))
         ,                   peek(offset).pos
         );;
