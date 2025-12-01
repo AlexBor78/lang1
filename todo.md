@@ -95,10 +95,11 @@
             - [X] in Lexer
             - [X] in Parser
 
-    - [X] upgrade build.sh script
+    - [ ] upgrade build.sh script
         - [X] add build arg (debug)
         - [X] use multiple cores
         - [X] pass DEBUGING through flags
+        - [ ] make symlink to compiler in project-root dir
 
 - [ ] extend parser
     - [X] extend AST(BreakStmt, ContinueStmt)
@@ -132,7 +133,7 @@
         3. types - fill TypeTable with types, check if types exists, fill types context
         4. Optimize
 
-    - [ ] create semantic analysts
+    - [ ] create semantic analysts analyzers
         - [ ] ProgramInitializer (Program name, global_scope, etc)
         - [ ] Modules phase
             - [ ] ModuleProcessor - check if file starts from ModuleDecl node

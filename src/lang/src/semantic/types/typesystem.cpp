@@ -1,5 +1,5 @@
 #include <lang/utils/diagnostic.h>
-#include <lang/semantic/typesystem.h>
+#include <lang/semantic/types/typesystem.h>
 
 namespace lang
 {

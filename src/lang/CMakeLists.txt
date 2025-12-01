@@ -20,11 +20,11 @@ set(sources
     src/ast/ast.cpp
 
     # semantic
-    src/semantic/semantic_initializer.cpp
-    src/semantic/typesystem.cpp
-    src/semantic/identifier.cpp
-    src/semantic/module.cpp
-    src/semantic/scope.cpp
+    src/semantic/types/semantic_initializer.cpp
+    src/semantic/types/typesystem.cpp
+    src/semantic/types/identifier.cpp
+    src/semantic/types/module.cpp
+    src/semantic/types/scope.cpp
     
     # utils
     # src/utils/diagnostic.cpp

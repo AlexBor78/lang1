@@ -9,7 +9,7 @@
 #include <lang/utils/diagnostic.h>
 #include <common/utils/logger.h>
 #include <lang/syntax/token.h>
-#include <lang/semantic/typesystem.h>
+#include <lang/semantic/types/typesystem.h>
 
 namespace lang::syntax::parser
 {

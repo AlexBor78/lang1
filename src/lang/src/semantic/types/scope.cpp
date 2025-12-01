@@ -1,6 +1,6 @@
-#include <lang/semantic/identifier.h>
+#include <lang/semantic/types/identifier.h>
 #include <lang/utils/diagnostic.h>
-#include <lang/semantic/scope.h>
+#include <lang/semantic/types/scope.h>
 
 namespace lang::semantic
 {

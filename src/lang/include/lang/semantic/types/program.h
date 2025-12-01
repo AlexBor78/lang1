@@ -5,9 +5,9 @@
 #include <string_view>
 #include <unordered_map>
 #include <lang/ast/ast.h>
-#include <lang/semantic/scope.h>
-#include <lang/semantic/module.h>
-#include <lang/semantic/identifier.h>
+#include <lang/semantic/types/scope.h>
+#include <lang/semantic/types/module.h>
+#include <lang/semantic/types/identifier.h>
 
 namespace lang::semantic
 {

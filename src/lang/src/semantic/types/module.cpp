@@ -1,5 +1,5 @@
-#include <lang/semantic/identifier.h>
-#include <lang/semantic/module.h>
+#include <lang/semantic/types/identifier.h>
+#include <lang/semantic/types/module.h>
 
 namespace lang::semantic
 {

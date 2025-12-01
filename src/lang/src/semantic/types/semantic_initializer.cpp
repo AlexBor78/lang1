@@ -1,4 +1,4 @@
-#include <lang/semantic/semantic_types.h>
+#include <lang/semantic/types/semantic_types.h>
 
 namespace lang::semantic
 {

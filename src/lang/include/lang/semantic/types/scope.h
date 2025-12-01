@@ -4,7 +4,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include <lang/semantic/typesystem.h>
+#include <lang/semantic/types/typesystem.h>
 #include <vector>
 
 namespace lang::semantic 

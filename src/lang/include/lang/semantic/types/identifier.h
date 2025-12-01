@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <lang/ast/ast.h>
-#include <lang/semantic/scope.h>
+#include <lang/semantic/types/scope.h>
 
 namespace lang::semantic
 {

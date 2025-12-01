@@ -3,9 +3,9 @@
 #include <memory>
 #include <unordered_map>
 
-#include <lang/semantic/scope.h>
-#include <lang/semantic/program.h>
-#include <lang/semantic/typesystem.h>
+#include <lang/semantic/types/scope.h>
+#include <lang/semantic/types/program.h>
+#include <lang/semantic/types/typesystem.h>
 
 namespace lang::semantic
 {
