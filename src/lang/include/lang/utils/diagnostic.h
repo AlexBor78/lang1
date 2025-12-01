@@ -1,6 +1,5 @@
 #pragma once
 
-#include "lang/common.h"
 #include <string>
 #include <exception>
 #include <string_view>

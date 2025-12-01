@@ -1,18 +1,18 @@
 #include <memory>
 #include <print>
 #include <lang/utils/printast.h>
-#include <lang/utils/frontend_utils.h>
+#include <lang/utils/syntax_utils.h>
 
 namespace lang::utils
 {
-    void print(const frontend::Token& tok) noexcept {
+    void print(const syntax::Token& tok) noexcept {
         std::println("TokenType: {} symbol: {}",
             stringify(tok.ty),
             tok.sym
         );
     }
 
-    void print(const std::vector<frontend::Token>& tokens) noexcept {
+    void print(const std::vector<syntax::Token>& tokens) noexcept {
         for(const auto& tok : tokens) {
             print(tok);
         }

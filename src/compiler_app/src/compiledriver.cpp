@@ -2,10 +2,10 @@
 #include <stdexcept>
 
 #include <lang/utils/istream.h>
-#include <lang/frontend/lexer.h>
-#include <lang/frontend/parser.h>
+#include <lang/syntax/lexer.h>
+#include <lang/syntax/parser.h>
 #include <lang/utils/ast_utils.h>
-#include <lang/utils/frontend_utils.h>
+#include <lang/utils/syntax_utils.h>
 
 #include <compiler/compiledriver.h>
 
@@ -24,7 +24,7 @@ namespace compiler_app {
         }
         
         // tokenize main file
-        lang::frontend::lexer::Lexer lexer(&file);
+        lang::syntax::lexer::Lexer lexer(&file);
         auto tokens = lexer.tokenize();
         if(!lexer.is_success()) {
             return; // todo: update lexer api
@@ -34,7 +34,7 @@ namespace compiler_app {
         }
         
         // build ast for main file
-        lang::frontend::parser::Parser parer;
+        lang::syntax::parser::Parser parer;
         auto ast = parer.parse(tokens);
         if(options.print_ast) {
             lang::utils::print(ast);

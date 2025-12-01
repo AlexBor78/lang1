@@ -24,8 +24,8 @@
     - [ ] add colors to logger output
 
 - [ ] project code refactor
-    - [ ] rename .../lang/frontend -> .../lang/syntax (and utils btw)
-    - [ ] make src/common dir and move logger and streams, maybe some utils to this
+    - [X] rename .../lang/frontend -> .../lang/syntax (and utils btw) // frontend -> syntax
+    - [ ] make src/common dir and move errors, logger streams, maybe some utils to this
     <!-- NO - [ ] maybe change file structure (mv .../lang/(semantic, syntax) -> .../lang/frontend/..., etc) -->
     - [X] rename src/compiler folder to src/compiler_app
     - [X] use shared_ptr instead unique_ptr in logger for streams

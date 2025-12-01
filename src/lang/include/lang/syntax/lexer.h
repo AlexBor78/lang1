@@ -5,10 +5,10 @@
 #include <lang/utils/error.h>
 #include <lang/utils/logger.h>
 #include <lang/utils/stream.h>
-#include <lang/frontend/token.h> 
-#include <lang/frontend/keywords.h> 
+#include <lang/syntax/token.h> 
+#include <lang/syntax/keywords.h> 
 
-namespace lang::frontend::lexer
+namespace lang::syntax::lexer
 {
     class Lexer
     {

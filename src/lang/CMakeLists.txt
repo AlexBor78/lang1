@@ -10,9 +10,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 set(sources
-    # frontend
-    src/frontend/parser.cpp
-    src/frontend/lexer.cpp
+    # syntax
+    src/syntax/parser.cpp
+    src/syntax/lexer.cpp
 
     # ast
     src/ast/stmt.cpp
@@ -29,12 +29,14 @@ set(sources
     # utils
     src/utils/diagnostic.cpp
     src/utils/printast.cpp
+    src/utils/utils.cpp
+
+    # common
     src/utils/istream.cpp
     src/utils/ostream.cpp
     src/utils/stream.cpp
     src/utils/logger.cpp
     src/utils/error.cpp
-    src/utils/utils.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${sources})

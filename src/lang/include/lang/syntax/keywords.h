@@ -2,9 +2,9 @@
 
 #include <string_view>
 #include <unordered_map>
-#include <lang/frontend/token.h>
+#include <lang/syntax/token.h>
 
-namespace lang::frontend::lexer
+namespace lang::syntax::lexer
 {
     inline std::unordered_map<std::string_view, TokenType> keywords =
     {

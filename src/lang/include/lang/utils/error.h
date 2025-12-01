@@ -45,10 +45,10 @@ namespace lang::errors
         // }
     };
 
-    class FrontendError : public CompileError
+    class SyntaxError : public CompileError
     {
     protected:
-        FrontendError(std::string_view _msg
+        SyntaxError(std::string_view _msg
         ,             SourceLocation _pos = {}
         ,             std::string_view _name = "FrontendError"
         ):  CompileError(_msg
@@ -57,30 +57,30 @@ namespace lang::errors
         ) {}
     };
 
-    class LexerError : public FrontendError
+    class LexerError : public SyntaxError
     {
     public:
         explicit LexerError(std::string_view _msg
         ,                   SourceLocation _pos = {}
-        ):  FrontendError(_msg
+        ):  SyntaxError(_msg
         ,                 std::move(_pos)
         ,                 "LexerError"
         ) {}
     };
 
-    class ParserError : public FrontendError
+    class ParserError : public SyntaxError
     {
     public:
         explicit ParserError(std::string_view _msg
         ,                    SourceLocation   _pos = {}
-        ):  FrontendError(_msg
+        ):  SyntaxError(_msg
         ,                 std::move(_pos)
         ,                 "ParserError"
         ) {}
     };
     
     // unused for now
-    // class MiddlendError : public CompileError
+    // class SemanticError : public CompileError
     // {
     // protected:
     //     MiddlendError(std::string_view _msg
@@ -127,10 +127,10 @@ namespace lang::errors
         }
     };
 
-    class FrontendWarn : public CompileWarn
+    class SyntaxWarn : public CompileWarn
     {
     protected:
-        FrontendWarn(std::string_view _msg
+        SyntaxWarn(std::string_view _msg
         ,             SourceLocation _pos = {}
         ,             std::string_view _name = "FrontendWarn"
         ):  CompileWarn(_msg
@@ -139,23 +139,23 @@ namespace lang::errors
         ) {}
     };
 
-    class LexerWarn : public FrontendWarn
+    class LexerWarn : public SyntaxWarn
     {
     public:
         explicit LexerWarn(std::string_view _msg
         ,                   SourceLocation _pos = {}
-        ):  FrontendWarn(_msg
+        ):  SyntaxWarn(_msg
         ,                 std::move(_pos)
         ,                 "LexerWarn"
         ) {}
     };
 
-    class ParserWarn : public FrontendWarn
+    class ParserWarn : public SyntaxWarn
     {
     public:
         explicit ParserWarn(std::string_view _msg
         ,                    SourceLocation   _pos = {}
-        ):  FrontendWarn(_msg
+        ):  SyntaxWarn(_msg
         ,                 std::move(_pos)
         ,                 "ParserWarn"
         ) {}

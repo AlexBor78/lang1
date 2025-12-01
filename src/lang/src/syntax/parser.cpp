@@ -4,11 +4,11 @@
 #include <format>
 #include <memory>
 #include <string>
-#include <lang/utils/frontend_utils.h>
+#include <lang/utils/syntax_utils.h>
 #include <lang/utils/ast_utils.h>
-#include <lang/frontend/parser.h>
+#include <lang/syntax/parser.h>
 
-namespace lang::frontend::parser
+namespace lang::syntax::parser
 {
 // public api
 

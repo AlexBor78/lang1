@@ -2,7 +2,7 @@
 
 #include <lang/ast/ast.h>
 #include <lang/ast/expr.h>
-#include <lang/frontend/token.h>
+#include <lang/syntax/token.h>
 
 namespace lang::utils
 {
@@ -10,7 +10,7 @@ namespace lang::utils
     constexpr const char* stringify(ast::OperatorExpr::OperatorKind) noexcept;
 
     // TokenType to OperatorExpr::OperatorKind
-    constexpr ast::OperatorExpr::OperatorKind token_to_op(frontend::TokenType);
+    constexpr ast::OperatorExpr::OperatorKind token_to_op(syntax::TokenType);
 
     // print ast or vector of ast's
     void print(const std::vector<std::unique_ptr<ast::BaseNode>>&) noexcept;
@@ -68,43 +68,43 @@ namespace lang::utils
         } return "UNKNOWN";
     }
 
-    constexpr ast::OperatorExpr::OperatorKind token_to_op(frontend::TokenType tok) {
+    constexpr ast::OperatorExpr::OperatorKind token_to_op(syntax::TokenType tok) {
         switch (tok) {
-            case frontend::TokenType::ASSIGN:       return ast::OperatorExpr::OperatorKind::ASSIGN;
-            case frontend::TokenType::PLUS:         return ast::OperatorExpr::OperatorKind::PLUS;
-            case frontend::TokenType::MINUS:        return ast::OperatorExpr::OperatorKind::MINUS;
-            case frontend::TokenType::STAR:         return ast::OperatorExpr::OperatorKind::STAR;
-            case frontend::TokenType::SLASH:        return ast::OperatorExpr::OperatorKind::SLASH;
-            case frontend::TokenType::PERCENT:      return ast::OperatorExpr::OperatorKind::PERCENT;
-            case frontend::TokenType::AMPERSAND:    return ast::OperatorExpr::OperatorKind::AMPERSAND;
-            case frontend::TokenType::EQ:           return ast::OperatorExpr::OperatorKind::EQ;
-            case frontend::TokenType::NEQ:          return ast::OperatorExpr::OperatorKind::NEQ;
-            case frontend::TokenType::LT:           return ast::OperatorExpr::OperatorKind::LT;
-            case frontend::TokenType::LE:           return ast::OperatorExpr::OperatorKind::LE;
-            case frontend::TokenType::GT:           return ast::OperatorExpr::OperatorKind::GT;
-            case frontend::TokenType::GE:           return ast::OperatorExpr::OperatorKind::GE;
-            case frontend::TokenType::BANG:         return ast::OperatorExpr::OperatorKind::BANG;
-            case frontend::TokenType::AND:          return ast::OperatorExpr::OperatorKind::AND;
-            case frontend::TokenType::OR:           return ast::OperatorExpr::OperatorKind::OR;
-            case frontend::TokenType::INCREMENT:    return ast::OperatorExpr::OperatorKind::INCREMENT;
-            case frontend::TokenType::DECREMENT:    return ast::OperatorExpr::OperatorKind::DECREMENT;
-            case frontend::TokenType::TILDE:        return ast::OperatorExpr::OperatorKind::TILDE;
-            case frontend::TokenType::BIT_OR:       return ast::OperatorExpr::OperatorKind::BIT_OR;
-            case frontend::TokenType::BIT_XOR:      return ast::OperatorExpr::OperatorKind::BIT_XOR;
-            case frontend::TokenType::SHIFT_LEFT:   return ast::OperatorExpr::OperatorKind::SHIFT_LEFT;
-            case frontend::TokenType::SHIFT_RIGHT:  return ast::OperatorExpr::OperatorKind::SHIFT_RIGHT;
+            case syntax::TokenType::ASSIGN:       return ast::OperatorExpr::OperatorKind::ASSIGN;
+            case syntax::TokenType::PLUS:         return ast::OperatorExpr::OperatorKind::PLUS;
+            case syntax::TokenType::MINUS:        return ast::OperatorExpr::OperatorKind::MINUS;
+            case syntax::TokenType::STAR:         return ast::OperatorExpr::OperatorKind::STAR;
+            case syntax::TokenType::SLASH:        return ast::OperatorExpr::OperatorKind::SLASH;
+            case syntax::TokenType::PERCENT:      return ast::OperatorExpr::OperatorKind::PERCENT;
+            case syntax::TokenType::AMPERSAND:    return ast::OperatorExpr::OperatorKind::AMPERSAND;
+            case syntax::TokenType::EQ:           return ast::OperatorExpr::OperatorKind::EQ;
+            case syntax::TokenType::NEQ:          return ast::OperatorExpr::OperatorKind::NEQ;
+            case syntax::TokenType::LT:           return ast::OperatorExpr::OperatorKind::LT;
+            case syntax::TokenType::LE:           return ast::OperatorExpr::OperatorKind::LE;
+            case syntax::TokenType::GT:           return ast::OperatorExpr::OperatorKind::GT;
+            case syntax::TokenType::GE:           return ast::OperatorExpr::OperatorKind::GE;
+            case syntax::TokenType::BANG:         return ast::OperatorExpr::OperatorKind::BANG;
+            case syntax::TokenType::AND:          return ast::OperatorExpr::OperatorKind::AND;
+            case syntax::TokenType::OR:           return ast::OperatorExpr::OperatorKind::OR;
+            case syntax::TokenType::INCREMENT:    return ast::OperatorExpr::OperatorKind::INCREMENT;
+            case syntax::TokenType::DECREMENT:    return ast::OperatorExpr::OperatorKind::DECREMENT;
+            case syntax::TokenType::TILDE:        return ast::OperatorExpr::OperatorKind::TILDE;
+            case syntax::TokenType::BIT_OR:       return ast::OperatorExpr::OperatorKind::BIT_OR;
+            case syntax::TokenType::BIT_XOR:      return ast::OperatorExpr::OperatorKind::BIT_XOR;
+            case syntax::TokenType::SHIFT_LEFT:   return ast::OperatorExpr::OperatorKind::SHIFT_LEFT;
+            case syntax::TokenType::SHIFT_RIGHT:  return ast::OperatorExpr::OperatorKind::SHIFT_RIGHT;
 
-            case frontend::TokenType::ADD_ASSIGN:   return ast::OperatorExpr::OperatorKind::ADD_ASSIGN;
-            case frontend::TokenType::SUB_ASSIGN:   return ast::OperatorExpr::OperatorKind::SUB_ASSIGN;
-            case frontend::TokenType::MUL_ASSIGN:   return ast::OperatorExpr::OperatorKind::MUL_ASSIGN;
-            case frontend::TokenType::DIV_ASSIGN:   return ast::OperatorExpr::OperatorKind::DIV_ASSIGN;
-            case frontend::TokenType::MOD_ASSIGN:   return ast::OperatorExpr::OperatorKind::MOD_ASSIGN;
+            case syntax::TokenType::ADD_ASSIGN:   return ast::OperatorExpr::OperatorKind::ADD_ASSIGN;
+            case syntax::TokenType::SUB_ASSIGN:   return ast::OperatorExpr::OperatorKind::SUB_ASSIGN;
+            case syntax::TokenType::MUL_ASSIGN:   return ast::OperatorExpr::OperatorKind::MUL_ASSIGN;
+            case syntax::TokenType::DIV_ASSIGN:   return ast::OperatorExpr::OperatorKind::DIV_ASSIGN;
+            case syntax::TokenType::MOD_ASSIGN:   return ast::OperatorExpr::OperatorKind::MOD_ASSIGN;
 
-            case frontend::TokenType::AND_ASSIGN:   return ast::OperatorExpr::OperatorKind::AND_ASSIGN;
-            case frontend::TokenType::OR_ASSIGN:    return ast::OperatorExpr::OperatorKind::OR_ASSIGN;
-            case frontend::TokenType::XOR_ASSIGN:   return ast::OperatorExpr::OperatorKind::XOR_ASSIGN;
-            case frontend::TokenType::SHL_ASSIGN:   return ast::OperatorExpr::OperatorKind::SHL_ASSIGN;
-            case frontend::TokenType::SHR_ASSIGN:   return ast::OperatorExpr::OperatorKind::SHR_ASSIGN;
+            case syntax::TokenType::AND_ASSIGN:   return ast::OperatorExpr::OperatorKind::AND_ASSIGN;
+            case syntax::TokenType::OR_ASSIGN:    return ast::OperatorExpr::OperatorKind::OR_ASSIGN;
+            case syntax::TokenType::XOR_ASSIGN:   return ast::OperatorExpr::OperatorKind::XOR_ASSIGN;
+            case syntax::TokenType::SHL_ASSIGN:   return ast::OperatorExpr::OperatorKind::SHL_ASSIGN;
+            case syntax::TokenType::SHR_ASSIGN:   return ast::OperatorExpr::OperatorKind::SHR_ASSIGN;
 
             default: throw std::runtime_error("wrong TokenType to OperatorKind");
         }

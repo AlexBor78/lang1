@@ -8,10 +8,10 @@
 #include <lang/ast/stmt.h>
 #include <lang/utils/error.h>
 #include <lang/utils/logger.h>
-#include <lang/frontend/token.h>
+#include <lang/syntax/token.h>
 #include <lang/semantic/typesystem.h>
 
-namespace lang::frontend::parser
+namespace lang::syntax::parser
 {
     class Parser {
     public: // api

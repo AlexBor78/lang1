@@ -3,7 +3,7 @@
 #include <string>
 #include <lang/common.h>
 
-namespace lang::frontend
+namespace lang::syntax
 {
     enum class TokenType
     {

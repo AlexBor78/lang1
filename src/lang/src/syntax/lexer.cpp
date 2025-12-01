@@ -1,9 +1,9 @@
 #include <lang/common.h> // LEXER_DEBUG
 #include <lang/utils/error.h>
-#include <lang/frontend/lexer.h>
-#include <lang/utils/frontend_utils.h>
+#include <lang/syntax/lexer.h>
+#include <lang/utils/syntax_utils.h>
 
-namespace lang::frontend::lexer
+namespace lang::syntax::lexer
 {
 // api
     bool Lexer::is_success() const noexcept {
