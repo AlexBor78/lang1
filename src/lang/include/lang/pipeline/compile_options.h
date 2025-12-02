@@ -6,8 +6,7 @@
 namespace lang::pipeline
 {
     struct CompileOptions {
-        std::string name{"a.out"};
-        std::string main_file{"main.lang"};
+        std::string name{"main"}; // todo: rename to program_name/output_name
         std::vector<std::string> import_paths;
         // int threads{1}; // todo: multi-threading
 
@@ -19,7 +18,7 @@ namespace lang::pipeline
         // debug flags
         bool trace_lexer{false};
         bool trace_parser{false};
-        bool print_tokens{false};
-        bool print_ast{false};
+        // bool print_tokens{false};
+        // bool print_ast{false};
     };
 }

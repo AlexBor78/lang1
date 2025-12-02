@@ -1,9 +1,4 @@
-// syntax
-#include <common/streams/istream.h>
-#include <lang/syntax/lexer.h>
-#include <lang/syntax/parser.h>
-
-// semantic
+#include <lang/pipeline/modules_loader.h>
 #include <lang/semantic/types/semantic_types.h>
 
 // utils
@@ -20,15 +15,15 @@ namespace lang::pipeline {
     }
 
     void CompileDriver::run() {
-        // syntax (parsing every file)
+       auto state = semantic::SemanticInitializer::init_state(options.name);
 
-        
+        // parsing all fils (loading them as modules to semantic info)
+        ModulesLoader loader(&state);
+        loader.load();
+        if(options.semantic_only) return;
 
-        // semantic
-        
+        // utils::print(state.program.modules["main"]->ast);
 
-        // ImportAnalyzer
-        // ..
-    
+        // semantic analyze
     }
 }

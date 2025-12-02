@@ -21,6 +21,7 @@ set(sources
 
     # semantic
     src/semantic/types/semantic_initializer.cpp
+    src/semantic/analyzers/import_processor.cpp
     src/semantic/types/typesystem.cpp
     src/semantic/types/identifier.cpp
     src/semantic/types/module.cpp
@@ -28,6 +29,8 @@ set(sources
 
     # pipeline
     src/pipeline/compiledriver.cpp
+    src/pipeline/syntax_driver.cpp
+    src/pipeline/modules_loader.cpp
     
     # utils
     src/utils/printast.cpp

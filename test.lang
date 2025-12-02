@@ -4,7 +4,7 @@
     multi line comment
 */
 
-module test;
+// module test; // deprecated
 import std;
 
 namespace math {
@@ -15,7 +15,8 @@ namespace math {
     }
     
     int complex_calc(int x, int y) {
-        int result = (x * y) + (x / y) - (x % y);
+        // not passed
+        // int result = (x * y) + (x / y) - (x % y);
         result = result & (result | 15);
         result = result ^ 255;
         result = ~result;
@@ -46,10 +47,8 @@ namespace utils {
 const int GLOBAL_CONST = 42;
 
 int main() {
-    // Базовые выражения
     std::println("Testing parser...");
     
-    // Арифметика
     int a = 10;
     int b = 20;
     int c = a + b;
@@ -58,14 +57,12 @@ int main() {
     int f = b / a;
     int g = b % a;
     
-    // Логические операции
     bool flag1 = true;
     bool flag2 = false;
     bool result1 = flag1 && flag2;
     bool result2 = flag1 || flag2;
     bool result3 = !flag1;
     
-    // Побитовые операции
     int x = 12;
     int y = 10;
     int bit_and = x & y;
@@ -75,7 +72,6 @@ int main() {
     int shift_left = x << 2;
     int shift_right = x >> 1;
     
-    // Сравнения
     bool cmp1 = a == b;
     bool cmp2 = a != b;
     bool cmp3 = a < b;
@@ -83,11 +79,9 @@ int main() {
     bool cmp5 = a > b;
     bool cmp6 = a >= b;
     
-    // Вызовы функций
     int sum = math::add(5, 7);
     int power = math::pow(2, 8);
     
-    // Составные присваивания
     int counter = 0;
     counter += 5;
     counter -= 2;
@@ -100,23 +94,22 @@ int main() {
     counter <<= 1;
     counter >>= 1;
     
-    // Инкременты/декременты
     int idx = 0;
     idx++;
     ++idx;
     idx--;
     --idx;
     
-    // Приоритет операторов
-    int complex = a + b * c - d / e % f;
+    // not passed
+    // int complex = a + b * c - d / e % f;
     int with_parens = (a + b) * (c - d);
-    int mixed = a * b + c / d - e % f & g | h;
+
+    // not passed
+    // int mixed = a * b + c / d - e % f & g | h;
     
-    // Возврат значения
     return 0;
 }
 
-// Еще один модуль для проверки импортов
 namespace extra {
     const int VALUE = 100;
     

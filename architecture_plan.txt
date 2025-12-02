@@ -53,23 +53,26 @@ namespace lang
         class Scope;
         struct Module;
         struct Program;
+        class SemanticContext;
+        class SemanticState;
+        class SemanticInitializer;
 
-        // analyzers - todo
-        class ImportProcessor : public ast::ASTVisitor;
-        class SymbolsCollector : public ast::ASTVisitor;
-        class NameChecker : public ast::ASTVisitor;
-        class TypeBuilder : public ast::ASTVisitor;
-        class TypeInitializer : public ast::ASTVisitor;
-        class TypeResolver : public ast::ASTVisitor;   
+        // analyzers
+        class ImportAnalyzer : public ast::ASTVisitor;
+        class SymbolsCollector : public ast::ASTVisitor; // todo
+        class NameChecker : public ast::ASTVisitor; // todo
+        class TypeBuilder : public ast::ASTVisitor; // todo
+        class TypeInitializer : public ast::ASTVisitor; // todo
+        class TypeResolver : public ast::ASTVisitor; // todo
     }
 
     
     namespace pipeline {
         struct CompileOptions;
         class CompileDriver;
-        class SyntaxDriver; // todo
+        class SyntaxDriver;
         class SemanticDriver; // todo
-        class ModulesLoader; // todo
+        class ModulesLoader;
     }
 
     namespace ast

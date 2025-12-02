@@ -53,14 +53,19 @@ namespace lang
         class Scope;
         struct Module;
         struct Program;
+        class SemanticContext;
+        class SemanticState;
+        class SemanticInitializer;
 
         // analyzers
-        // TODO:
+        class ImportAnalyzer : public ConstASTVisitor;
     }
 
     namespace pipeline {
         struct CompileOptions;
         class CompileDriver;
+        class SyntaxDriver;
+        class ModulesLoader;
     }
 
     namespace ast

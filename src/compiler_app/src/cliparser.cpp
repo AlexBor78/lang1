@@ -5,7 +5,12 @@
 namespace compiler_app {
     lang::pipeline::CompileOptions CLIParser::process(const std::vector<std::string>& args)
     {
-        parse(args); // btw add main files   
+        parse(args);
+
+        // TODO: write --help
+        // usage: compiler [options]
+        // in options only write paths to find file, it will find main.lang itself
+        
 
         // processing flags
         for(const auto& flag : flags) {
@@ -41,14 +46,14 @@ namespace compiler_app {
                 optoins.trace_parser = true;
                 continue;
             }
-            if(flag.flag == "--print-tokens") {
-                optoins.print_tokens = true;
-                continue;
-            }
-            if(flag.flag == "--print-ast") {
-                optoins.print_ast = true;
-                continue;
-            }
+            // if(flag.flag == "--print-tokens") {
+            //     optoins.print_tokens = true;
+            //     continue;
+            // }
+            // if(flag.flag == "--print-ast") {
+            //     optoins.print_ast = true;
+            //     continue;
+            // }
 
             throw std::runtime_error(std::format("unknown flag: {}, use --help", flag.flag));
         }
@@ -67,10 +72,7 @@ namespace compiler_app {
                     flag.value = args[i];
                 }
                 flags.emplace_back(std::move(flag));
-            } else {
-                if(!optoins.main_file.empty()) throw std::runtime_error(std::format("unexpected value or file: {}, use --help", arg));
-                optoins.main_file = arg;
-            }
+            } else throw std::runtime_error(std::format("unexpected value: {}, use --help", arg));
         }
     }
 

@@ -15,5 +15,4 @@ namespace lang::utils
             case(semantic::Identifier::Kind::TYPE): return "TYPE";
         }
     }
-
 }

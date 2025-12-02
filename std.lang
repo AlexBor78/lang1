@@ -1,0 +1,5 @@
+// extern println(const char* str);
+// extern print(const char* str);
+
+// if all file commented - error in lexer "reached eof"
+void foo();

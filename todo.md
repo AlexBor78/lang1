@@ -139,12 +139,14 @@
         4. Optimize
 
     - [ ] create semantic analyzers
-        - [ ] ProgramInitializer (Program name, global_scope, etc)
-        - [ ] SymbolsCollector - collect all symbol (not in body)
+        - [X] ProgramInitializer (Program name, global_scope, etc)
 
         - [ ] Semantic analyze
-            - [ ] Modules phase
-                - [ ] ImportProcessor process ast return all imported modules (name)
+            - [X] Modules phase
+                - [X] ImportAnalyzers process ast return all imported modules (names)
+                <!-- maybe rename ImportAnalyzer -> ImportsCollector -->
+                - [ ] SymbolsCollector - collect all symbol (not body)
+                
             - [ ] Names phase
                 - [ ] NameChecker check if identifier exists (var and functions)
 
