@@ -12,7 +12,7 @@ namespace lang::semantic
     class SemanticContext {
     private: // api
         std::unordered_map<ast::BaseNode*, std::unique_ptr<Scope>> scope_context;
-        // std::unordered_map<ast::BaseNode*, std::unique_ptr<QualType>> types_context; // in next commit
+        std::unordered_map<ast::BaseNode*, QualType> types_context; // in future
 
     public:
         Scope* get_scope(ast::BaseNode*);

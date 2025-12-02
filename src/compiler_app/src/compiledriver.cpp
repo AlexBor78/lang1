@@ -1,9 +1,15 @@
 #include <format>
 #include <stdexcept>
 
+// syntax
 #include <common/streams/istream.h>
 #include <lang/syntax/lexer.h>
 #include <lang/syntax/parser.h>
+
+// semantic
+#include <lang/semantic/types/semantic_types.h>
+
+// utils
 #include <lang/utils/ast_utils.h>
 #include <lang/utils/syntax_utils.h>
 
@@ -43,7 +49,11 @@ namespace compiler_app {
         if(options.syntax_only) return;
 
         // semantic
-        // todo:
+        
+        
+        // auto semantic_state = lang::semantic::SemanticInitializer::init_state(options.name);
+
+        
 
         // ImportAnalyzer
         // ..

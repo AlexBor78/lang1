@@ -240,6 +240,7 @@ namespace lang::ast
         const StmtNode* get_body() const noexcept;
     };
 
+    // deprecated
     class DeclModule : public DeclStmt
     {
     public:

@@ -12,9 +12,9 @@
 namespace lang::semantic
 {
     struct Program {        
-        std::string name{"Main"};
+        std::string name{"main"};
         std::unordered_map<std::string_view, std::unique_ptr<Module>> modules;
-        std::unique_ptr<Scope> global_scope{nullptr}; // lang types, etc
+        std::unique_ptr<Scope> global_scope{nullptr}; // lang built-in types, etc        
 
         ~Program() = default;
         // copy constructor
@@ -26,7 +26,7 @@ namespace lang::semantic
         {}
 
         // default constructor
-        Program(std::string_view _name = "Main"
+        Program(std::string_view _name = "main"
         ,       std::unique_ptr<Scope> _global_scope = nullptr
         ,       std::unordered_map<std::string_view, std::unique_ptr<Module>> _modules = {}
         ):  name(_name)

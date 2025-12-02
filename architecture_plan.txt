@@ -1,0 +1,164 @@
+namespace common
+{
+    namespace diagnostic {
+        class DiagnosticBuilder;
+
+        class Diagnostic : public std::exception;
+        class Error : public Diagnostic;
+        class InterError : public Error;
+        class Warn : public Diagnostic;
+    }
+
+    namespace streams {
+        class AbstractStream;
+
+        class InputStream : public AbstractStream;
+            class FileIStream : public InputStream;
+            class StringIStream : public InputStream;
+            class ConsoleIStream : public InputStream;
+
+        class OutputStream : public AbstractStream;
+            class FileOStream : public OutputStream;
+            class StringOStream : public OutputStream;
+            class ConsoleOStream : public OutputStream;
+            class ConsoleErrOStream : public OutputStream;
+    }
+
+    namespace utils {
+        class Logger;
+    }
+
+    inline void debug_break();
+    struct FileLocation;
+    struct SourceLocation
+}
+
+namespace lang
+{
+    namespace syntax {
+        enum class TokenType;
+        struct Token;
+        namespace lexer {
+            class lexer;
+            inline std::unordered_map<std::string_view, TokenType> keywords;
+        }
+        namespace parser {
+            class Parser;
+        }
+    }
+
+    namespace semantic {
+        // types
+        struct Identifier;
+        class Scope;
+        struct Module;
+        struct Program;
+
+        // analyzers - todo
+        class ImportProcessor : public ast::ASTVisitor;
+        class SymbolsCollector : public ast::ASTVisitor;
+        class NameChecker : public ast::ASTVisitor;
+        class TypeBuilder : public ast::ASTVisitor;
+        class TypeInitializer : public ast::ASTVisitor;
+        class TypeResolver : public ast::ASTVisitor;   
+    }
+
+    // todo
+    namespace pipeline {
+        struct CompileOptions;
+        class CompileDriver;
+        class SyntaxDriver;
+        class SemanticDriver;
+        class ModulesLoader;
+    }
+
+    namespace ast
+    {
+        class BaseNode;
+        class StmtNode : public BaseNode;
+        class ExprNode : public StmtNode;
+
+        class ASTVisitor;
+        class ConstASTVisitor;
+
+    // control flow
+        class BlockStmt : public StmtNode;
+        class StructureStmt : public StmtNode;
+        class StructureStmtWithCond : public StructureStmt;
+        class IfStmt : public StructureStmtWithCond;
+        class ElseStmt : public StructureStmt;
+        class ForStmt : public StructureStmtWithCond;
+        class WhileStmt : public StructureStmtWithCond;
+    
+    // decls
+        class DeclStmt : public StmtNode;
+        class DeclName : DeclStmt;
+        class DeclVariable : public DeclName;
+        class DeclFunction : public DeclName;
+        class DeclModule : public DeclName; // deprecated
+        class DeclNamespace : public DeclName; // deprecated in future
+
+    // other stmts
+        class ImportStmt : StmtNode;
+        class ReturnStmt : StmtNode;
+        class BreakStmt : StmtNode;
+        class ContinueStmt : StmtNode;
+    }
+
+    namespace diagnostic {
+        class CompileError : public common::diagnostic::Error;
+
+        class SyntaxError : public CompileError;
+        class LexerError : public SyntaxError;
+        class ParserError : public SyntaxError;
+
+        // todo semantic errors
+        class SemanticError : public CompileError;
+
+        class CompileWarn : public common::diagnostic::Warn;
+
+        class SyntaxWarn : public CompileWarn;
+        class LexerError : public SyntaxError;
+        class ParserWarn : public SyntaxError;
+
+        // todo semantic warns
+        class SemanticWarn : public CompileWarn;
+    }
+    namespace utils
+    {
+        // enum types to string
+        constexpr const char* stringify(ast::OperatorExpr::OperatorKind) noexcept;
+        constexpr const char* stringify(syntax::TokenType) noexcept;
+
+        // print token or vector of tokens
+        void print(const std::vector<syntax::Token>&) noexcept;
+        void print(const syntax::Token&) noexcept;
+
+        // used in parser
+        constexpr bool is_declarator(syntax::TokenType) noexcept;
+        constexpr bool is_operator(syntax::TokenType) noexcept;
+        constexpr bool is_literal(syntax::TokenType) noexcept;
+
+        // TokenType to OperatorExpr::OperatorKind
+        constexpr ast::OperatorExpr::OperatorKind token_to_op(syntax::TokenType);
+
+        // print ast or vector of ast's
+        class ASTPrinter : public ast::ConstASTVisitor;
+        void print(const std::vector<std::unique_ptr<ast::BaseNode>>&) noexcept;
+        void print(const ast::BaseNode*) noexcept;
+
+        // used in parser
+        constexpr bool is_unary_op(ast::OperatorExpr::OperatorKind) noexcept;
+        constexpr bool is_prefix_op(ast::OperatorExpr::OperatorKind) noexcept;
+        constexpr bool is_postfix_op(ast::OperatorExpr::OperatorKind) noexcept;
+        constexpr bool is_mul_op(ast::OperatorExpr::OperatorKind) noexcept;
+        constexpr bool is_add_op(ast::OperatorExpr::OperatorKind) noexcept;
+        constexpr bool is_compare_op(ast::OperatorExpr::OperatorKind) noexcept;
+        constexpr bool is_logical_op(ast::OperatorExpr::OperatorKind) noexcept;
+        constexpr bool is_assign_op(ast::OperatorExpr::OperatorKind) noexcept;
+    }
+}
+
+namespace compiler_app {
+    class CLIParser;
+}

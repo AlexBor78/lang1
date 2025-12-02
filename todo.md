@@ -119,6 +119,11 @@
     - [X] remove types from AST and add type context
     - [X] add SyntaxType and SyntaxTypeContext (use in parser)
 
+- [ ] pipeline - drivers which control process of compilation
+    - [ ] SyntaxDriver
+    - [ ] ModulesLoader - loads all imported modules before semantic analyze
+    - [ ] CompileDriver
+
 
 - [ ] semantic...
     - [X] create semantic types
@@ -128,29 +133,32 @@
         - [X] program
 
     - Semantic phases:
-        1. Modules - process imports, collect all names from modules, (without body)
+        1. Modules - build ast for every module in project, and then collect all symbols
         2. Names - check if name exist
         3. types - fill TypeTable with types, check if types exists, fill types context
         4. Optimize
 
-    - [ ] create semantic analysts analyzers
+    - [ ] create semantic analyzers
         - [ ] ProgramInitializer (Program name, global_scope, etc)
-        - [ ] Modules phase
-            - [ ] ModuleProcessor - check if file starts from ModuleDecl node
-            - [ ] ImportProcessor - process modules import (save every name to scopes, without body procession)
+        - [ ] SymbolsCollector - collect all symbol (not in body)
 
-        - [ ] Names phase
-            - [ ] NameChecker check if identifier exists (var and functions)
+        - [ ] Semantic analyze
+            - [ ] Modules phase
+                - [ ] ImportProcessor process ast return all imported modules (name)
+            - [ ] Names phase
+                - [ ] NameChecker check if identifier exists (var and functions)
 
-        - [ ] Types phase
-            - [ ] TypeBuilder - fill TypeTable with types (not supported for now, in future: aliases, structs, enum)
-            - [ ] TypeInitializer - create QualType from SyntaxType (BTW check if  type exists)
-            - [ ] TypeResolver - resolve types (e.g. bool -> int, uint -> int, etc)
+            - [ ] Types phase
+                - [ ] TypeBuilder - fill TypeTable with types (not supported for now, in future: aliases, structs, enum)
+                - [ ] TypeInitializer - create QualType from SyntaxType (BTW check if  type exists)
+                - [ ] TypeResolver - resolve types (e.g. bool -> int, uint -> int, etc)
 
-        - [ ] optimize phase
-            - [ ] Optimizers (e.g. increment, blockstmt->one-stmt(if possible), etc)
+            - [ ] optimize phase
+                - [ ] Optimizers (e.g. increment, blockstmt->one-stmt(if possible), etc)
 
 - [ ] todo some day(after 0:0 version), wrote just to not forget
+    - [ ] remove ModuleDecl node (file_name is module name)
+    - [ ] replace namespaces with modules (remove namespaces)
     - [ ] use precompiled headers
     - [ ] design module (for increment compilation)
     - [ ] multi-threading
