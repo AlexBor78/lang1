@@ -58,6 +58,11 @@ namespace lang
         // TODO:
     }
 
+    namespace pipeline {
+        struct CompileOptions;
+        class CompileDriver;
+    }
+
     namespace ast
     {
         class BaseNode;
@@ -145,9 +150,6 @@ namespace lang
 }
 
 namespace compiler_app {
-    struct CompileOptions;
     struct ParsedFlag;
-
     class CLIParser;
-    class CompileDriver;
 }

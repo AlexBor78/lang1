@@ -11,7 +11,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(sources
     src/main.cpp
     src/cliparser.cpp
-    src/compiledriver.cpp
 )
 
 add_executable(${PROJECT_NAME} ${sources})

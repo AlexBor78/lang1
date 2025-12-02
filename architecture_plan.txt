@@ -63,13 +63,13 @@ namespace lang
         class TypeResolver : public ast::ASTVisitor;   
     }
 
-    // todo
+    
     namespace pipeline {
         struct CompileOptions;
         class CompileDriver;
-        class SyntaxDriver;
-        class SemanticDriver;
-        class ModulesLoader;
+        class SyntaxDriver; // todo
+        class SemanticDriver; // todo
+        class ModulesLoader; // todo
     }
 
     namespace ast

@@ -25,17 +25,15 @@ set(sources
     src/semantic/types/identifier.cpp
     src/semantic/types/module.cpp
     src/semantic/types/scope.cpp
+
+    # pipeline
+    src/pipeline/compiledriver.cpp
     
     # utils
-    # src/utils/diagnostic.cpp
     src/utils/printast.cpp
     src/utils/utils.cpp
 
     # common
-    # src/utils/istream.cpp
-    # src/utils/ostream.cpp
-    # src/utils/stream.cpp
-    # src/utils/logger.cpp
     src/utils/error.cpp
 )
 

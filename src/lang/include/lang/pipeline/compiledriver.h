@@ -1,9 +1,8 @@
 #pragma once
 
-#include <compiler/cliparser.h>
+#include <lang/pipeline/compile_options.h>
 
-
-namespace compiler_app
+namespace lang::pipeline
 {
     class CompileDriver
     {
