@@ -138,6 +138,11 @@
         3. types - fill TypeTable with types, check if types exists, fill types context
         4. Optimize
 
+    - [ ] fix problems founded
+        - [ ] remove noexcept from ast visitors
+        - [ ] SAVE NODE SourceLocation IN PARSER!!!!!!
+        - [ ] remove module decl node
+
     - [ ] create semantic analyzers
         - [X] ProgramInitializer (Program name, global_scope, etc)
 
@@ -145,7 +150,7 @@
             - [X] Modules phase
                 - [X] ImportAnalyzers process ast return all imported modules (names)
                 <!-- maybe rename ImportAnalyzer -> ImportsCollector -->
-                - [ ] SymbolsCollector - collect all symbol (not body)
+                - [X] SymbolsCollector - collect all symbol (not body)
                 
             - [ ] Names phase
                 - [ ] NameChecker check if identifier exists (var and functions)
@@ -173,10 +178,10 @@
 
     - [ ] file format (some JSON stuff)
         - [ ] needs JSON lib
-        - [ ] serialization (and serializer)
-            - [ ] AST serializer (ConstVisitor BTW)
-            - [ ] Module(data structure) serializer (TypeTable, Scope, Identifier, etc)
-            - [ ] main Serializer class
+        - [ ] serialization
+            <!-- - [ ] AST serializer (ConstVisitor BTW) no needs, but still wants to dump :)-->
+            - [ ] Module's(data structure) serializer (TypeTable, Scope, Identifier, etc)
+            - [ ] SerializationDriver class
         - [ ] deserialization (and deserializer)
             - [ ] AST deserializer (ConstVisitor BTW)
             - [ ] Module(data structure) deserializer (TypeTable, Scope, Identifier, etc)
