@@ -274,6 +274,7 @@ namespace lang::ast
         virtual void accept(ASTVisitor&) noexcept override;
 
         const StmtNode* get_body() const noexcept;
+        StmtNode* get_body() noexcept;
     };
 
     class ImportStmt : public StmtNode

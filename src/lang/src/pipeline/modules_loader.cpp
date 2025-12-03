@@ -21,10 +21,9 @@ namespace lang::pipeline
     }
 
     void ModulesLoader::load(const std::string& name) {
-        if(!state->program.modules.contains(name)) {
-            driver.process(name);
-            state->program.modules[name]->dependencies = import_processor.process(state->program.modules[name]->ast);
-            load(state->program.modules[name]->dependencies);
-        }
+        if(state->program.modules.contains(name)) return;
+        driver.process(name);
+        state->program.modules[name]->dependencies = import_processor.process(state->program.modules[name]->ast);
+        load(state->program.modules[name]->dependencies);
     }
 }

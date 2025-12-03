@@ -59,7 +59,7 @@ namespace lang
 
         // analyzers
         class ImportAnalyzer : public ast::ASTVisitor;
-        class SymbolsCollector : public ast::ASTVisitor; // todo
+        class SymbolsCollector : public ASTVisitor; // none const => needs non-const ptr in Identifier (to edit in future)
         class NameChecker : public ast::ASTVisitor; // todo
         class TypeBuilder : public ast::ASTVisitor; // todo
         class TypeInitializer : public ast::ASTVisitor; // todo
@@ -71,7 +71,7 @@ namespace lang
         struct CompileOptions;
         class CompileDriver;
         class SyntaxDriver;
-        class SemanticDriver; // todo
+        class SemanticDriver;
         class ModulesLoader;
     }
 

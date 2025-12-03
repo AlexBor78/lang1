@@ -16,9 +16,9 @@ namespace lang::pipeline
         bool semantic_only{false};
 
         // debug flags
-        bool trace_lexer{false};
-        bool trace_parser{false};
-        // bool print_tokens{false};
-        // bool print_ast{false};
+        bool trace_lexer{false}; // todo: SyntaxDriver, Lexer support
+        bool trace_parser{false}; // todo: SyntaxDriver, Parser support
+        std::vector<std::string> print_modules_ast;
+        std::vector<std::string> print_modules_tokens;
     };
 }

@@ -1,7 +1,19 @@
+#include "lang/semantic/types/scope.h"
 #include <lang/semantic/types/semantic_types.h>
 
 namespace lang::semantic
 {
+// SemanticState
+
+    void SemanticState::enter_scope(Scope* scope) {
+        curr_scope = scope;
+    }
+
+    void SemanticState::leave_scope() {
+        curr_scope = curr_scope->get_parent();
+    }
+
+// SemanticInitializer
 
     SemanticState SemanticInitializer::init_state(std::string_view name) {
         SemanticState state;

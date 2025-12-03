@@ -174,6 +174,11 @@ namespace lang::ast
     {
         return body.get();
     }
+
+    StmtNode* DeclNamespace::get_body() noexcept
+    {
+        return body.get();
+    }
     
 // ImportStmt
 

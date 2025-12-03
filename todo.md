@@ -159,6 +159,7 @@
                 - [ ] Optimizers (e.g. increment, blockstmt->one-stmt(if possible), etc)
 
 - [ ] todo some day(after 0:0 version), wrote just to not forget
+    - [ ] change DeclNode api -> std::string_view get_name() -> const std::string& get_name()
     - [ ] remove ModuleDecl node (file_name is module name)
     - [ ] replace namespaces with modules (remove namespaces)
     - [ ] use precompiled headers

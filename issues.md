@@ -2,4 +2,6 @@
 - [ ] bugs when try to run test :(
         - [ ] in lexer: fails if comment in end of file
         - [ ] something wrong with minus in looong exprs (commented in test.lang)
+
+- [ ] segfault if add imports to std.lang (std, main, test)
         

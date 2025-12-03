@@ -19,18 +19,22 @@ set(sources
     src/ast/expr.cpp
     src/ast/ast.cpp
 
-    # semantic
+    # semantic types
     src/semantic/types/semantic_initializer.cpp
-    src/semantic/analyzers/import_processor.cpp
     src/semantic/types/typesystem.cpp
     src/semantic/types/identifier.cpp
     src/semantic/types/module.cpp
     src/semantic/types/scope.cpp
 
+    # semantic analyzers
+    src/semantic/analyzers/import_processor.cpp
+    src/semantic/analyzers/symbols_collector.cpp
+
     # pipeline
     src/pipeline/compiledriver.cpp
     src/pipeline/syntax_driver.cpp
     src/pipeline/modules_loader.cpp
+    src/pipeline/semantic_driver.cpp
     
     # utils
     src/utils/printast.cpp
