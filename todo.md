@@ -125,6 +125,8 @@
     - [ ] CompileDriver
 
 
+CUUUUUREEEEENTTTT!!!!!!!!!!!!!!!!!
+
 - [ ] semantic...
     - [X] create semantic types
         - [X] identifier
