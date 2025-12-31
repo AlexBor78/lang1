@@ -32,7 +32,6 @@
     - [X] use shared_ptr instead unique_ptr in logger for streams
     - [X] refactor PrintAST
         - [X] rename some nodes (e.g. CallExpr -> FunctionExpr)
-        - [ ] check if // WTF?
 
     - [ ] make naming(classes, args, api, etc) more consistence
         - [ ] use AST alias type instead of `std::vector<ast::BaseNode>` 
@@ -124,8 +123,19 @@
     - [ ] ModulesLoader - loads all imported modules before semantic analyze
     - [ ] CompileDriver
 
-
 CUUUUUREEEEENTTTT!!!!!!!!!!!!!!!!!
+
+- [ ] add documentation
+    - [X] move and clean up all docs we already had
+    - [ ] add doxygen to project, and write doc in code
+    - [ ] wite down all other code and architecture docs
+    - [ ] clean-up roadmap, dived notes and roadmap, sort all notes
+
+- [ ] Change done stuff -> new and actual ideas
+    - [ ] new type's syntax AND ne type's Types design (to have infinity wrappers)
+    - [ ] remove namespaces at all
+    - [ ] add keywords, nodes, etc for new features
+    - [ ] implement new modules (at list everything without increment build)
 
 - [ ] semantic...
     - [X] create semantic types
@@ -134,11 +144,13 @@ CUUUUUREEEEENTTTT!!!!!!!!!!!!!!!!!
         - [X] module
         - [X] program
 
+<!-- DOCUMENTATION DOWN -->
     - Semantic phases:
         1. Modules - build ast for every module in project, and then collect all symbols
         2. Names - check if name exist
         3. types - fill TypeTable with types, check if types exists, fill types context
         4. Optimize
+<!-- DOCUMENTATION UP -->
 
     - [ ] fix problems founded
         - [ ] remove noexcept from ast visitors
@@ -165,14 +177,6 @@ CUUUUUREEEEENTTTT!!!!!!!!!!!!!!!!!
             - [ ] optimize phase
                 - [ ] Optimizers (e.g. increment, blockstmt->one-stmt(if possible), etc)
 
-- [ ] todo some day(after 0:0 version), wrote just to not forget
-    - [ ] change DeclNode api -> std::string_view get_name() -> const std::string& get_name()
-    - [ ] remove ModuleDecl node (file_name is module name)
-    - [ ] replace namespaces with modules (remove namespaces)
-    - [ ] use precompiled headers
-    - [ ] design module (for increment compilation)
-    - [ ] multi-threading
-    
 - [ ] design module (files and logic)
     - [ ] check if file was edited (by hash)
         - [ ] crypto library
@@ -188,3 +192,16 @@ CUUUUUREEEEENTTTT!!!!!!!!!!!!!!!!!
             - [ ] AST deserializer (ConstVisitor BTW)
             - [ ] Module(data structure) deserializer (TypeTable, Scope, Identifier, etc)
             - [ ] main DeSerializer class
+
+- [ ] todo some day(after 0:0 version), wrote just to not forget
+    - [ ] change DeclNode api -> std::string_view get_name() -> const std::string& get_name()
+    - [ ] remove ModuleDecl node (file_name is module name)
+    - [ ] replace namespaces with modules (remove namespaces)
+    - [ ] use precompiled headers
+    - [ ] design module (for increment compilation)
+    - [ ] multi-threading
+
+- [ ] language features after 0:0 version
+    - [ ] structs
+    - [ ] alias types
+    - [ ] base std
