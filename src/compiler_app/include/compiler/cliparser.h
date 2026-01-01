@@ -8,6 +8,9 @@
 
 namespace compiler_app
 {
+    /**
+     * @note value is optinal
+     */
     struct ParsedFlag {
         std::string flag;
         std::string value; // optional

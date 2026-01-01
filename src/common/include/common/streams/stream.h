@@ -56,12 +56,20 @@ namespace common::streams
 
         virtual std::string read_word();
 
-        // if(offset == 0) return curr token
-        // return curr+offset token
+        /**
+         * @brief see current+offset token
+         * 
+         * @param offset 
+         * @return current+offset char 
+         */
         virtual char peek(size_t offset = 0) const;
 
-        // if(offset == 0) return curr token and move cursor 
-        // return curr+offset token and move cursor
+        /**
+         * @brief move cursor by offset and return last token
+         * 
+         * @param offset 
+         * @return char 
+         */
         virtual char advance(size_t offset = 0);
 
         virtual void skip(size_t n = 1);
@@ -100,7 +108,9 @@ namespace common::streams
         void write_word(std::format_string<Args...> fmt, Args&&... args) noexcept {
             write_word(std::format(fmt, std::forward<Args>(args)...));
         }
-        // todo: add cursor movements maybe
+        /**
+         * @todo add cursor movements maybe
+         */
     };
 
     // useless i think

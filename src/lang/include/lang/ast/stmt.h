@@ -240,7 +240,10 @@ namespace lang::ast
         const StmtNode* get_body() const noexcept;
     };
 
-    // deprecated
+    /**
+     * @deprecated no need to delcare module -> file name is module
+     * 
+     */
     class DeclModule : public DeclStmt
     {
     public:

@@ -5,6 +5,12 @@
 
 namespace lang::pipeline
 {
+    /** 
+     * @todo rename lname -> program_name/output_name
+     * @todo multithreading
+     * @todo support for trace_lexer
+     * @todo support for trace_parser
+     */
     struct CompileOptions {
         std::string name{"main"}; // todo: rename to program_name/output_name
         std::vector<std::string> import_paths;

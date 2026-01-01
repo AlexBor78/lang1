@@ -62,7 +62,10 @@ namespace common::utils
         void set_infostream(std::unique_ptr<streams::OutputStream>) noexcept;
         void set_errstream(std::unique_ptr<streams::OutputStream>) noexcept;
 
-        // print to console by default 
+        /**
+         * @note print to console by default 
+         * 
+         */
         Logger() = delete;
         Logger(LogLevel _level
         ,      std::shared_ptr<streams::OutputStream> _infostream = std::make_shared<streams::ConsoleOStream>()
