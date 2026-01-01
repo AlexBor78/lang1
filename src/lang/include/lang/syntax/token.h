@@ -5,6 +5,10 @@
 
 namespace lang::syntax
 {
+    /**
+     * @warning using values of enum in utils functions, don't change if dont know how
+     * 
+     */
     enum class TokenType
     {
         // Identifiers and literals
@@ -15,6 +19,8 @@ namespace lang::syntax
         // Literal values
         TRUE,
         FALSE,
+
+        // Operators
             
         // Assignment
         ASSIGN,     // =
@@ -74,6 +80,8 @@ namespace lang::syntax
         RBRACE,         // }
         LBRACKET,       // [
         RBRACKET,       // ]
+        LARROW,         // <-
+        RARROW,         // ->
         SEMICOLON,      // ;
         COLON,          // :
         DOUBLECOLON,    // ::
@@ -81,14 +89,15 @@ namespace lang::syntax
         DOT,            // .
 
         // Declaration keywords
+        EXTERN,
+        FN,
+        MUTABLE,
         CONST,
         STRUCT,
+        ALIAS,
         ENUM,
-        MODULE,
-        NAMESPACE,
-        EXTERN,
         
-        // Keywords
+        // Other keywords
         IF,
         ELSE,
         FOR,
@@ -97,14 +106,14 @@ namespace lang::syntax
         CONTINUE,
         RETURN,
         IMPORT,
+        STACK,
         
         // Special
         END,        // End of file
         ILLEGAL,    // Unknown token
     };
 
-    struct Token
-    {
+    struct Token {
         TokenType ty{TokenType::ILLEGAL};
         common::SourceLocation pos;
         std::string sym;

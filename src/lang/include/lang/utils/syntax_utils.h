@@ -24,13 +24,11 @@ namespace lang::utils
     constexpr const char* stringify(syntax::TokenType ty) noexcept {
         switch(ty) {
             // Identifiers and literals
-            case syntax::TokenType::IDENTIFIER: return "IDENTIFIER";
-            case syntax::TokenType::NUMBER:     return "NUMBER";
-            case syntax::TokenType::STRING:     return "STRING";
-
-            // Literal values
-            case syntax::TokenType::TRUE:       return "TRUE";
-            case syntax::TokenType::FALSE:      return "FALSE";
+            case syntax::TokenType::IDENTIFIER:   return "IDENTIFIER";
+            case syntax::TokenType::NUMBER:       return "NUMBER";
+            case syntax::TokenType::STRING:       return "STRING";
+            case syntax::TokenType::TRUE:         return "TRUE";
+            case syntax::TokenType::FALSE:        return "FALSE";
 
             // Operators
             case syntax::TokenType::ASSIGN:       return "ASSIGN";
@@ -70,7 +68,6 @@ namespace lang::utils
             case syntax::TokenType::SHL_ASSIGN:   return "SHL_ASSIGN";
             case syntax::TokenType::SHR_ASSIGN:   return "SHR_ASSIGN";
 
-
             // Delimiters
             case syntax::TokenType::LPAREN:       return "LPAREN";
             case syntax::TokenType::RPAREN:       return "RPAREN";
@@ -78,6 +75,8 @@ namespace lang::utils
             case syntax::TokenType::RBRACE:       return "RBRACE";
             case syntax::TokenType::LBRACKET:     return "LBRACKET";
             case syntax::TokenType::RBRACKET:     return "RBRACKET";
+            case syntax::TokenType::LARROW:       return "LARROW";
+            case syntax::TokenType::RARROW:       return "RARROW";
             case syntax::TokenType::SEMICOLON:    return "SEMICOLON";
             case syntax::TokenType::COLON:        return "COLON";
             case syntax::TokenType::DOUBLECOLON:  return "DOUBLECOLON";
@@ -85,11 +84,15 @@ namespace lang::utils
             case syntax::TokenType::DOT:          return "DOT";
 
             // Declaration keywords
+            case syntax::TokenType::EXTERN:       return "EXTERN";
+            case syntax::TokenType::FN:           return "FN";
             case syntax::TokenType::CONST:        return "CONST";
+            case syntax::TokenType::MUTABLE:      return "MUTABLE";
             case syntax::TokenType::STRUCT:       return "STRUCT";
+            case syntax::TokenType::ALIAS:       return "ALIAS";
             case syntax::TokenType::ENUM:         return "ENUM";
 
-            // Keywords
+            // Other keywords
             case syntax::TokenType::IF:           return "IF";
             case syntax::TokenType::ELSE:         return "ELSE";
             case syntax::TokenType::FOR:          return "FOR";
@@ -98,13 +101,11 @@ namespace lang::utils
             case syntax::TokenType::CONTINUE:     return "CONTINUE";
             case syntax::TokenType::RETURN:       return "RETURN";
             case syntax::TokenType::IMPORT:       return "IMPORT";
-            case syntax::TokenType::MODULE:       return "MODULE";
-            case syntax::TokenType::NAMESPACE:    return "NAMESPACE";
-            case syntax::TokenType::EXTERN:       return "EXTERN";
+            case syntax::TokenType::STACK:        return "STACK";
             
             // Special
-            case syntax::TokenType::END:        return "END";
-            case syntax::TokenType::ILLEGAL:    return "ILLEGAL";
+            case syntax::TokenType::END:          return "END";
+            case syntax::TokenType::ILLEGAL:      return "ILLEGAL";
         } return "UNKNOWN";
     }
 
@@ -121,8 +122,8 @@ namespace lang::utils
     constexpr bool is_declarator(syntax::TokenType tok) noexcept {
         return  static_cast<int>(tok) > static_cast<int>(syntax::TokenType::DOT)
         &&      static_cast<int>(tok) < static_cast<int>(syntax::TokenType::IF)
-        ||      tok == syntax::TokenType::STAR
+        ||      tok == syntax::TokenType::IDENTIFIER
         ||      tok == syntax::TokenType::AMPERSAND
-        ||      tok == syntax::TokenType::IDENTIFIER;
+        ||      tok == syntax::TokenType::STAR;
     }
 }

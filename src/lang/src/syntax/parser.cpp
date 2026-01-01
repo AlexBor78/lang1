@@ -121,8 +121,6 @@ namespace lang::syntax::parser
 
     std::unique_ptr<ast::StmtNode> Parser::process_stmt() {
         breakpoint(); logger.debug("proccess_stmt()");
-        // modules
-        if(!is_end() && match(TokenType::MODULE)) throw diagnostic::ParserError("module keyword is deprecated");
         if(!is_end() && match(TokenType::IMPORT)) {
             auto node = process_import_stmt();
             process_semicolon();
@@ -143,19 +141,14 @@ namespace lang::syntax::parser
         if(!is_end() && match(TokenType::LBRACE)) return process_scope();
         if(!is_end() && match(TokenType::BREAK)) throw break_is_not_suported();
         if(!is_end() && match(TokenType::CONTINUE)) throw continue_is_not_suported();
-
-        // other exprs
         if(!is_end() && match(TokenType::RETURN)) {
             auto node = process_return_stmt();
             process_semicolon();
             return std::move(node);
         }
 
-        // declarations
-        if(!is_end() && match(TokenType::NAMESPACE)) return process_namespace_decl();
-        
+        // declarations        
         if(!is_end() && look_like_declare()) return process_declare();
-
 
         // if it not stmt -> try expr :)
         auto node = process_expr();
@@ -164,17 +157,7 @@ namespace lang::syntax::parser
         return std::move(node);
     }
 
-    // modules stmt's
-
-    // std::unique_ptr<ast::DeclModule> Parser::process_module_decl() {
-    //     breakpoint(); logger.debug("proccess_module_decl()");
-    //     if(module_declared) throw multiple_module_decl_in_file();
-    //     skip(); // skip MODULE toks
-    //     if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_module_name();
-    //     logger.log("parsing module: {}", peek().sym);
-    //     return std::make_unique<ast::DeclModule>(advance().sym);
-    // }
-
+    // modules stmts
     std::unique_ptr<ast::ImportStmt> Parser::process_import_stmt() {
         breakpoint(); logger.debug("proccess_import_stmt()");
         skip(); // skip IMPORT TOK
@@ -182,9 +165,9 @@ namespace lang::syntax::parser
         return std::make_unique<ast::ImportStmt>(advance().sym);
     }
 
-    // types stmt's - unsupported for now
+    // types stmts - unsupported for now
 
-    // control flow stmt's unsupported for now
+    // control flow stmts
 
     std::unique_ptr<ast::IfStmt> Parser::process_if_stmt() {
         breakpoint(); logger.debug("proccess_if_stmt()");
@@ -269,7 +252,7 @@ namespace lang::syntax::parser
         return std::make_unique<ast::WhileStmt>(std::move(cond), std::move(body));
     }
 
-    // other stmt's
+    // other stmts
 
     std::unique_ptr<ast::BlockStmt> Parser::process_scope() {
         breakpoint(); logger.debug("process_scope()");
@@ -305,7 +288,7 @@ namespace lang::syntax::parser
         return std::make_unique<ast::ContinueStmt>();
     }
 
-    // declare stmt's
+    // declare stmts
 
     bool Parser::look_like_declare() {
         if(!is_end() && match(TokenType::EXTERN)) {
@@ -385,15 +368,6 @@ namespace lang::syntax::parser
             process_semicolon();
             return std::move(node);
         } throw unexpected_token(2);
-    }
-
-    std::unique_ptr<ast::DeclNamespace> Parser::process_namespace_decl() {
-        breakpoint();
-        if(peek(1).ty != TokenType::IDENTIFIER) throw expected_namespace_name();
-        std::string name = peek(1).sym;
-        skip(2);
-        
-        return std::make_unique<ast::DeclNamespace>(name, process_scope());;
     }
 
     std::unique_ptr<AbstractType> Parser::process_type() {
@@ -580,12 +554,12 @@ namespace lang::syntax::parser
     std::unique_ptr<ast::ExprNode> Parser::process_name() {
         breakpoint(); logger.debug("process_name()");
         if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_identifier();
-        if(!is_end(1) && match(TokenType::DOUBLECOLON, 1)) return process_namespace_expr();
+        if(!is_end(1) && match(TokenType::DOUBLECOLON, 1)) return process_symbol_path();
         if(!is_end(1) && match(TokenType::LPAREN, 1)) return process_function_expr();
         return process_variable_expr();
     }
 
-    std::unique_ptr<ast::NamespaceExpr> Parser::process_namespace_expr() {
+    std::unique_ptr<ast::SymbolPath> Parser::process_symbol_path() {
         breakpoint(); logger.debug("process_namespace_expr()");
         std::string name = advance().sym;
         
@@ -593,7 +567,7 @@ namespace lang::syntax::parser
         // if(!is_end() && !match(TokenType::DOUBLECOLON)) throw expected_doublecolon();
         skip(); // skip '::'
 
-        return std::make_unique<ast::NamespaceExpr>(name, process_name());
+        return std::make_unique<ast::SymbolPath>(name, process_name());
     }
 
     std::unique_ptr<ast::FunctionExpr> Parser::process_function_expr() {
@@ -741,9 +715,9 @@ namespace lang::syntax::parser
     diagnostic::ParserError Parser::expected_variable_name(size_t offset) const noexcept {
         return diagnostic::ParserError(std::format("expected variable name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
-    diagnostic::ParserError Parser::expected_namespace_name(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected namespace name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
-    }
+    // diagnostic::ParserError Parser::expected_namespace_name(size_t offset) const noexcept {
+    //     return diagnostic::ParserError(std::format("expected namespace name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    // }
     diagnostic::ParserError Parser::expected_module_name(size_t offset) const noexcept {
         return diagnostic::ParserError(std::format("expected module name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }

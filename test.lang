@@ -7,7 +7,7 @@
 // module test; // deprecated
 import std;
 
-namespace math {
+/*namespace math*/ {
     extern int pow(int a, int b);
     
     int add(int a, int b) {
@@ -24,7 +24,7 @@ namespace math {
     }
 }
 
-namespace utils {
+/*namespace utils*/ {
     void print_numbers() {
         int i = 0;
         i++;
@@ -110,7 +110,7 @@ int main() {
     return 0;
 }
 
-namespace extra {
+/*namespace extra*/ {
     const int VALUE = 100;
     
     void test_fn() {

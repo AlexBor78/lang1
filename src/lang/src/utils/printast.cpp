@@ -168,25 +168,6 @@ namespace lang::utils
         remove_from_prefix(4);
     }
 
-    void PrintAST::visit_decl_module(const ast::DeclModule& node) noexcept
-    {
-        println("DeclModule:");
-        add_to_prefix();
-        println("name: {}", node.get_name());
-        remove_from_prefix();
-    }
-    void PrintAST::visit_decl_namespace(const ast::DeclNamespace& node) noexcept
-    {
-        println("DeclNamespace:");
-        add_to_prefix();
-        println("name: {}", node.get_name());
-        print("body: ");
-        add_to_prefix();
-        if(node.get_body()) node.get_body()->accept(*this);
-        else println("null");
-
-        remove_from_prefix();
-    }
     void PrintAST::visit_import_stmt(const ast::ImportStmt& node) noexcept
     {
         println("ImportStmt:");
@@ -238,7 +219,7 @@ namespace lang::utils
         println("name: {}", node.get_name());
         remove_from_prefix();
     }
-    void PrintAST::visit_namespace_expr(const ast::NamespaceExpr& node) noexcept
+    void PrintAST::visit_symbol_path(const ast::SymbolPath& node) noexcept
     {
         println("NamespaceExpr:");
         add_to_prefix();

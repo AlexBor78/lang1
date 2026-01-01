@@ -58,6 +58,8 @@ namespace lang::syntax::lexer
         {"}", TokenType::RBRACE},
         {"[", TokenType::LBRACKET},
         {"]", TokenType::RBRACKET},
+        {"<-", TokenType::LARROW},
+        {"->", TokenType::RARROW},
         {";", TokenType::SEMICOLON},
         {"::", TokenType::DOUBLECOLON},
         {":", TokenType::COLON},
@@ -65,14 +67,15 @@ namespace lang::syntax::lexer
         {".", TokenType::DOT},
 
         // Declaration 
-        {"const", TokenType::CONST},
-        {"struct", TokenType::STRUCT},
-        {"enum", TokenType::ENUM},
-        {"module", TokenType::MODULE},
-        {"namespace", TokenType::NAMESPACE},
         {"extern", TokenType::EXTERN},
+        {"fn", TokenType::FN},
+        {"const", TokenType::CONST},
+        {"mutable", TokenType::MUTABLE},
+        {"struct", TokenType::STRUCT},
+        {"alisa", TokenType::ALIAS},
+        {"enum", TokenType::ENUM},
 
-        // Keywords
+        // Other keywords
         {"if", TokenType::IF},
         {"else", TokenType::ELSE},
         {"for", TokenType::FOR},

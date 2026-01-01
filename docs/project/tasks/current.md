@@ -10,17 +10,18 @@ add `doc` directory, and some directories in it:
 - [X] Documentation
     - [X] reorganize docs
     - [X] add doxygen
-- Update stuff 
-    - update keywords
-    - update type's syntax, and type's Types (better wrappers with OOP)
-    - impl base modules and remove namespace's
-    - impl stack allocations (as in doc)
-- make names more consistence
+- [ ] Update stuff 
+    - [ ] update keywords
+    - [ ] update type's syntax, and type's Types (better wrappers with OOP)
+    - [ ] impl base modules and remove namespace's
+    - [ ] impl stack allocations (as in doc)
+- [ ] make names more consistence
 
 ## Tasks:
 Change done stuff -> new and actual ideas
 - [X] new type's syntax AND ne type's Types design (to have infinity wrappers)
-- [ ] remove namespaces at all
-- [ ] add keywords, nodes, etc for new features
-- [ ] pointer to function
+- [X] remove namespaces at all
+- [X] update keywords
+- [^] add keywords, nodes, etc for new features
+- [^] pointer to function
 - [ ] implement new modules (at list everything without increment build)

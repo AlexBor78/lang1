@@ -240,45 +240,45 @@ namespace lang::ast
         const StmtNode* get_body() const noexcept;
     };
 
-    /**
-     * @deprecated no need to delcare module -> file name is module
-     * 
-     */
-    class DeclModule : public DeclStmt
-    {
-    public:
-        explicit DeclModule(std::string_view _name
-        ,                   common::SourceLocation _pos = default_pos()
-        ):  DeclStmt(_name
-            ,        std::move(_pos)
-            )
-        {}
+    // /**
+    //  * @deprecated no need to delcare module -> file name is module
+    //  * 
+    //  */
+    // class DeclModule : public DeclStmt
+    // {
+    // public:
+    //     explicit DeclModule(std::string_view _name
+    //     ,                   common::SourceLocation _pos = default_pos()
+    //     ):  DeclStmt(_name
+    //         ,        std::move(_pos)
+    //         )
+    //     {}
 
-        virtual void accept(ConstASTVisitor&) const noexcept override;
-        virtual void accept(ASTVisitor&) noexcept override;
-    };
+    //     virtual void accept(ConstASTVisitor&) const noexcept override;
+    //     virtual void accept(ASTVisitor&) noexcept override;
+    // };
 
-    class DeclNamespace : public DeclStmt
-    {
-    private:
-        StmtPtr body;
+    // class DeclNamespace : public DeclStmt
+    // {
+    // private:
+    //     StmtPtr body;
 
-    public:
-        explicit DeclNamespace(std::string_view _name
-        ,                      StmtPtr _body
-        ,                      common::SourceLocation _pos = default_pos()
-        ):  DeclStmt(_name
-            ,        std::move(_pos)
-            )
-        ,   body(std::move(_body))
-        {}
+    // public:
+    //     explicit DeclNamespace(std::string_view _name
+    //     ,                      StmtPtr _body
+    //     ,                      common::SourceLocation _pos = default_pos()
+    //     ):  DeclStmt(_name
+    //         ,        std::move(_pos)
+    //         )
+    //     ,   body(std::move(_body))
+    //     {}
 
-        virtual void accept(ConstASTVisitor&) const noexcept override;
-        virtual void accept(ASTVisitor&) noexcept override;
+    //     virtual void accept(ConstASTVisitor&) const noexcept override;
+    //     virtual void accept(ASTVisitor&) noexcept override;
 
-        const StmtNode* get_body() const noexcept;
-        StmtNode* get_body() noexcept;
-    };
+    //     const StmtNode* get_body() const noexcept;
+    //     StmtNode* get_body() noexcept;
+    // };
 
     class ImportStmt : public StmtNode
     {

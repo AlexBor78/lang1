@@ -30,16 +30,4 @@ namespace lang::semantic
         if(state->curr_scope->contains(std::string(node.get_name()))) return;
         state->curr_scope->add_identifier(Identifier::create(node.get_name(), Identifier::Kind::FUNCTOIN, &node));
     }
-
-    // will be removed in future
-    void SymbolsCollector::visit_decl_namespace(ast::DeclNamespace& node) noexcept {
-        if(state->curr_scope->contains(std::string(node.get_name()))) return;
-        auto ident = Identifier::create(node.get_name(), Identifier::Kind::NAMESPACE, &node, state->curr_scope);
-        state->enter_scope(ident->inner.get());
-        state->curr_scope->add_identifier(std::move(ident)); // add namespace to scope
-
-        node.get_body()->accept(*this); // process al declared symbol in that
-
-        state->leave_scope();
-    }
 }

@@ -22,10 +22,8 @@ namespace lang::semantic
         virtual void visit_block_stmt(ast::BlockStmt&) noexcept override;
         virtual void visit_decl_var(ast::DeclVariable&) noexcept override;
         virtual void visit_decl_func(ast::DeclFunction&) noexcept override;
-        virtual void visit_decl_namespace(ast::DeclNamespace&) noexcept override;
 
     public: // useless nodes
-        virtual void visit_decl_module(ast::DeclModule&) noexcept override {} // deprecated
         virtual void visit_if_stmt(ast::IfStmt&) noexcept override {}
         virtual void visit_else_stmt(ast::ElseStmt&) noexcept override {}
         virtual void visit_for_stmt(ast::ForStmt&) noexcept override {}
@@ -38,7 +36,7 @@ namespace lang::semantic
         virtual void visit_string_literal(ast::StringLiteral&) noexcept override {}
         virtual void visit_bool_literal(ast::BoolLiteral&) noexcept override {}
         virtual void visit_variable_expr(ast::VariableExpr&) noexcept override {}
-        virtual void visit_namespace_expr(ast::NamespaceExpr&) noexcept override {}
+        virtual void visit_symbol_path(ast::SymbolPath&) noexcept override {}
         virtual void visit_call_expr(ast::FunctionExpr&) noexcept override {}
         virtual void visit_binop_expr(ast::BinOpExpr&) noexcept override {}
         virtual void visit_prefix_unary_op_expr(ast::PrefixUnaryOpExpr&) noexcept override {}

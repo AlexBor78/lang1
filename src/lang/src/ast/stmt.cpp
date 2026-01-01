@@ -147,38 +147,6 @@ namespace lang::ast
     {
         return body.get();
     }
-
-// DeclModule
-
-    void DeclModule::accept(ConstASTVisitor& visitor) const noexcept
-    {
-        visitor.visit_decl_module(*this);
-    }
-    void DeclModule::accept(ASTVisitor& visitor) noexcept
-    {
-        visitor.visit_decl_module(*this);
-    }
-
-// DeclNamespace
-
-    void DeclNamespace::accept(ConstASTVisitor& visitor) const noexcept
-    {
-        visitor.visit_decl_namespace(*this);
-    }
-    void DeclNamespace::accept(ASTVisitor& visitor) noexcept
-    {
-        visitor.visit_decl_namespace(*this);
-    }
-
-    const StmtNode* DeclNamespace::get_body() const noexcept
-    {
-        return body.get();
-    }
-
-    StmtNode* DeclNamespace::get_body() noexcept
-    {
-        return body.get();
-    }
     
 // ImportStmt
 

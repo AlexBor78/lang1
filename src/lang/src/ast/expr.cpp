@@ -67,20 +67,20 @@ namespace lang::ast
 
 // NamespaceExpr
 
-    void NamespaceExpr::accept(ConstASTVisitor& visitor) const noexcept
+    void SymbolPath::accept(ConstASTVisitor& visitor) const noexcept
     {
-        visitor.visit_namespace_expr(*this);
+        visitor.visit_symbol_path(*this);
     }
-    void NamespaceExpr::accept(ASTVisitor& visitor) noexcept
+    void SymbolPath::accept(ASTVisitor& visitor) noexcept
     {
-        visitor.visit_namespace_expr(*this);
+        visitor.visit_symbol_path(*this);
     }
 
-    const ExprNode* NamespaceExpr::get_identifier() const noexcept
+    const ExprNode* SymbolPath::get_identifier() const noexcept
     {
         return identifier.get();
     }
-    ExprNode* NamespaceExpr::get_identifier() noexcept
+    ExprNode* SymbolPath::get_identifier() noexcept
     {
         return identifier.get();
     }

@@ -96,7 +96,6 @@ namespace lang::syntax::parser
         // declare
         std::unique_ptr<AbstractType>           process_type();
         std::unique_ptr<ast::DeclStmt>          process_declare();
-        std::unique_ptr<ast::DeclNamespace>     process_namespace_decl();
         std::unique_ptr<ast::DeclVariable>      process_variable_decl();
         std::unique_ptr<ast::DeclFunction>      process_function_decl();
 
@@ -117,7 +116,7 @@ namespace lang::syntax::parser
         std::unique_ptr<ast::ExprNode>          process_name();
         std::unique_ptr<ast::FunctionExpr>      process_function_expr();
         std::unique_ptr<ast::VariableExpr>      process_variable_expr();
-        std::unique_ptr<ast::NamespaceExpr>     process_namespace_expr();
+        std::unique_ptr<ast::SymbolPath>        process_symbol_path();
 
         // literals
         std::unique_ptr<ast::LiteralExpr>       process_literal();
@@ -151,7 +150,6 @@ namespace lang::syntax::parser
         diagnostic::ParserError expected_unary_op(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_postfix_op(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_identifier(size_t offset = 0) const noexcept;
-        diagnostic::ParserError expected_namespace_name(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_module_name(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_variable_name(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_function_name(size_t offset = 0) const noexcept;
@@ -166,6 +164,7 @@ namespace lang::syntax::parser
         diagnostic::ParserError expected_rbrace(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_lparen(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_rparen(size_t offset = 0) const noexcept;
+        
         diagnostic::ParserError unexpected_token(size_t offset = 0) const noexcept;
     };
 }
