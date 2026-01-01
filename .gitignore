@@ -21,3 +21,7 @@ Makefile
 logs/
 log/
 *.log
+
+# doxygen auto-generated documentation
+
+docs/api/generated
