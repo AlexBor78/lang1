@@ -121,6 +121,8 @@ namespace lang::utils
     constexpr bool is_declarator(syntax::TokenType tok) noexcept {
         return  static_cast<int>(tok) > static_cast<int>(syntax::TokenType::DOT)
         &&      static_cast<int>(tok) < static_cast<int>(syntax::TokenType::IF)
+        ||      tok == syntax::TokenType::STAR
+        ||      tok == syntax::TokenType::AMPERSAND
         ||      tok == syntax::TokenType::IDENTIFIER;
     }
 }

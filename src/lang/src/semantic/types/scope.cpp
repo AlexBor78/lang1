@@ -1,3 +1,4 @@
+#include "lang/semantic/types/typesystem.h"
 #include <lang/semantic/types/identifier.h>
 #include <lang/utils/diagnostic.h>
 #include <lang/semantic/types/scope.h>
@@ -40,7 +41,7 @@ namespace lang::semantic
         else return nullptr;
     }
 
-    const Type* Scope::get_type(const std::string& name) const noexcept {
+    const AbstractType* Scope::get_type(const std::string& name) const noexcept {
         if(!parent || typetable.contains(name)) return typetable.get_type(name);
         return parent->get_type(name);
     }

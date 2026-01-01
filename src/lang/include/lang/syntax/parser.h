@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <lang/ast/ast.h>
 #include <lang/ast/expr.h>
@@ -13,34 +14,50 @@
 
 namespace lang::syntax::parser
 {
+
+    struct SyntaxContainer {
+        ast::AST ast;
+
+        /**
+         * @brief DeclNode of something -> It's type
+         * 
+         */
+        std::unordered_map<ast::BaseNode*, std::unique_ptr<AbstractType>> types_context;
+
+        /**
+         * @brief DeclNode of something -> is it extern
+         * 
+         */
+        std::unordered_set<ast::BaseNode*> extern_list;
+    };
+
     class Parser {
     public: // api
         Parser() {
             init_logger();
         }
 
-        ast::AST parse(const std::vector<Token>&);
+        SyntaxContainer parse(const std::vector<Token>&);
         bool had_errors() const noexcept;
-        
-        std::unordered_map<ast::BaseNode*, SemanticBag> get_semantic_context() const;
-        void clear_semantic_context() noexcept;
 
     private: // vars
         common::utils::Logger logger{common::utils::Logger::LogLevel::ALL};
-        std::unordered_map<ast::BaseNode*, SemanticBag> semantic_context;
+        std::unordered_map<ast::BaseNode*, std::unique_ptr<AbstractType>> types_context;
+        std::unordered_set<ast::BaseNode*> extern_list;
 
         const std::vector<Token>* tokens{nullptr};    
-        bool module_declared{false};
+        // bool module_declared{false}; // deprecated
         bool success{true};
         size_t pos{0};
     
     private: // api
-        // don't clear semantic_context
+        // don't clear semantic_contexts
         void reset_state();
         void init_logger();
         void breakpoint();
 
-        void add_semantic_info(ast::BaseNode*, SemanticBag) noexcept;
+        void save_type_to_context(ast::DeclStmt*, std::unique_ptr<AbstractType>);
+        void add_to_extern_list(ast::DeclStmt*);
 
         bool         is_end(size_t n = 1) const;
         bool         match(TokenType, size_t offset = 0) const;
@@ -48,6 +65,10 @@ namespace lang::syntax::parser
         Token        advance();
         void         putback(size_t n = 1);
         void         skip(size_t n = 1);
+
+    private: // look_like function
+
+        bool look_like_declare();
 
     private: // process_ functions
         
@@ -57,7 +78,7 @@ namespace lang::syntax::parser
         std::unique_ptr<ast::StmtNode>          process_stmt();
         
         // modules
-        std::unique_ptr<ast::DeclModule>        process_module_decl();
+        // std::unique_ptr<ast::DeclModule>        process_module_decl();
         std::unique_ptr<ast::ImportStmt>        process_import_stmt();
 
         // control flow
@@ -73,7 +94,7 @@ namespace lang::syntax::parser
         std::unique_ptr<ast::ReturnStmt>        process_return_stmt();
 
         // declare
-        SemanticBag process_type();
+        std::unique_ptr<AbstractType>           process_type();
         std::unique_ptr<ast::DeclStmt>          process_declare();
         std::unique_ptr<ast::DeclNamespace>     process_namespace_decl();
         std::unique_ptr<ast::DeclVariable>      process_variable_decl();

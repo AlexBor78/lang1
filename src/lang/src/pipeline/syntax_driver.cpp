@@ -51,12 +51,17 @@ namespace lang::pipeline
         auto tokens = lexer.tokenize();
 
         syntax::parser::Parser parser;
-        auto ast = parser.parse(tokens);
+        auto syntax_container = parser.parse(tokens);
 
         // save data to semantic container
+
+        /**
+         * @todo save context data
+         * 
+         */
         auto module_ = semantic::Module::create(module_name
-        ,                                                                state->program.global_scope.get()
-        ,                                                                std::move(ast));
+        ,                                       state->program.global_scope.get()
+        ,                                       std::move(syntax_container.ast));
         // in table std::string_view, bsc name of module save's by module
         state->program.modules[module_->name] = std::move(module_);
     }

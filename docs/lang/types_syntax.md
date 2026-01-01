@@ -27,5 +27,5 @@
 - `const* int x;` const pointer to mutable int 
 - `* const int x;` mutable pointer to const int 
 - `** const int x;` mutable pointer to mutable pointer to const int
-- `*fn(int, int) x;` poi[[Types syntax]]nter to function `fn(int, int) -> void`
+- `*fn(int, int) x;` pointer to function `fn(int, int) -> void`
 - `*fn(int, int) -> int x;` pointer to function `fn(int, int) -> int`

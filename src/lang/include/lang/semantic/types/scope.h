@@ -31,7 +31,7 @@ namespace lang::semantic
 
         const Identifier* get_identifier(const std::string&) const noexcept;
         Identifier* get_identifier(const std::string&) noexcept;
-        const Type* get_type(const std::string&) const noexcept;
+        const AbstractType* get_type(const std::string&) const noexcept;
 
         const Scope* get_parent() const noexcept;
         Scope* get_parent() noexcept;

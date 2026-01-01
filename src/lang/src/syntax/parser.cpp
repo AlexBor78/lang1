@@ -1,3 +1,6 @@
+#include "lang/semantic/types/typesystem.h"
+#include "lang/syntax/token.h"
+#include "lang/utils/diagnostic.h"
 #include <common/common.h>
 // #define PARSER_DEBUG
 
@@ -12,7 +15,7 @@ namespace lang::syntax::parser
 {
 // public api
 
-    std::vector<std::unique_ptr<ast::BaseNode>> Parser::parse(const std::vector<Token>& _tokens) {
+    SyntaxContainer Parser::parse(const std::vector<Token>& _tokens) {
         reset_state();
         tokens = &_tokens;
         std::vector<std::unique_ptr<ast::BaseNode>> ast;
@@ -24,28 +27,24 @@ namespace lang::syntax::parser
             return {};
         } catch(const std::exception& e) {
             success = false;
-            logger.error("error while parsing: {}", e.what());
+            logger.error("inter error while parsing: {}", e.what());
             return {};
-        }} return ast;
+        }} return SyntaxContainer{
+            .ast = std::move(ast),
+            .types_context = std::move(types_context),
+            .extern_list = std::move(extern_list)
+        };
     }
 
     bool Parser::had_errors() const noexcept {
         return !success;
     }
 
-    std::unordered_map<ast::BaseNode*, SemanticBag> Parser::get_semantic_context() const {
-        return std::move(semantic_context);
-    }
-
-    void Parser::clear_semantic_context() noexcept {
-        semantic_context.clear();
-    }
-
 // private api
     
     void Parser::reset_state() {
         tokens = nullptr;
-        module_declared = false;
+        // module_declared = false;
         success = true;
         pos = 0;
     }
@@ -75,8 +74,11 @@ namespace lang::syntax::parser
         return pos + n >= tokens->size();
     }
 
-    void Parser::add_semantic_info(ast::BaseNode* node, SemanticBag context) noexcept {
-        semantic_context[node] = context;
+    void Parser::save_type_to_context(ast::DeclStmt* node, std::unique_ptr<AbstractType> type) {
+        types_context[node] = std::move(type);
+    }
+    void Parser::add_to_extern_list(ast::DeclStmt* node) {
+        extern_list.emplace(node);
     }
 
     bool Parser::match(TokenType tt, size_t offset) const {
@@ -120,16 +122,13 @@ namespace lang::syntax::parser
     std::unique_ptr<ast::StmtNode> Parser::process_stmt() {
         breakpoint(); logger.debug("proccess_stmt()");
         // modules
-        if(!is_end() && match(TokenType::MODULE)) {
-            auto node = process_module_decl();
-            process_semicolon();
-            return std::move(node);
-        }
+        if(!is_end() && match(TokenType::MODULE)) throw diagnostic::ParserError("module keyword is deprecated");
         if(!is_end() && match(TokenType::IMPORT)) {
             auto node = process_import_stmt();
             process_semicolon();
             return std::move(node);
         }
+        
         // types
         if(!is_end() && match(TokenType::STRUCT)) throw strcut_is_not_suported();
         if(!is_end() && match(TokenType::ENUM)) throw enum_is_not_suported();
@@ -140,21 +139,24 @@ namespace lang::syntax::parser
         if(!is_end() && match(TokenType::FOR)) return process_for_stmt();
         if(!is_end() && match(TokenType::WHILE)) return process_while_stmt();
 
-        // other stmt's
+        // other stmts
         if(!is_end() && match(TokenType::LBRACE)) return process_scope();
         if(!is_end() && match(TokenType::BREAK)) throw break_is_not_suported();
         if(!is_end() && match(TokenType::CONTINUE)) throw continue_is_not_suported();
+
+        // other exprs
         if(!is_end() && match(TokenType::RETURN)) {
             auto node = process_return_stmt();
             process_semicolon();
             return std::move(node);
         }
-        
+
         // declarations
         if(!is_end() && match(TokenType::NAMESPACE)) return process_namespace_decl();
-        if(utils::is_declarator(peek().ty) 
-        && match(TokenType::IDENTIFIER, 1)) return process_declare();
-            
+        
+        if(!is_end() && look_like_declare()) return process_declare();
+
+
         // if it not stmt -> try expr :)
         auto node = process_expr();
         process_semicolon();
@@ -164,14 +166,14 @@ namespace lang::syntax::parser
 
     // modules stmt's
 
-    std::unique_ptr<ast::DeclModule> Parser::process_module_decl() {
-        breakpoint(); logger.debug("proccess_module_decl()");
-        if(module_declared) throw multiple_module_decl_in_file();
-        skip(); // skip MODULE toks
-        if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_module_name();
-        logger.log("parsing module: {}", peek().sym);
-        return std::make_unique<ast::DeclModule>(advance().sym);
-    }
+    // std::unique_ptr<ast::DeclModule> Parser::process_module_decl() {
+    //     breakpoint(); logger.debug("proccess_module_decl()");
+    //     if(module_declared) throw multiple_module_decl_in_file();
+    //     skip(); // skip MODULE toks
+    //     if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_module_name();
+    //     logger.log("parsing module: {}", peek().sym);
+    //     return std::make_unique<ast::DeclModule>(advance().sym);
+    // }
 
     std::unique_ptr<ast::ImportStmt> Parser::process_import_stmt() {
         breakpoint(); logger.debug("proccess_import_stmt()");
@@ -305,37 +307,84 @@ namespace lang::syntax::parser
 
     // declare stmt's
 
+    bool Parser::look_like_declare() {
+        if(!is_end() && match(TokenType::EXTERN)) {
+            return true;
+        }
+
+        int words{0};
+        while(!is_end() && (
+            match(TokenType::AMPERSAND)
+        ||  match(TokenType::STAR)
+        ||  match(TokenType::CONST))) {skip(); ++words;}
+
+        // type name
+        if(!is_end() && !match(TokenType::IDENTIFIER)) {
+            if(words > 0) putback(words);
+            return false;
+        }
+        
+        //  symbol name
+        if(!is_end(1) && !match(TokenType::IDENTIFIER, 1)) {
+            if(words > 0) putback(words);
+            return false;
+        }
+
+        // function declaration
+        if(!is_end(2) && match(TokenType::LPAREN, 2)) {
+            if(words > 0) putback(words);
+            return true;
+        }
+
+        // variable declaration
+        if(!is_end(2) && (
+            match(TokenType::SEMICOLON,2)
+        ||  match(TokenType::ASSIGN, 2))) {
+            if(words > 0) putback(words);
+            return true;
+        } return false;
+    }
+
     std::unique_ptr<ast::DeclStmt> Parser::process_declare() {        
         breakpoint(); logger.debug("process_declare()");
 
-        int words{0};
+        bool is_extern{false};
         if(!is_end() && match(TokenType::EXTERN)) {
-            ++words;
+            is_extern = true;
             skip();
         }
-        if(!is_end() && match(TokenType::CONST)) {
-            ++words;
-            skip();
-        }
+
+        // skip type wrappers
+        int words{0};
+        while(!is_end() && (
+            match(TokenType::AMPERSAND)
+        ||  match(TokenType::STAR)
+        ||  match(TokenType::CONST))) {skip(); ++words; }
+
+        // type name
         if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_type();
+        
+        //  symbol name
         if(!is_end(1) && !match(TokenType::IDENTIFIER, 1)) throw expected_identifier(1);
 
         // function declaration
         if(!is_end(2) && match(TokenType::LPAREN, 2)) {
             if(words > 0) putback(words);
-            return process_function_decl();
+            auto node = process_function_decl();
+            add_to_extern_list(node.get());
+            return std::move(node);
         }
 
         // variable declaration
-        if(!is_end(2) && match(TokenType::SEMICOLON,2)
-        || match(TokenType::ASSIGN, 2)) {
+        if(!is_end(2) && (
+            match(TokenType::SEMICOLON,2)
+        ||  match(TokenType::ASSIGN, 2))) {
             if(words > 0) putback(words);
             auto node = process_variable_decl();
+            add_to_extern_list(node.get());
             process_semicolon();
             return std::move(node);
-        }
-        
-        throw unexpected_token(2);
+        } throw unexpected_token(2);
     }
 
     std::unique_ptr<ast::DeclNamespace> Parser::process_namespace_decl() {
@@ -347,44 +396,36 @@ namespace lang::syntax::parser
         return std::make_unique<ast::DeclNamespace>(name, process_scope());;
     }
 
-    SemanticBag Parser::process_type() {
+    std::unique_ptr<AbstractType> Parser::process_type() {
         breakpoint(); logger.debug("process_type()");
 
-        QualType::Flags flags{QualType::Flags::NONE};
-        bool is_extern{false};
-
-        if(!is_end() && match(TokenType::EXTERN)) {
-            is_extern = true;
+        if(!is_end() && match(TokenType::AMPERSAND)) {
             skip();
+            return std::make_unique<WrapperType>(WrapperType::WrapperKind::REFERENCE, process_type());
+        }
+
+        if(!is_end() && match(TokenType::STAR)) {
+            skip();
+            return std::make_unique<WrapperType>(WrapperType::WrapperKind::POINTER, process_type());
         }
 
         if(!is_end() && match(TokenType::CONST)) {
-            flags |= QualType::Flags::CONST;
             skip();
+            return std::make_unique<WrapperType>(WrapperType::WrapperKind::CONST, process_type());
         }
         
-        // save type name
-        if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_type();
-        // const Type* type = add_type(std::make_unique<Type>(advance().sym));
-        auto name = advance().sym;
-
-        if(!is_end() && match(TokenType::STAR)) { 
-            flags | QualType::Flags::POINTER;
-            skip();
-        }
-        if(!is_end() && match(TokenType::AMPERSAND)) {
-            flags | QualType::Flags::REFERENCE;
-            skip();
+        if(!is_end() && match(TokenType::IDENTIFIER)) {
+            return std::make_unique<UnresolvedType>(advance().sym);
         }
 
-        return SemanticBag(name, flags, is_extern);
+        throw unexpected_token();
     }
 
     std::unique_ptr<ast::DeclVariable> Parser::process_variable_decl() {
         breakpoint(); logger.debug("process_variable_decl()");
 
         // get type of variable
-        auto semantic = process_type();
+        auto type = process_type();
 
         // save variable name
         if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_variable_name();
@@ -396,19 +437,19 @@ namespace lang::syntax::parser
             skip(); // skip =
             auto expr = process_expr();
             auto node = std::make_unique<ast::DeclVariable>(name, std::move(expr));
-            add_semantic_info(node.get(), semantic);
+            save_type_to_context(node.get(), std::move(type));
             return std::move(node);
         }
 
         auto node = std::make_unique<ast::DeclVariable>(name);
-        add_semantic_info(node.get(), semantic);
+        save_type_to_context(node.get(), std::move(type));
         return std::move(node);
     }
 
     std::unique_ptr<ast::DeclFunction> Parser::process_function_decl() {
         breakpoint(); logger.debug("process_function_decl()");
         
-        auto semantic = process_type();
+        auto type = process_type();
 
         // save name
         if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_function_name();
@@ -431,12 +472,12 @@ namespace lang::syntax::parser
         // if forward declaration
         if(!is_end() && match(TokenType::SEMICOLON)) { skip(); // skip ';'
             auto node = std::make_unique<ast::DeclFunction>(name, std::move(args), nullptr);
-            add_semantic_info(node.get(), semantic);
+            save_type_to_context(node.get(), std::move(type));
             return std::move(node);
         } 
         
         auto node = std::make_unique<ast::DeclFunction>(name, std::move(args), process_scope());
-        add_semantic_info(node.get(), semantic);
+        save_type_to_context(node.get(), std::move(type));
         return std::move(node);
     }
 
@@ -592,7 +633,9 @@ namespace lang::syntax::parser
             case(TokenType::STRING): return process_string_literal();
             case(TokenType::TRUE):   return process_bool_literal();
             case(TokenType::FALSE):  return process_bool_literal();
-            default: throw unexpected_token();
+            default: {
+                throw unexpected_token();
+            }
         }
     }
 

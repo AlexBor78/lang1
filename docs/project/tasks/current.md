@@ -19,7 +19,8 @@ add `doc` directory, and some directories in it:
 
 ## Tasks:
 Change done stuff -> new and actual ideas
-- [ ] new type's syntax AND ne type's Types design (to have infinity wrappers)
+- [X] new type's syntax AND ne type's Types design (to have infinity wrappers)
 - [ ] remove namespaces at all
 - [ ] add keywords, nodes, etc for new features
+- [ ] pointer to function
 - [ ] implement new modules (at list everything without increment build)

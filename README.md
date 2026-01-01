@@ -1,9 +1,11 @@
 # The "C with modules" programming language
 
 ## Intro
-I **LOVE** C, but i still see lots of problems in it. So I'm creating a language (to learn how to create language) and i have ideas what language it will be, and language shouldn't be too hard to implement (at list, not that hard as OOP abstract language).
+I **LOVE** C, but i still see lots of problems in it. So I'm creating a language (to learn how to create language also)
+and i have ideas what language it will be and how to solve so C's problems.
+And i still think the language shouldn't be too hard to implement (at list, not that hard as OOP abstract language).
 
-And main idea of that language: *Extend `C` with modules, and some other ideas, but **save** `C` style, bcs C is GOAT.*
+And **main idea** of that language: *Extend `C` with modules, and some other ideas, but **save** `C` style, bcs C is GOAT.*
 
 My **Reasons** to create that:
 1. everything in "What i don't like in C?"
@@ -13,7 +15,7 @@ My **Reasons** to create that:
 
 1. Headers, every who programed in C or C++ in big codebases understand downgrade (slow compilation, really not save, copy-pasting is not cool).
 2. Type syntax - in C it is not realy good, in [`docs/lang/types_syntax.md`](./docs/lang/types_syntax.md) i show my idea, and the reason is constance and understatement.
-3. It just have lots of thing that is outdated.
+3. It just have lots of thing that is outdated in my opinion (some syntax, some features, etc).
 
 ## Quick Links
 - [Task List](./docs/project/tasks/current.md)
