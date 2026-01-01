@@ -18,6 +18,10 @@ add `doc` directory, and some directories in it:
 - make names more consistence
 
 ## Tasks:
-- [ ] reorganize and clean up docs
-    - [ ] tasks
-    - [ ] roadmap
+- [X] reorganize and clean up docs
+    - [X] tasks
+    - [X] roadmap
+- [X] move and clean up all docs we already had
+- [ ] add doxygen to project, and write doc in code
+- [ ] wite down all other code and architecture docs
+- [ ] clean-up roadmap, dived notes and roadmap, sort all notes
