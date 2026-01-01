@@ -11,3 +11,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_subdirectory(src/common)
 add_subdirectory(src/lang)
 add_subdirectory(src/compiler_app)
+
+# Generating documentation with doxygen
+add_custom_target(docs
+    COMMAND doxygen Doxyfile
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Generating documentation"
+)

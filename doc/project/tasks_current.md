@@ -25,3 +25,5 @@ add `doc` directory, and some directories in it:
 - [ ] add doxygen to project, and write doc in code
 - [ ] wite down all other code and architecture docs
 - [ ] clean-up roadmap, dived notes and roadmap, sort all notes
+- [ ] remove clean.sh and run.sh and write one good script (not ai generated)
+- [ ] decide gitignore generated doc or not

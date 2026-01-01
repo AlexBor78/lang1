@@ -16,6 +16,10 @@ while [[ $# -gt 0 ]]; do
             BUILD_TYPE="Release" 
             shift
             ;;
+        --docs)
+            GENERATE_DOCS=1
+            shift
+            ;;
         -j|--jobs)
             JOBS="$2"
             shift 2
@@ -39,5 +43,12 @@ echo "Building $BUILD_TYPE version with $JOBS jobs..."
 mkdir -p build
 cmake -B build -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CMAKE_DEFINES
 cmake --build build --parallel $JOBS
+
+if [[ $GENERATE_DOCS -eq 1 ]]; then
+    echo "Generating documentation..."
+    cmake --build build --target docs
+    echo "Documentation generated in docs/api/html/"
+fi
+
 
 echo "Build completed!"
