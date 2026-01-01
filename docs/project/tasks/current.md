@@ -7,9 +7,9 @@ add `doc` directory, and some directories in it:
 - project   - docs for project's life, like roadmap, tasks, issues, etc
 
 ## (Nears) Plans for now
-- Documentation
-    - reorganize docs
-    - add doxygen
+- [X] Documentation
+    - [X] reorganize docs
+    - [X] add doxygen
 - Update stuff 
     - update keywords
     - update type's syntax, and type's Types (better wrappers with OOP)
@@ -18,14 +18,8 @@ add `doc` directory, and some directories in it:
 - make names more consistence
 
 ## Tasks:
-- [X] reorganize and clean up docs
-    - [X] tasks
-    - [X] roadmap
-- [X] move and clean up all docs we already had
-- [X] add doxygen to project
-- [^] write doc in code
-- [^] wite down all other code and architecture docs
-- [X] clean-up roadmap, dived notes and roadmap, sort all notes
-- [X] remove clean.sh and run.sh and write one good script (not ai generated)
-- [X] decide gitignore generated doc or not - IGNORE
-- [X] mv doc -> docs
+Change done stuff -> new and actual ideas
+- [ ] new type's syntax AND ne type's Types design (to have infinity wrappers)
+- [ ] remove namespaces at all
+- [ ] add keywords, nodes, etc for new features
+- [ ] implement new modules (at list everything without increment build)

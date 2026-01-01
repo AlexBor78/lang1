@@ -44,7 +44,6 @@ just list of all task, just to not forget :)
         - [ ] some optimizers
     - [ ] Codegen 
 
-
 ## semantic
 - [X] create semantic types
     - [X] identifier
@@ -53,6 +52,7 @@ just list of all task, just to not forget :)
     - [X] program
 
 <!-- DOCUMENTATION DOWN -->
+<!-- TODO: move to documentation -->
 - Semantic phases:
     1. Modules - build ast for every module in project, and then collect all symbols
     2. Names - check if name exist
@@ -106,16 +106,18 @@ just list of all task, just to not forget :)
     - [ ] add LogicError <- SemanticError
     - [ ] add etc <- SemanticError
 
-## Change done stuff -> new and actual ideas
-- [ ] new type's syntax AND ne type's Types design (to have infinity wrappers)
-- [ ] remove namespaces at all
-- [ ] add keywords, nodes, etc for new features
-- [ ] implement new modules (at list everything without increment build)
-
-
 ## Documentation
-
-now it is in current tasks
+- [^] write doc in code
+- [^] wite down all other code and architecture docss
+- [X] reorganize and clean up docs
+    - [X] tasks
+    - [X] roadmap
+- [X] move and clean up all docs we already had
+- [X] add doxygen to project
+- [X] clean-up roadmap, dived notes and roadmap, sort all notes
+- [X] remove clean.sh and run.sh and write one good script (not ai generated)
+- [X] decide gitignore generated doc or not - IGNORE
+- [X] mv doc -> docs
 
 ## Other
 
@@ -130,4 +132,4 @@ now it is in current tasks
 - [X] CLIParser
 - [X] CompileDriver - control process of compilation
 - [ ] update build.sh to make symlink to compiler in project-root dir (and update clean.sh to remove link)
-- [ ] remove run.sh
+- [X] remove run.sh
