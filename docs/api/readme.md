@@ -12,4 +12,4 @@ but explanations about different decisions and architecture i will write manuall
 **In future:** it will hosed by GitHub Pages.
 
 **Code already have some documentation in it, so for now - read that,**
-AND auto-generated documentation 
+AND [auto-generated](./generated/html/index.html) documentation 

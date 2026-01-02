@@ -23,7 +23,7 @@ Change done stuff -> new and actual ideas
 - [X] remove namespaces at all
 - [X] update keywords
 - [^] add keywords, nodes, etc for new features
-- [^] pointer to function
+- [X] pointer to function
 - [X] update architecture.txt
 - [ ] are we need even architecture_plan.txt ?
 - [ ] implement new modules (at list everything without increment build)

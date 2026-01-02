@@ -1,7 +1,3 @@
-#include "lang/semantic/types/typesystem.h"
-#include "lang/syntax/token.h"
-#include "lang/utils/diagnostic.h"
-#include <common/common.h>
 // #define PARSER_DEBUG
 
 #include <format>
@@ -100,6 +96,13 @@ namespace lang::syntax::parser
     void Parser::skip(size_t n) {
         if(n==0) return;
         pos += n;
+    }
+
+    size_t Parser::save_pos() {
+        return pos;
+    }
+    void Parser::load_pos(size_t new_pos) {
+        pos = new_pos;
     }
 
 // process_ functions
@@ -299,7 +302,14 @@ namespace lang::syntax::parser
         while(!is_end() && (
             match(TokenType::AMPERSAND)
         ||  match(TokenType::STAR)
-        ||  match(TokenType::CONST))) {skip(); ++words;}
+        ||  match(TokenType::CONST)
+        ||  match(TokenType::FN))) {
+            if(match(TokenType::FN)) {
+                if(words > 0) putback(words);
+                return true;
+            }
+            skip(); ++words;
+        }
 
         // type name
         if(!is_end() && !match(TokenType::IDENTIFIER)) {
@@ -337,22 +347,17 @@ namespace lang::syntax::parser
             skip();
         }
 
-        // skip type wrappers
-        int words{0};
-        while(!is_end() && (
-            match(TokenType::AMPERSAND)
-        ||  match(TokenType::STAR)
-        ||  match(TokenType::CONST))) {skip(); ++words; }
-
-        // type name
-        if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_type();
+        auto pos = save_pos();
+        // will it cause memory leak? - i think no,
+        // but not 100% sure that will not cause problems
+        process_type(); // skip the type
         
         //  symbol name
-        if(!is_end(1) && !match(TokenType::IDENTIFIER, 1)) throw expected_identifier(1);
+        if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_identifier(1);
 
         // function declaration
-        if(!is_end(2) && match(TokenType::LPAREN, 2)) {
-            if(words > 0) putback(words);
+        if(!is_end(2) && match(TokenType::LPAREN, 1)) {
+            load_pos(pos);
             auto node = process_function_decl();
             add_to_extern_list(node.get());
             return std::move(node);
@@ -360,9 +365,9 @@ namespace lang::syntax::parser
 
         // variable declaration
         if(!is_end(2) && (
-            match(TokenType::SEMICOLON,2)
-        ||  match(TokenType::ASSIGN, 2))) {
-            if(words > 0) putback(words);
+            match(TokenType::SEMICOLON,1)
+        ||  match(TokenType::ASSIGN, 1))) {
+            load_pos(pos);
             auto node = process_variable_decl();
             add_to_extern_list(node.get());
             process_semicolon();
@@ -373,26 +378,56 @@ namespace lang::syntax::parser
     std::unique_ptr<AbstractType> Parser::process_type() {
         breakpoint(); logger.debug("process_type()");
 
-        if(!is_end() && match(TokenType::AMPERSAND)) {
-            skip();
+        if(!is_end() && match(TokenType::AMPERSAND)) { skip();
             return std::make_unique<WrapperType>(WrapperType::WrapperKind::REFERENCE, process_type());
         }
 
-        if(!is_end() && match(TokenType::STAR)) {
-            skip();
+        if(!is_end() && match(TokenType::STAR)) { skip();
             return std::make_unique<WrapperType>(WrapperType::WrapperKind::POINTER, process_type());
         }
 
-        if(!is_end() && match(TokenType::CONST)) {
-            skip();
+        if(!is_end() && match(TokenType::CONST)) { skip();
             return std::make_unique<WrapperType>(WrapperType::WrapperKind::CONST, process_type());
+        }
+
+        if(!is_end() && match(TokenType::MUTABLE)) { skip();
+            return std::make_unique<WrapperType>(WrapperType::WrapperKind::MUTABLE, process_type());
         }
         
         if(!is_end() && match(TokenType::IDENTIFIER)) {
             return std::make_unique<UnresolvedType>(advance().sym);
         }
 
-        throw unexpected_token();
+        /*
+            - `*fn(int, int) x;` pointer to function `fn(int, int) -> void`
+            - `*fn(int, int) -> int x;` pointer to function `fn(int, int) -> int`
+        */
+        if(!is_end() && match(TokenType::FN)) { skip(); // skip fn keyword
+            if(!is_end() && !match(TokenType::LPAREN)) throw expected_lparen();
+            skip(); // skip '('
+
+            std::vector<std::unique_ptr<AbstractType>> args_types;
+            std::unique_ptr<AbstractType> return_type = std::make_unique<UnresolvedType>("void");
+
+            while(!is_end() && !match(TokenType::RPAREN)) {
+                args_types.emplace_back(process_type());
+                if(!is_end() && match(TokenType::RPAREN)) break;
+                if(!is_end() && !match(TokenType::COMMA)) throw expected_comma();
+                skip(); // skip ','
+            } 
+            
+            if(!is_end() && !match(TokenType::RPAREN)) throw expected_rparen();
+            skip(); // skip ')'
+
+            if(!is_end() && match(TokenType::RARROW)) { skip(); // skip "->"
+                return_type = process_type();
+            } 
+            
+            return std::make_unique<FunctionType>(
+                std::move(args_types),
+                std::move(return_type)
+            );
+        } throw unexpected_token();
     }
 
     std::unique_ptr<ast::DeclVariable> Parser::process_variable_decl() {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include <string>
 #include <cstdint>
 #include <string_view>
@@ -14,8 +15,10 @@ namespace lang
      * 
      */
     class AbstractType {
-    public:
+    protected:
         AbstractType() = default;
+
+    public:
         virtual ~AbstractType() = default;
         virtual bool is_builtin() {return false;}
         // virtual AbstractType& operator=(AbstractType& other) = default;
@@ -28,7 +31,8 @@ namespace lang
      * 
      */
     class BaseType : public AbstractType {
-    
+    protected:
+        BaseType() = default;
     };
 
     /**
@@ -63,6 +67,21 @@ namespace lang
                       }
         ):  name(_name)
         ,   info(_info)
+        {}
+    };
+
+    class FunctionType : public BaseType {
+    private:
+        std::vector<std::unique_ptr<AbstractType>> args_types;
+        std::unique_ptr<AbstractType> return_type;
+
+    public:
+        FunctionType() = default;
+        FunctionType(
+            std::vector<std::unique_ptr<AbstractType>> _args_types,
+            std::unique_ptr<AbstractType> _return_type
+        ): args_types(std::move(_args_types))
+        ,  return_type(std::move(_return_type))
         {}
     };
 

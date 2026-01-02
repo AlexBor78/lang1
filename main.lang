@@ -29,6 +29,9 @@ int main() {
         std::println("i={}", i);
     }
     const* const* const* const* const* int args;
+    const& const *fn(int, int) x;
+    *fn(int, int) -> int x;
+    *fn(*int, *fn() -> int) -> **int y;
 }
 
 // comment in end of file

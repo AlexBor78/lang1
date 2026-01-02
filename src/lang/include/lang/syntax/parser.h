@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
@@ -65,6 +66,10 @@ namespace lang::syntax::parser
         Token        advance();
         void         putback(size_t n = 1);
         void         skip(size_t n = 1);
+
+        // cursor movements
+        size_t  save_pos();
+        void   load_pos(size_t);
 
     private: // look_like function
 
