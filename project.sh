@@ -47,7 +47,7 @@ clean() {
     rm -rf build
     rm -rf .cache
     if [[ $CLEAN_DOCS -eq 1 ]]; then
-        rm -rf doc/api/generated
+        rm -rf docs/api/generated
     fi
 }
 
