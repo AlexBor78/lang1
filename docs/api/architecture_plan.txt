@@ -35,6 +35,14 @@ namespace common
 
 namespace lang
 {
+    class AbstractType;
+    class WrapperType : public AbstractType;
+    class BaseType : public AbstractType;
+
+    struct TypeInfo;
+    class BuiltinType : public BaseType;
+    class UnsolvedType : public BaseType;
+
     namespace syntax {
         enum class TokenType;
         struct Token;
@@ -66,7 +74,6 @@ namespace lang
         class TypeResolver : public ast::ASTVisitor; // todo
     }
 
-    
     namespace pipeline {
         struct CompileOptions;
         class CompileDriver;
@@ -137,18 +144,18 @@ namespace lang
         void print(const std::vector<syntax::Token>&) noexcept;
         void print(const syntax::Token&) noexcept;
 
+        // TokenType to OperatorExpr::OperatorKind
+        constexpr ast::OperatorExpr::OperatorKind token_to_op(syntax::TokenType);
+
+        // print asts
+        class ASTPrinter : public ast::ConstASTVisitor;
+        void print(const std::vector<std::unique_ptr<ast::BaseNode>>&) noexcept;
+        void print(const ast::BaseNode*) noexcept;
+
         // used in parser
         constexpr bool is_declarator(syntax::TokenType) noexcept;
         constexpr bool is_operator(syntax::TokenType) noexcept;
         constexpr bool is_literal(syntax::TokenType) noexcept;
-
-        // TokenType to OperatorExpr::OperatorKind
-        constexpr ast::OperatorExpr::OperatorKind token_to_op(syntax::TokenType);
-
-        // print ast or vector of ast's
-        class ASTPrinter : public ast::ConstASTVisitor;
-        void print(const std::vector<std::unique_ptr<ast::BaseNode>>&) noexcept;
-        void print(const ast::BaseNode*) noexcept;
 
         // used in parser
         constexpr bool is_unary_op(ast::OperatorExpr::OperatorKind) noexcept;
