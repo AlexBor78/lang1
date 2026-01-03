@@ -1,3 +1,4 @@
+#include "lang/common/symbol_path.h"
 #include <lang/ast/visitor.h>
 #include <lang/ast/stmt.h>
 #include <iostream>
@@ -165,14 +166,14 @@ namespace lang::ast
     std::string_view ImportStmt::get_imported() const noexcept
     {
         std::println(std::cerr, "using deprecated ImportStmt::get_imported() method");
-        return imported.path[0];
+        return path.path[0];
     }
 
-    const ModulePath& ImportStmt::get_path() const noexcept {
-        return imported;
+    const SymbolPath& ImportStmt::get_path() const noexcept {
+        return path;
     }
     bool ImportStmt::is_relative() const noexcept {
-        return imported.is_relative;
+        return m_is_relative;
     }
 
 // ReturnStmt

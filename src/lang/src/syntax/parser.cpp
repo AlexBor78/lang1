@@ -1,7 +1,5 @@
 // #define PARSER_DEBUG
 
-#include "lang/ast/stmt.h"
-#include "lang/syntax/token.h"
 #include <format>
 #include <memory>
 #include <string>
@@ -184,10 +182,9 @@ namespace lang::syntax::parser
             path.emplace_back(advance().sym);
         }
 
-        return std::make_unique<ast::ImportStmt>(ast::ModulePath{
+        return std::make_unique<ast::ImportStmt>(SymbolPath{
             .path = std::move(path)
-        ,   .is_relative = is_relative
-        });
+        }, is_relative);
     }
 
     // types stmts - unsupported for now
@@ -639,7 +636,7 @@ namespace lang::syntax::parser
         return process_variable_expr();
     }
 
-    std::unique_ptr<ast::SymbolPath> Parser::process_symbol_path() {
+    std::unique_ptr<ast::SymbolPathExpr> Parser::process_symbol_path() {
         breakpoint(); logger.debug("process_namespace_expr()");
         std::string name = advance().sym;
         
@@ -647,7 +644,7 @@ namespace lang::syntax::parser
         // if(!is_end() && !match(TokenType::DOUBLECOLON)) throw expected_doublecolon();
         skip(); // skip '::'
 
-        return std::make_unique<ast::SymbolPath>(name, process_name());
+        return std::make_unique<ast::SymbolPathExpr>(name, process_name());
     }
 
     std::unique_ptr<ast::FunctionExpr> Parser::process_function_expr() {

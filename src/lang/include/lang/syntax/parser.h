@@ -129,7 +129,7 @@ namespace lang::syntax::parser
         std::unique_ptr<ast::ExprNode>          process_name();
         std::unique_ptr<ast::FunctionExpr>      process_function_expr();
         std::unique_ptr<ast::VariableExpr>      process_variable_expr();
-        std::unique_ptr<ast::SymbolPath>        process_symbol_path();
+        std::unique_ptr<ast::SymbolPathExpr>        process_symbol_path();
 
         // literals
         std::unique_ptr<ast::LiteralExpr>       process_literal();

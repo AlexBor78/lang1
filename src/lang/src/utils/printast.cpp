@@ -219,7 +219,7 @@ namespace lang::utils
         println("name: {}", node.get_name());
         remove_from_prefix();
     }
-    void PrintAST::visit_symbol_path(const ast::SymbolPath& node) noexcept
+    void PrintAST::visit_symbol_path(const ast::SymbolPathExpr& node) noexcept
     {
         println("NamespaceExpr:");
         add_to_prefix();

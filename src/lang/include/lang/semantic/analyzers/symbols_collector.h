@@ -36,7 +36,7 @@ namespace lang::semantic
         virtual void visit_string_literal(ast::StringLiteral&) noexcept override {}
         virtual void visit_bool_literal(ast::BoolLiteral&) noexcept override {}
         virtual void visit_variable_expr(ast::VariableExpr&) noexcept override {}
-        virtual void visit_symbol_path(ast::SymbolPath&) noexcept override {}
+        virtual void visit_symbol_path(ast::SymbolPathExpr&) noexcept override {}
         virtual void visit_call_expr(ast::FunctionExpr&) noexcept override {}
         virtual void visit_binop_expr(ast::BinOpExpr&) noexcept override {}
         virtual void visit_prefix_unary_op_expr(ast::PrefixUnaryOpExpr&) noexcept override {}

@@ -4,6 +4,7 @@
 #include <vector>
 #include <string_view>
 #include <lang/ast/ast.h>
+#include <lang/common/symbol_path.h>
 
 namespace lang::ast
 {   
@@ -240,71 +241,27 @@ namespace lang::ast
         const StmtNode* get_body() const noexcept;
     };
 
-    // /**
-    //  * @deprecated no need to delcare module -> file name is module
-    //  * 
-    //  */
-    // class DeclModule : public DeclStmt
-    // {
-    // public:
-    //     explicit DeclModule(std::string_view _name
-    //     ,                   common::SourceLocation _pos = default_pos()
-    //     ):  DeclStmt(_name
-    //         ,        std::move(_pos)
-    //         )
-    //     {}
-
-    //     virtual void accept(ConstASTVisitor&) const noexcept override;
-    //     virtual void accept(ASTVisitor&) noexcept override;
-    // };
-
-    // class DeclNamespace : public DeclStmt
-    // {
-    // private:
-    //     StmtPtr body;
-
-    // public:
-    //     explicit DeclNamespace(std::string_view _name
-    //     ,                      StmtPtr _body
-    //     ,                      common::SourceLocation _pos = default_pos()
-    //     ):  DeclStmt(_name
-    //         ,        std::move(_pos)
-    //         )
-    //     ,   body(std::move(_body))
-    //     {}
-
-    //     virtual void accept(ConstASTVisitor&) const noexcept override;
-    //     virtual void accept(ASTVisitor&) noexcept override;
-
-    //     const StmtNode* get_body() const noexcept;
-    //     StmtNode* get_body() noexcept;
-    // };
-
-    // here for now
-    struct ModulePath {
-        std::vector<std::string> path;
-        bool is_relative{false};
-    };
-
     class ImportStmt : public StmtNode
     {
     private:
-        ModulePath imported;
+        SymbolPath path;
+        bool m_is_relative;
         
     public:
         explicit ImportStmt(std::string_view _imported
         ,                   bool _relative = false
         ,                   common::SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
-        ,   imported{.path = {std::string(_imported)}
-            ,    .is_relative = _relative
-            }
+        ,   path{.path = {std::string(_imported)}}
+        ,   m_is_relative(_relative)
         {}
 
-        explicit ImportStmt(ModulePath _imported
+        explicit ImportStmt(SymbolPath _imported
+        ,                   bool _relative = false
         ,                   common::SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
-        ,   imported(std::move(_imported))
+        ,   path(std::move(_imported))
+        ,   m_is_relative(_relative)
         {}
 
         virtual void accept(ConstASTVisitor&) const noexcept override;
@@ -315,7 +272,7 @@ namespace lang::ast
          */
         std::string_view get_imported() const noexcept;
 
-        const ModulePath& get_path() const noexcept;
+        const SymbolPath& get_path() const noexcept;
         bool is_relative() const noexcept;
     };
 

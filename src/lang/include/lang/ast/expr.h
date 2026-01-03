@@ -99,12 +99,12 @@ namespace lang::ast
         virtual void accept(ASTVisitor&) noexcept override;
     };
 
-    class SymbolPath : public IdentifierExpr
+    class SymbolPathExpr : public IdentifierExpr
     {
     private:
         ExprPtr identifier;
     public:
-        SymbolPath(std::string_view _name
+        SymbolPathExpr(std::string_view _name
         ,             ExprPtr _identifier
         ,             common::SourceLocation _pos = default_pos()
         ):  IdentifierExpr(_name
