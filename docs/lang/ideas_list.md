@@ -133,3 +133,8 @@ import .module::submodule::-::name;
 ```
 **About implementation:** after that keyword parser will test it, then continue parsing if test passed
 testing stmt will not added to file's AST
+
+## Parser "debug"
+
+**Reason:** need to see if parser even saw you write
+**Description:** something like `#pragma message` in C++

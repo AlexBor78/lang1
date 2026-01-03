@@ -26,4 +26,5 @@ Change done stuff -> new and actual ideas
 - [X] pointer to function
 - [X] update architecture.txt
 - [ ] are we even need architecture_plan.txt ?
-- [^] implement new modules (at list everything without increment build)
+- [X] implement new modules (at list everything without increment build)
+- [ ] `

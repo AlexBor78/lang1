@@ -9,25 +9,28 @@
 #include <lang/pipeline/compiledriver.h>
 
 namespace lang::pipeline {
-    
     void CompileDriver::run(CompileOptions _options) {
-        options = std::move(_options);
+        compile_options = std::move(_options);
         run();
     }
 
-    void CompileDriver::run() {
-       auto state = semantic::SemanticInitializer::init_state(options.name);
+    void CompileDriver::run()
+    {
+       auto semantic_state = semantic::SemanticInitializer::init_state(compile_options.output_name);
 
-        {   // parsing all fils (loading them as modules to semantic info)
-            ModulesLoader loader(&state);
-            loader.load();
-            if(options.syntax_only) return;
+        {   // parsing all files (loading them as modules to semantic info)
+            ModulesLoader loader(
+                &compile_options,
+                &compile_state,
+                &semantic_state
+            ); loader.load();
+            if(compile_options.syntax_only) return;
         }
         
         {   // semantic analyze
-            SemanticDriver analyzer(&state);
+            SemanticDriver analyzer(&semantic_state);
             analyzer.analyze();
-            if(options.semantic_only) return;
+            if(compile_options.semantic_only) return;
         }
 
         {   // codegen: todo

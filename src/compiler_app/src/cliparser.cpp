@@ -15,7 +15,7 @@ namespace compiler_app {
         // processing flags
         for(const auto& flag : flags) {
             if(flag.flag == "-o" || flag.flag == "--output") {
-                optoins.name = flag.value;
+                optoins.output_name = flag.value;
                 continue;
             }
             if(flag.flag == "-I" || flag.flag == "--import-path") {

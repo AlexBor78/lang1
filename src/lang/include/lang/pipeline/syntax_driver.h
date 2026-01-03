@@ -1,28 +1,42 @@
 #pragma once
 
+#include <lang/syntax/syntax_container.h>
+#include <lang/pipeline/compile_state.h>
+#include <lang/pipeline/compile_options.h>
 #include <lang/semantic/types/semantic_types.h>
-#include <vector>
+#include <lang/semantic/types/module.h>
 
 namespace lang::pipeline
 {
     class SyntaxDriver
     {
     public:
-        explicit SyntaxDriver(semantic::SemanticState* _state
-        ,                     const std::vector<std::string> _paths = {}
-        ):  state(_state)
-        ,   paths(&_paths)
+        explicit SyntaxDriver(const CompileOptions* _compile_options // unused for now
+        ,                     CompileState* _compile_state
+        ,                     semantic::SemanticState* _semantic_state
+        ):  compile_options(_compile_options)
+        ,   compile_state(_compile_state)
+        ,   semantic_state(_semantic_state)
         {}
 
-    private: // var
-        semantic::SemanticState* state{nullptr};
-        const std::vector<std::string>* paths{nullptr};
+        // receive file name
+        /**
+         * @brief process file, return ModuleID of file (one file = one module)
+         * @param file file path
+         * @return semantic::ModuleID 
+         */
+        syntax::SyntaxContainer process_file(const std::string&);
 
-    public:
-        void set_import_paths(const std::vector<std::string>&);
-        
-        // receive module name, not file name (will create path of module itself)
-        void process(const std::string&);
-        void process(const std::string&, semantic::SemanticState*);
+        /**
+         * @brief look for module, then process
+         * @param module_id id of module
+         * @return semantic::ModuleID 
+         */
+        semantic::ModuleID process_module(const semantic::ModuleID&);
+
+    private: // var
+        const CompileOptions* compile_options;
+        CompileState* compile_state{nullptr};
+        semantic::SemanticState* semantic_state{nullptr};
     };
 }

@@ -1,11 +1,14 @@
 #pragma once
 
-#include <string>
 #include <memory>
+#include <vector>
+#include <string>
 #include <unordered_map>
 
 #include <lang/semantic/types/typesystem.h>
-#include <vector>
+
+// bcf of that include clang going crazy, but code still WORK
+// #include <lang/semantic/types/identifier.h>
 
 namespace lang::semantic 
 {

@@ -1,10 +1,10 @@
-// module main; // deprecated
 import std;
-import .test; // run test BY IMPORT ONLY!!!!! DAMN YEAH
+import test; // run test BY IMPORT ONLY!!!!! DAMN YEAH
+import test_lib;
 
 import std::io;
-import std::io::submodule::submodule;
-import .module::submodule::submodule::submodule::submodule::submodule::submodule::submodule::submodule;
+// import std::io::submodule::submodule;
+// import .module::submodule::submodule::submodule::submodule::submodule::submodule::submodule::submodule;
 
 // one line comment
 

@@ -1,3 +1,6 @@
+import std;
+import .io;
+
 // extern println(const char* str);
 // extern print(const char* str);
 

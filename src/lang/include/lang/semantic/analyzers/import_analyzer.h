@@ -1,22 +1,26 @@
 #pragma once
 
-#include <string>
 #include <vector>
 
 #include <lang/ast/ast.h>
 #include <lang/ast/visitor.h>
+#include <lang/common/symbol_path.h>
+#include <lang/semantic/types/module.h>
 
 namespace lang::semantic
 {
     class ImportAnalyzer : public ast::ConstASTVisitor
     {
     public:
-        std::vector<std::string> process(const ast::AST&);
+        std::vector<ModuleID> process(const ast::AST&);
+        
+        void set_current_path(const SymbolPath&);
 
         virtual void visit_import_stmt(const ast::ImportStmt&) noexcept override;
     
     private:
-        std::vector<std::string> imports;
+        std::vector<ModuleID> imports;
+        SymbolPath current_path;
 
     public: // other shit from visitor
         virtual void visit_block_stmt(const ast::BlockStmt&) noexcept override {}
