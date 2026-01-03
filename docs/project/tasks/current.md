@@ -24,7 +24,8 @@ Change done stuff -> new and actual ideas
 - [X] update keywords
 - [^] add keywords, nodes, etc for new features
 - [X] pointer to function
-- [X] update architecture.txt
+- [ ] update architecture.txt
 - [ ] are we even need architecture_plan.txt ?
 - [X] implement new modules (at list everything without increment build)
-- [ ] `
+- [ ] `export import` support
+- [ ] stack allocations support
