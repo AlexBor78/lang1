@@ -118,3 +118,18 @@ import {
     C"path/to/header_b.h" as b
 };
 ```
+
+## Parser assert
+
+**Reason:** test parser
+
+**Description:** to test parser, you write Keyword, and stmt **WITH**, it will check if exception was thrown
+
+**Keyword:** `Parser_Assert:` (yeah with `:`)
+example:
+```
+Parser_Assert:
+import .module::submodule::-::name;
+```
+**About implementation:** after that keyword parser will test it, then continue parsing if test passed
+testing stmt will not added to file's AST

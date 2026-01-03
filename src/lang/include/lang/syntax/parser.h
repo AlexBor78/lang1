@@ -95,6 +95,9 @@ namespace lang::syntax::parser
         std::unique_ptr<ast::ImportStmt>        process_import_stmt();
 
         // control flow
+        /**
+        * @todo remove check for '{' in body, it will work (bcs of anonymous scopes)
+        */
         std::unique_ptr<ast::IfStmt>            process_if_stmt();
         std::unique_ptr<ast::ElseStmt>          process_else_stmt();
         std::unique_ptr<ast::ForStmt>           process_for_stmt();
@@ -164,6 +167,7 @@ namespace lang::syntax::parser
         diagnostic::ParserError expected_postfix_op(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_identifier(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_module_name(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_submodule_name(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_variable_name(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_function_name(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_doublecolon(size_t offset = 0) const noexcept;

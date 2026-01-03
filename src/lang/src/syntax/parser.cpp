@@ -179,6 +179,7 @@ namespace lang::syntax::parser
         path.emplace_back(advance().sym);
 
         while(!is_end() && match(TokenType::DOUBLECOLON)) { skip(); // skip ::
+            if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_submodule_name();
             path.emplace_back(advance().sym);
         }
 
@@ -191,9 +192,6 @@ namespace lang::syntax::parser
 
     // control flow stmts
 
-    /**
-     * @todo remove check for '{' in body, it will work (bcs of anonymous scopes)
-     */
     std::unique_ptr<ast::IfStmt> Parser::process_if_stmt() {
         breakpoint(); logger.debug("proccess_if_stmt()");
         skip(); // skip IF tok
@@ -214,9 +212,6 @@ namespace lang::syntax::parser
         return std::make_unique<ast::IfStmt>(std::move(cond), std::move(body));
     }
 
-    /**
-     * @todo remove check for '{' in body, it will work (bcs of anonymous scopes)
-     */
     std::unique_ptr<ast::ElseStmt> Parser::process_else_stmt() {
         breakpoint(); logger.debug("proccess_else_stmt()");
         skip(); // skip IF tok
@@ -229,9 +224,6 @@ namespace lang::syntax::parser
         return std::make_unique<ast::ElseStmt>(std::move(body));
     }
 
-    /**
-     * @todo remove check for '{' in body, it will work (bcs of anonymous scopes)
-     */
     std::unique_ptr<ast::ForStmt> Parser::process_for_stmt() {
         breakpoint(); logger.debug("proccess_for_stmt()");
         skip(); // skip IF tok
@@ -263,9 +255,6 @@ namespace lang::syntax::parser
         return std::make_unique<ast::ForStmt>(std::move(decl), std::move(cond), std::move(incr), std::move(body));
     }
 
-    /**
-     * @todo remove check for '{' in body, it will work (bcs of anonymous scopes)
-     */
     std::unique_ptr<ast::WhileStmt> Parser::process_while_stmt() {
         breakpoint(); logger.debug("proccess_while_stmt()");
         skip(); // skip IF tok
@@ -797,6 +786,9 @@ namespace lang::syntax::parser
     // }
     diagnostic::ParserError Parser::expected_module_name(size_t offset) const noexcept {
         return diagnostic::ParserError(std::format("expected module name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    }
+    diagnostic::ParserError Parser::expected_submodule_name(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected submodule name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
     diagnostic::ParserError Parser::expected_type(size_t offset) const noexcept {
         return diagnostic::ParserError(std::format("expected type, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
