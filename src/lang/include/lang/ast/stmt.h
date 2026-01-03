@@ -280,22 +280,43 @@ namespace lang::ast
     //     StmtNode* get_body() noexcept;
     // };
 
+    // here for now
+    struct ModulePath {
+        std::vector<std::string> path;
+        bool is_relative{false};
+    };
+
     class ImportStmt : public StmtNode
     {
     private:
-        std::string imported;
+        ModulePath imported;
         
     public:
         explicit ImportStmt(std::string_view _imported
+        ,                   bool _relative = false
         ,                   common::SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
-        ,   imported(_imported)
+        ,   imported{.path = {std::string(_imported)}
+            ,    .is_relative = _relative
+            }
+        {}
+
+        explicit ImportStmt(ModulePath _imported
+        ,                   common::SourceLocation _pos = default_pos()
+        ):  StmtNode(std::move(_pos))
+        ,   imported(std::move(_imported))
         {}
 
         virtual void accept(ConstASTVisitor&) const noexcept override;
         virtual void accept(ASTVisitor&) noexcept override;
 
+        /**
+         * @deprecated here only until remove its usage from old code, for build success
+         */
         std::string_view get_imported() const noexcept;
+
+        const ModulePath& get_path() const noexcept;
+        bool is_relative() const noexcept;
     };
 
     class ReturnStmt : public StmtNode

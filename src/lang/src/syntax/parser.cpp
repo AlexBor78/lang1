@@ -1,11 +1,14 @@
 // #define PARSER_DEBUG
 
+#include "lang/ast/stmt.h"
+#include "lang/syntax/token.h"
 #include <format>
 #include <memory>
 #include <string>
 #include <lang/utils/syntax_utils.h>
 #include <lang/utils/ast_utils.h>
 #include <lang/syntax/parser.h>
+#include <vector>
 
 namespace lang::syntax::parser
 {
@@ -75,6 +78,9 @@ namespace lang::syntax::parser
     }
     void Parser::add_to_extern_list(ast::DeclStmt* node) {
         extern_list.emplace(node);
+    }
+    void Parser::add_to_export_list(ast::DeclStmt* node) {
+        export_list.emplace(node);
     }
 
     bool Parser::match(TokenType tt, size_t offset) const {
@@ -164,14 +170,33 @@ namespace lang::syntax::parser
     std::unique_ptr<ast::ImportStmt> Parser::process_import_stmt() {
         breakpoint(); logger.debug("proccess_import_stmt()");
         skip(); // skip IMPORT TOK
+
+        bool is_relative{false};
+        if(!is_end() && match(TokenType::DOT)) { skip(); // skip .
+            is_relative = true;
+        }
+
+        std::vector<std::string> path;
         if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_module_name();
-        return std::make_unique<ast::ImportStmt>(advance().sym);
+        path.emplace_back(advance().sym);
+
+        while(!is_end() && match(TokenType::DOUBLECOLON)) { skip(); // skip ::
+            path.emplace_back(advance().sym);
+        }
+
+        return std::make_unique<ast::ImportStmt>(ast::ModulePath{
+            .path = std::move(path)
+        ,   .is_relative = is_relative
+        });
     }
 
     // types stmts - unsupported for now
 
     // control flow stmts
 
+    /**
+     * @todo remove check for '{' in body, it will work (bcs of anonymous scopes)
+     */
     std::unique_ptr<ast::IfStmt> Parser::process_if_stmt() {
         breakpoint(); logger.debug("proccess_if_stmt()");
         skip(); // skip IF tok
@@ -192,6 +217,9 @@ namespace lang::syntax::parser
         return std::make_unique<ast::IfStmt>(std::move(cond), std::move(body));
     }
 
+    /**
+     * @todo remove check for '{' in body, it will work (bcs of anonymous scopes)
+     */
     std::unique_ptr<ast::ElseStmt> Parser::process_else_stmt() {
         breakpoint(); logger.debug("proccess_else_stmt()");
         skip(); // skip IF tok
@@ -204,6 +232,9 @@ namespace lang::syntax::parser
         return std::make_unique<ast::ElseStmt>(std::move(body));
     }
 
+    /**
+     * @todo remove check for '{' in body, it will work (bcs of anonymous scopes)
+     */
     std::unique_ptr<ast::ForStmt> Parser::process_for_stmt() {
         breakpoint(); logger.debug("proccess_for_stmt()");
         skip(); // skip IF tok
@@ -235,6 +266,9 @@ namespace lang::syntax::parser
         return std::make_unique<ast::ForStmt>(std::move(decl), std::move(cond), std::move(incr), std::move(body));
     }
 
+    /**
+     * @todo remove check for '{' in body, it will work (bcs of anonymous scopes)
+     */
     std::unique_ptr<ast::WhileStmt> Parser::process_while_stmt() {
         breakpoint(); logger.debug("proccess_while_stmt()");
         skip(); // skip IF tok
@@ -294,6 +328,9 @@ namespace lang::syntax::parser
     // declare stmts
 
     bool Parser::look_like_declare() {
+        if(!is_end() && match(TokenType::EXPORT)) {
+            return true;
+        }
         if(!is_end() && match(TokenType::EXTERN)) {
             return true;
         }
@@ -341,6 +378,12 @@ namespace lang::syntax::parser
     std::unique_ptr<ast::DeclStmt> Parser::process_declare() {        
         breakpoint(); logger.debug("process_declare()");
 
+        bool is_export{false};
+        if(!is_end() && match(TokenType::EXPORT)) {
+            is_export = true;
+            skip();
+        }
+
         bool is_extern{false};
         if(!is_end() && match(TokenType::EXTERN)) {
             is_extern = true;
@@ -359,7 +402,8 @@ namespace lang::syntax::parser
         if(!is_end(2) && match(TokenType::LPAREN, 1)) {
             load_pos(pos);
             auto node = process_function_decl();
-            add_to_extern_list(node.get());
+            if(is_export) add_to_export_list(node.get());
+            if(is_extern) add_to_extern_list(node.get());
             return std::move(node);
         }
 
@@ -369,7 +413,8 @@ namespace lang::syntax::parser
         ||  match(TokenType::ASSIGN, 1))) {
             load_pos(pos);
             auto node = process_variable_decl();
-            add_to_extern_list(node.get());
+            if(is_export) add_to_export_list(node.get());
+            if(is_extern) add_to_extern_list(node.get());
             process_semicolon();
             return std::move(node);
         } throw unexpected_token(2);

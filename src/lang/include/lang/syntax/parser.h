@@ -26,6 +26,12 @@ namespace lang::syntax::parser
         std::unordered_map<ast::BaseNode*, std::unique_ptr<AbstractType>> types_context;
 
         /**
+         * @brief DeclNode of something -> is it exported
+         * 
+         */
+        std::unordered_set<ast::BaseNode*> export_list;
+
+        /**
          * @brief DeclNode of something -> is it extern
          * 
          */
@@ -44,6 +50,7 @@ namespace lang::syntax::parser
     private: // vars
         common::utils::Logger logger{common::utils::Logger::LogLevel::ALL};
         std::unordered_map<ast::BaseNode*, std::unique_ptr<AbstractType>> types_context;
+        std::unordered_set<ast::BaseNode*> export_list;
         std::unordered_set<ast::BaseNode*> extern_list;
 
         const std::vector<Token>* tokens{nullptr};    
@@ -59,6 +66,7 @@ namespace lang::syntax::parser
 
         void save_type_to_context(ast::DeclStmt*, std::unique_ptr<AbstractType>);
         void add_to_extern_list(ast::DeclStmt*);
+        void add_to_export_list(ast::DeclStmt*);
 
         bool         is_end(size_t n = 1) const;
         bool         match(TokenType, size_t offset = 0) const;

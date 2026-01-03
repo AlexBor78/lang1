@@ -89,6 +89,7 @@ namespace lang::syntax
         DOT,            // .
 
         // Declaration keywords
+        EXPORT,
         EXTERN,
         FN,
         MUTABLE,

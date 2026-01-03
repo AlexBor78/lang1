@@ -67,6 +67,7 @@ namespace lang::syntax::lexer
         {".", TokenType::DOT},
 
         // Declaration 
+        {"export", TokenType::EXPORT},
         {"extern", TokenType::EXTERN},
         {"fn", TokenType::FN},
         {"const", TokenType::CONST},

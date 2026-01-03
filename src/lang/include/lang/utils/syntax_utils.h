@@ -84,6 +84,7 @@ namespace lang::utils
             case syntax::TokenType::DOT:          return "DOT";
 
             // Declaration keywords
+            case syntax::TokenType::EXPORT:       return "EXPORT";
             case syntax::TokenType::EXTERN:       return "EXTERN";
             case syntax::TokenType::FN:           return "FN";
             case syntax::TokenType::CONST:        return "CONST";

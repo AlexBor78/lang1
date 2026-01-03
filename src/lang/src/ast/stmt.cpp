@@ -1,5 +1,8 @@
 #include <lang/ast/visitor.h>
 #include <lang/ast/stmt.h>
+#include <iostream>
+#include <print>
+
 
 namespace lang::ast
 {
@@ -161,7 +164,15 @@ namespace lang::ast
 
     std::string_view ImportStmt::get_imported() const noexcept
     {
+        std::println(std::cerr, "using deprecated ImportStmt::get_imported() method");
+        return imported.path[0];
+    }
+
+    const ModulePath& ImportStmt::get_path() const noexcept {
         return imported;
+    }
+    bool ImportStmt::is_relative() const noexcept {
+        return imported.is_relative;
     }
 
 // ReturnStmt

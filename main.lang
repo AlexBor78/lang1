@@ -1,6 +1,10 @@
 // module main; // deprecated
 import std;
-import test; // run test BY IMPORT ONLY!!!!! DAMN YEAH
+import .test; // run test BY IMPORT ONLY!!!!! DAMN YEAH
+
+import std::io;
+import std::io::submodule::submodule;
+import .module::submodule::submodule::submodule::submodule::submodule::submodule::submodule::submodule;
 
 // one line comment
 
@@ -10,6 +14,10 @@ import test; // run test BY IMPORT ONLY!!!!! DAMN YEAH
     comment
     block
 */
+
+export void foo() {
+    
+}
 
 int main() {
     std::println("Hello, World!");
