@@ -27,5 +27,5 @@ Change done stuff -> new and actual ideas
 - [ ] update architecture.txt
 - [ ] are we even need architecture_plan.txt ?
 - [X] implement new modules (at list everything without increment build)
-- [ ] `export import` support
-- [ ] stack allocations support
+- [X] `export import` support
+- [ ] stack allocations syntax support

@@ -1,5 +1,5 @@
 import std;
-import .io;
+export import .io;
 
 // extern println(const char* str);
 // extern print(const char* str);

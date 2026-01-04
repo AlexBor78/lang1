@@ -1,2 +1,2 @@
 import std;
-import .sub_lib;
+export import .sub_lib;

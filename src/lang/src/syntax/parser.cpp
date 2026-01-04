@@ -128,9 +128,20 @@ namespace lang::syntax::parser
 
     std::unique_ptr<ast::StmtNode> Parser::process_stmt() {
         breakpoint(); logger.debug("proccess_stmt()");
+        // modules
+        // import
         if(!is_end() && match(TokenType::IMPORT)) {
             auto node = process_import_stmt();
             process_semicolon();
+            return std::move(node);
+        }
+        // export import
+        if(!is_end(2) 
+        && match(TokenType::EXPORT)
+        && match(TokenType::IMPORT, 1)) { skip(); // skip export
+            auto node = process_import_stmt();
+            process_semicolon();
+            extern_list.emplace(node.get());
             return std::move(node);
         }
         
