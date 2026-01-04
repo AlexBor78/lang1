@@ -14,4 +14,4 @@ we use keyword `stack` to reserve memory on stack (will allocated on start)
 ```
 ## Current state
 
-syntax with `{}` initialization is not supported, bur main idea is working
+syntax with `{}` initialization is not supported, but main idea is working

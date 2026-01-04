@@ -19,8 +19,8 @@ My **Reasons** to create that:
 
 ## Quick Links
 - [Task List](./docs/project/tasks/current.md)
-- [Architecture Overview(pseudocode)](./docs/api/architecture.txt)
-- [Language Documentation](./docs/lang/)
+- [Architecture Overview](./docs/api/architecture_overview.md)
+- [Language Documentation](./docs/lang/readme.md)
 - [Build](#build)
 
 ## Project state
@@ -30,19 +30,25 @@ Pipeline, ClI-app, and Semantic is our current target to implement.
 
 ##  How to navigate over the project
 
+I recommend to read [overview](./docs/api/architecture_overview.md),
+it contains everything about files and code organization.
+
 ### Docs
 in every docs directory placed readme file, that contains main ideas of that dir, where what is stored, what contains etc. so starting from `docs` dir as root, you can fast find what you want.
 
 e.g. in `docs/` placed readme file, that contains `Why here's that dirs, and what in it?`, and then in every dir readme about it.
 
 ### CodeBase
-
-I only started to write doxygen docs, so mostly code documented in it in comments, i hope  (can not be sure) you will understand it :)
+also, with [overview](./docs/api/architecture_overview.md) i recommend to use auto-generated docs,
+overview - show project architecture, without implementations, without details,
+Doxygen docs - reference to every part, so when you what reference you want - use doxygen.
 
 ## How to help project
 
-Right now project on that stage, where you can help. There are tasks in `/docs/project/` directory, so you can chose, implement and then pull-request (i will be happy) <3
-(BUT in project still deficit of documentation, help will be kinda hard, and i on the way to fix it soon)
+Right now project on that stage, where you can help. There are tasks in `/docs/project/tasks` directory,
+so you can chose, implement and then pull-request (i will be happy) <3
+(BUT in project still deficit of documentation, help will be kinda hard,
+i wrote project overview, and auto-generated doxygen references not really bad, but not really much documented with doxygen yet)
 
 ## Build
 

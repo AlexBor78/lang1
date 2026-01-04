@@ -7,6 +7,10 @@
 #include <string_view>
 #include <unordered_map>
 
+/**
+ * @todo move to lang::semantic namespace
+ * 
+ */
 namespace lang
 {
 

@@ -30,7 +30,7 @@ namespace common
 
     inline void debug_break();
     struct FileLocation;
-    struct SourceLocation
+    struct SourceLocation;
 }
 
 namespace lang
@@ -42,6 +42,7 @@ namespace lang
     struct TypeInfo;
     class BuiltinType : public BaseType;
     class UnsolvedType : public BaseType;
+    class FunctionType : public BaseType;
 
     namespace syntax {
         enum class TokenType;
