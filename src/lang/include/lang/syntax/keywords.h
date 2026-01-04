@@ -84,6 +84,7 @@ namespace lang::syntax::lexer
         {"break", TokenType::BREAK},
         {"continue", TokenType::CONTINUE},
         {"return", TokenType::RETURN},
-        {"import", TokenType::IMPORT}
+        {"import", TokenType::IMPORT},
+        {"stack", TokenType::STACK}
     };
 }

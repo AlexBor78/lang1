@@ -1,12 +1,10 @@
 // #define PARSER_DEBUG
 
 #include <format>
-#include <memory>
 #include <string>
 #include <lang/utils/syntax_utils.h>
 #include <lang/utils/ast_utils.h>
 #include <lang/syntax/parser.h>
-#include <vector>
 
 namespace lang::syntax::parser
 {
@@ -48,11 +46,11 @@ namespace lang::syntax::parser
 
     void Parser::init_logger() {
         logger.set_name("Parser");
-        #ifdef PARSER_DEBUG            
+        #ifdef PARSER_DEBUG
             logger.set_level(common::utils::Logger::LogLevel::ALL);
         #else
             logger.set_level(common::utils::Logger::LogLevel::INFO | common::utils::Logger::LogLevel::WARN | common::utils::Logger::LogLevel::ERROR);
-        #endif 
+        #endif
         // logger.set_level(common::utils::Logger::LogLevel::ALL); // just for now
     }
 
@@ -338,7 +336,8 @@ namespace lang::syntax::parser
         ||  match(TokenType::STAR)
         ||  match(TokenType::CONST)
         ||  match(TokenType::FN))) {
-            if(match(TokenType::FN)) {
+            if(match(TokenType::FN)
+            || match(TokenType::CONST)) {
                 if(words > 0) putback(words);
                 return true;
             }
@@ -346,27 +345,31 @@ namespace lang::syntax::parser
         }
 
         // type name
-        if(!is_end() && !match(TokenType::IDENTIFIER)) {
+        if(!is_end(1) && !match(TokenType::IDENTIFIER)) {
             if(words > 0) putback(words);
             return false;
         }
         
         //  symbol name
-        if(!is_end(1) && !match(TokenType::IDENTIFIER, 1)) {
+        if(!is_end(2) && !match(TokenType::IDENTIFIER, 1)) {
             if(words > 0) putback(words);
             return false;
         }
 
         // function declaration
-        if(!is_end(2) && match(TokenType::LPAREN, 2)) {
+        if(!is_end(3) && match(TokenType::LPAREN, 2)) {
             if(words > 0) putback(words);
             return true;
         }
 
         // variable declaration
-        if(!is_end(2) && (
+        if(!is_end(3) && (
             match(TokenType::SEMICOLON,2)
-        ||  match(TokenType::ASSIGN, 2))) {
+        ||  match(TokenType::ASSIGN, 2)
+        ||  (!is_end(4)
+        &&  match(TokenType::LARROW, 2)
+        // check for stack also, so <- will not used as =
+        &&  match(TokenType::STACK, 3)))) {
             if(words > 0) putback(words);
             return true;
         } return false;
@@ -393,7 +396,7 @@ namespace lang::syntax::parser
         process_type(); // skip the type
         
         //  symbol name
-        if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_identifier(1);
+        if(!is_end(1) && !match(TokenType::IDENTIFIER)) throw expected_identifier(1);
 
         // function declaration
         if(!is_end(2) && match(TokenType::LPAREN, 1)) {
@@ -407,7 +410,11 @@ namespace lang::syntax::parser
         // variable declaration
         if(!is_end(2) && (
             match(TokenType::SEMICOLON,1)
-        ||  match(TokenType::ASSIGN, 1))) {
+        ||  match(TokenType::ASSIGN, 1)
+        ||  (!is_end(3)
+        &&  match(TokenType::LARROW, 1)
+        // check for stack also, so <- will not used as =
+        &&  match(TokenType::STACK, 2)))) {
             load_pos(pos);
             auto node = process_variable_decl();
             if(is_export) add_to_export_list(node.get());
@@ -483,11 +490,13 @@ namespace lang::syntax::parser
         auto name = advance().sym;
 
         // if variable has initialization
-        
-        if(!is_end() && match(TokenType::ASSIGN)) {
-            skip(); // skip =
-            auto expr = process_expr();
-            auto node = std::make_unique<ast::DeclVariable>(name, std::move(expr));
+        if(!is_end(2) && (
+            match(TokenType::ASSIGN)
+        ||  (match(TokenType::LARROW)
+        // check for stack also, so <- will not used as =
+        &&  match(TokenType::STACK, 1)))) {skip(); // skip = or <-
+            auto init_expr = process_expr();
+            auto node = std::make_unique<ast::DeclVariable>(name, std::move(init_expr));
             save_type_to_context(node.get(), std::move(type));
             return std::move(node);
         }
@@ -535,7 +544,29 @@ namespace lang::syntax::parser
     // expr's
 
     std::unique_ptr<ast::ExprNode> Parser::process_expr() {
+        if(!is_end() && match(TokenType::STACK)) return process_stackalloc_expr();
         return process_operator();
+    }
+
+    std::unique_ptr<ast::StackAllocExpr> Parser::process_stackalloc_expr() {
+        breakpoint(); logger.debug("process_stackalloc_expr()");
+        skip(); // skip stack keyword
+        if(!is_end() && !match(TokenType::LBRACKET)) throw expected_lbracket();
+
+        std::vector<size_t> dimensions;
+        while(!is_end() && match(TokenType::LBRACKET)) { skip(); // skip [
+            if(!is_end() && !match(TokenType::NUMBER)) throw expected_number();
+            dimensions.emplace_back(std::stoull(advance().sym));
+            if(!is_end() && !match(TokenType::RBRACKET)) throw expected_rbracket();
+            skip(); // skip ]
+        }
+
+        // check for initialization
+        if(!is_end() && match(TokenType::ASSIGN)) throw stack_initialization_not_supported();
+
+        return std::make_unique<ast::StackAllocExpr>(
+            std::move(dimensions)
+        );
     }
     
     // TODO: add is_-_op funcs for TokenType not only for Operator
@@ -752,12 +783,21 @@ namespace lang::syntax::parser
     diagnostic::ParserError Parser::continue_is_not_suported(size_t offset) const noexcept {
         return diagnostic::ParserError("continue is currently not suported", common::SourceLocation());
     }
+    diagnostic::ParserError Parser::stack_initialization_not_supported(size_t offset) const noexcept {
+        return diagnostic::ParserError("stack initialization is currently not suported", common::SourceLocation());
+    }
     diagnostic::ParserError Parser::multiple_module_decl_in_file(size_t offset) const noexcept {
         return diagnostic::ParserError("multiple module in one file is not allowed", common::SourceLocation());
     }
 
     diagnostic::ParserError Parser::expected_semicolon(size_t offset) const noexcept {
         return diagnostic::ParserError(std::format("expected ';', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    }
+    diagnostic::ParserError Parser::expected_lbracket(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected '[', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+    }
+    diagnostic::ParserError Parser::expected_rbracket(size_t offset) const noexcept {
+        return diagnostic::ParserError(std::format("expected ']', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
     }
     diagnostic::ParserError Parser::expected_lbrace(size_t offset) const noexcept {
         return diagnostic::ParserError(std::format("expected '{{', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);

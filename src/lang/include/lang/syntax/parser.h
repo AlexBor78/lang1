@@ -70,7 +70,7 @@ namespace lang::syntax::parser
         
         // modules
         // std::unique_ptr<ast::DeclModule>        process_module_decl();
-        
+
         std::unique_ptr<ast::ImportStmt>        process_import_stmt();
 
         // control flow
@@ -92,6 +92,7 @@ namespace lang::syntax::parser
         std::unique_ptr<AbstractType>           process_type();
         std::unique_ptr<ast::DeclStmt>          process_declare();
         std::unique_ptr<ast::DeclVariable>      process_variable_decl();
+        std::unique_ptr<ast::StackAllocExpr>    process_stackalloc_expr();
         std::unique_ptr<ast::DeclFunction>      process_function_decl();
 
     // exprs
@@ -127,7 +128,7 @@ namespace lang::syntax::parser
         diagnostic::ParserError putback_out_of_range(size_t offset = 0) const noexcept;
         diagnostic::ParserError end_reached(size_t offset = 0) const noexcept;
 
-        // other diagnostic
+        // other diagnostic stack_initialization_not_supported
         diagnostic::ParserError multiple_module_decl_in_file(size_t offset = 0) const noexcept;
         diagnostic::ParserError is_end_with_zero(size_t offset = 0) const noexcept;
         diagnostic::ParserError strcut_is_not_suported(size_t offset = 0) const noexcept;
@@ -138,6 +139,7 @@ namespace lang::syntax::parser
         diagnostic::ParserError while_is_not_suported(size_t offset = 0) const noexcept;
         diagnostic::ParserError break_is_not_suported(size_t offset = 0) const noexcept;
         diagnostic::ParserError continue_is_not_suported(size_t offset = 0) const noexcept;
+        diagnostic::ParserError stack_initialization_not_supported(size_t offset = 0) const noexcept;
 
         // expected X
         diagnostic::ParserError expected_add_op(size_t offset = 0) const noexcept;
@@ -156,6 +158,8 @@ namespace lang::syntax::parser
         diagnostic::ParserError expected_bool(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_comma(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_type(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_lbracket(size_t offset = 0) const noexcept;
+        diagnostic::ParserError expected_rbracket(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_lbrace(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_rbrace(size_t offset = 0) const noexcept;
         diagnostic::ParserError expected_lparen(size_t offset = 0) const noexcept;

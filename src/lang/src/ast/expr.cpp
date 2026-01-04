@@ -176,4 +176,19 @@ namespace lang::ast
     {
         visitor.visit_postfix_unary_op_expr(*this);
     }
+
+// StackAllocExpr
+
+    const std::vector<size_t> StackAllocExpr::get_dimensions() const noexcept {
+        return dimensions;
+    }
+
+    void StackAllocExpr::accept(ConstASTVisitor& visitor) const noexcept
+    {
+        visitor.visit_stackalloc_expr(*this);
+    }
+    void StackAllocExpr::accept(ASTVisitor& visitor) noexcept
+    {
+        visitor.visit_stackalloc_expr(*this);
+    }
 }

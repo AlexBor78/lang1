@@ -1,4 +1,3 @@
-#include "lang/ast/stmt.h"
 #include <print>
 #include <utility>
 #include <lang/utils/printast.h>
@@ -217,6 +216,15 @@ namespace lang::utils
         println("VariableExpr:");
         add_to_prefix();
         println("name: {}", node.get_name());
+        remove_from_prefix();
+    }
+    void PrintAST::visit_stackalloc_expr(const ast::StackAllocExpr& node) noexcept {
+        println("StackAllocExpr:");
+        add_to_prefix();
+        print("dimensions: ");
+        for(const auto size : node.get_dimensions()) {
+            print("[{}]", size);
+        }
         remove_from_prefix();
     }
     void PrintAST::visit_symbol_path(const ast::SymbolPathExpr& node) noexcept

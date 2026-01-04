@@ -40,6 +40,9 @@ int main() {
     const& const *fn(int, int) x;
     *fn(int, int) -> int x;
     *fn(*int, *fn() -> int) -> **int y;
+    *char buf <- stack[256];
+    **int matrix <- stack[10][10];
+    
 }
 
 // comment in end of file

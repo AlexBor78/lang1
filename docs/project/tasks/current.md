@@ -28,4 +28,7 @@ Change done stuff -> new and actual ideas
 - [ ] are we even need architecture_plan.txt ?
 - [X] implement new modules (at list everything without increment build)
 - [X] `export import` support
-- [ ] stack allocations syntax support
+- [X] stack allocations syntax support
+- [ ] fix fail of lexer if one-line comment in end of file
+- [ ] fix falling while generating diagnostic message
+- [ ] pass pos of node in parser

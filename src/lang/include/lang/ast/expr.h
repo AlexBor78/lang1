@@ -303,4 +303,21 @@ namespace lang::ast
         virtual void accept(ConstASTVisitor&) const noexcept override;
         virtual void accept(ASTVisitor&) noexcept override;
     };
+
+    class StackAllocExpr : public ExprNode {
+        std::vector<size_t> dimensions;
+
+    public:
+
+        explicit StackAllocExpr(std::vector<size_t> _dimensions
+        ,                       common::SourceLocation _pos = default_pos()
+        ):  ExprNode(_pos)
+        ,   dimensions(std::move(_dimensions))
+        {}
+
+        const std::vector<size_t> get_dimensions() const noexcept;
+        
+        virtual void accept(ConstASTVisitor&) const noexcept override;
+        virtual void accept(ASTVisitor&) noexcept override;
+    };
 }
