@@ -20,6 +20,9 @@ export void foo() {
 }
 
 int main() {
+
+    // sdasd
+    // sdasd
     std::println("Hello, World!");
     if(a == 0) {
         std::println("IfStmt is work");
@@ -45,5 +48,5 @@ int main() {
     
 }
 
-// comment in end of file
-void todo_fix_big();
+// lexer error: peak out of range
+// asdasd asdasd

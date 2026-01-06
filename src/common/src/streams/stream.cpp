@@ -35,7 +35,8 @@ namespace common::streams
     }
 
     bool InputStream::good() const noexcept {
-        return istream && istream->good();
+        if(!is_eof_reached) return istream && istream->good();
+        return !lookahead_buffer.empty();
     }
 
     bool InputStream::bad() const noexcept {
@@ -59,11 +60,10 @@ namespace common::streams
         if(is_eof_reached) return;
         while(lookahead_buffer.length() <= offset) {
             auto c = istream->get();
-            if(c == EOF) {
+            if(c == std::char_traits<char>::eof()) {
                 is_eof_reached = true;
                 return;
-            }
-            lookahead_buffer += static_cast<char>(c);
+            } lookahead_buffer += static_cast<char>(c);
         }
     }
 
@@ -100,8 +100,9 @@ namespace common::streams
         std::string word;
         for(char c = peek(); 
             !is_eof() && (isalnum(c) || c == '_'); 
-            c = peek()) word += advance();
-        return std::move(word);
+            c = peek()) { word += advance();
+            if(is_eof()) break;
+        } return std::move(word);
     }
     
     void InputStream::skip_whitespace() {

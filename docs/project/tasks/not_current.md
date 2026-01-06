@@ -2,35 +2,30 @@
 
 just list of all task, just to not forget :)
 
+### Tasks for future refactoring
+- [ ] updates api (private and public)
+    - [ ] rename Lexer::is_success() -> Lexer::had_errors()
+    - [ ] rename `is_end()` -> `can_read()`
+    - [ ] chose only one of `offset` and `n` args
+- [ ] make naming more consistence
+    - [ ] `ImportAnalyzer` -> `ImportsCollector`
+    
+- [ ] little improvement how code placed in files
+- [ ] use warn, not only errors (wars - not fall or fail, error - usually fall and fail)
+
 ## Code
 
-### Logger
-- [X] add .log to gitignore
-- [X] implement logger
+### Diagnostic
 - [ ] add colors to logger output
+- [ ] add colors to builded errors
+- [ ] add syntax highlight
 
-### Parser
-- [ ] refactor
-    - [X] first iteration
-        - [X] adapt to new api
-        - [X] clean up code a little bit
-    - [ ] second iteration
-        - [ ] use warns
-        - [ ] clean up code
-        - [ ] add pos to errors and nodes
-        - [ ] maybe(would be perfect) fix issue with last's tokens (peek(): out of range, if token missed)
-    - [X] extend AST(BreakStmt, ContinueStmt)
-    - [X] add END token 
+### Syntax
+- [ ] Parser
     - [ ] save node pos
-    - [X] add if-else for while
-    - [X] allow stmt without {} for if-else, for, while, stmt
-
-### Lexer
-- [X] rename class Tokenizer to Lexer 
-- [X] extend lexer for 3 char op's and comments
-- [ ] extend literals (0xFF, unicode, \xFF, etc)
-- [X] use lexer api instead of stream api (use steam api IN imp of lexer api)
-- [ ] use warn
+    - [ ] fix issue with last's tokens (peek(): out of range, if token missed)
+- [ ] Lexer
+    - [ ] extend literals (0xFF, unicode, \xFF, etc)
 
 ### pipeline - drivers which control process of compilation
 - [X] SyntaxDriver - Lexer + parser
@@ -44,13 +39,7 @@ just list of all task, just to not forget :)
         - [ ] some optimizers
     - [ ] Codegen 
 
-## semantic
-- [X] create semantic types
-    - [X] identifier
-    - [X] scope
-    - [X] module
-    - [X] program
-
+### semantic
 <!-- DOCUMENTATION DOWN -->
 <!-- TODO: move to documentation -->
 - Semantic phases:
@@ -62,17 +51,14 @@ just list of all task, just to not forget :)
 
 - [ ] fix problems founded
     - [ ] remove noexcept from ast visitors
-    - [ ] SAVE NODE SourceLocation IN PARSER!!!!!!
-    - [ ] remove module decl node
 
 - [ ] create semantic analyzers
     - [X] ProgramInitializer (Program name, global_scope, etc)
 
     - [ ] Semantic analyze
         - [X] Modules phase
-            - [X] ImportAnalyzers process ast return all imported modules (names)
-            <!-- maybe rename ImportAnalyzer -> ImportsCollector -->
-            - [X] SymbolsCollector - collect all symbol (not body)
+            - [X] ImportAnalyzers - process ast return all imported modules
+            - [ ] SymbolsCollector - collect all symbol declarations
             
         - [ ] Names phase
             - [ ] NameChecker check if identifier exists (var and functions)
@@ -85,51 +71,18 @@ just list of all task, just to not forget :)
         - [ ] optimize phase
             - [ ] Optimizers (e.g. increment, blockstmt->one-stmt(if possible), etc)
 
-### make naming(classes, args, api, etc) more consistence
-<!-- - [ ] use AST alias type instead of `std::vector<ast::BaseNode>`  not only alias, structure with context--> 
-<!-- - [ ] maybe rename ASTVisitor -> Visitor (and with const variation) no -->
-- [ ] standardization api (private and public)
-    - [ ] rename Lexer::is_success() -> Lexer::had_errors() <!-- maybe deprecated bcs of different code structure -->
-
-
-### refactor and extend Error
-- [X] add warns
-- [ ] add colors
-- [X] upgrade output
-- [X] handle multi-line tokens
-- [X] add SyntaxError's <- CompileError
-    - [X] add StreamError   <- SyntaxError
-    - [X] add LexerError    <- SyntaxError
-    - [X] add ParserError   <- SyntaxError
-- [ ] add SemanticError's <- CompileError
-    - [ ] add TypeError <- SemanticError
-    - [ ] add LogicError <- SemanticError
-    - [ ] add etc <- SemanticError
-
 ## Documentation
 - [^] write doc in code
 - [^] wite down all other code and architecture docss
-- [X] reorganize and clean up docs
-    - [X] tasks
-    - [X] roadmap
-- [X] move and clean up all docs we already had
-- [X] add doxygen to project
-- [X] clean-up roadmap, dived notes and roadmap, sort all notes
-- [X] remove clean.sh and run.sh and write one good script (not ai generated)
-- [X] decide gitignore generated doc or not - IGNORE
-- [X] mv doc -> docs
 
 ## Other
 
 ### upgrade build.sh script
-- [X] add build arg (debug)
-- [X] use multiple cores
-- [X] pass DEBUGING through flags
 - [ ] make symlink to compiler in project-root dir
-
+- [ ] pass arguments to compiler in `run` command
 
 ### add user-api to compiler cli app (POSIX like, or even use POSIX standard)
-- [X] CLIParser
-- [X] CompileDriver - control process of compilation
-- [ ] update build.sh to make symlink to compiler in project-root dir (and update clean.sh to remove link)
-- [X] remove run.sh
+- [ ] make POSIX-like cli compiler with support of:
+    - [ ] import paths
+    - [ ] different compile flags
+    - [ ] etc

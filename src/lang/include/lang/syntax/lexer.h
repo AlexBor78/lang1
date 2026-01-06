@@ -43,6 +43,7 @@ namespace lang::syntax::lexer
         diagnostic::LexerError reached_eof() const;
         diagnostic::LexerError passed_zero_to_eof() const;
 
+        diagnostic::LexerError unexpected_token(common::SourceLocation) const;
         diagnostic::LexerError word_start_num(common::SourceLocation) const;
         diagnostic::LexerError not_closed_comment_block(common::SourceLocation) const;
         diagnostic::LexerError not_closed_string(common::SourceLocation) const;

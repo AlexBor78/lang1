@@ -55,7 +55,7 @@ namespace lang::syntax::lexer
             else break;
         } catch(const std::exception& e) {
             success = false;
-            logger.error("error while lexer working: {}", e.what());
+            logger.error("lexer inter error: {}", e.what());
             if(!is_eof()) skip();
             else break;
         }
@@ -77,6 +77,7 @@ namespace lang::syntax::lexer
         #else
             logger.set_level(common::utils::Logger::LogLevel::INFO | common::utils::Logger::LogLevel::WARN | common::utils::Logger::LogLevel::ERROR);
         #endif 
+        // logger.set_level(common::utils::Logger::LogLevel::ALL);s
     }
 
     void Lexer::breakpoint() noexcept {
@@ -104,6 +105,9 @@ namespace lang::syntax::lexer
     diagnostic::LexerError Lexer::passed_zero_to_eof() const {
         return diagnostic::LexerError("passed zero to is_eof()");
     }
+    diagnostic::LexerError Lexer::unexpected_token(common::SourceLocation pos) const {
+        return diagnostic::LexerError("unexpected token", pos);
+    }
     diagnostic::LexerError Lexer::word_start_num(common::SourceLocation pos) const {
         return diagnostic::LexerError("word can not starts from number", pos);
     }
@@ -130,8 +134,8 @@ namespace lang::syntax::lexer
         if(is_eof()) throw reached_eof();
     }
     bool Lexer::is_eof(size_t n) const {
-        check_stream();
         if(n == 0) throw passed_zero_to_eof();
+        check_stream();
         return stream->is_eof(n);
     }
     char Lexer::peek(size_t offset) const {
@@ -198,7 +202,7 @@ namespace lang::syntax::lexer
     }
 
     void Lexer::tokenize_word() {
-        breakpoint(); logger.debug("tokenize_word() keyword");
+        breakpoint(); logger.debug("tokenize_word()");
         common::SourceLocation pos = get_pos();
         std::string buf = read_word();
         
@@ -245,7 +249,7 @@ namespace lang::syntax::lexer
                     .sym = std::move(buf)
                 }); return;
             }
-        }
+        } throw unexpected_token(pos);
     }
 
     void Lexer::tokenize_number() {
@@ -318,14 +322,15 @@ namespace lang::syntax::lexer
 
     void Lexer::process_comment(){
         if(peek(0) != '/') return;
-        if(peek(1) == '/') process_comment_line();
-        if(peek(1) == '*') process_comment_block();
+        if(!is_eof(2) && peek(1) == '/') return process_comment_line();
+        if(!is_eof(2) && peek(1) == '*') return process_comment_block();
     }
 
     void Lexer::process_comment_line() {
         breakpoint(); logger.debug("process_coment_line()");
         skip(2); // skip "//"
-        while(!is_eof() && peek() != '\n') skip();
+
+        while(!is_eof(1) && peek() != '\n') skip();
     }
     void Lexer::process_comment_block() {
         breakpoint(); logger.debug("process_coment_block()");
