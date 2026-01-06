@@ -21,9 +21,6 @@ just list of all task, just to not forget :)
 - [ ] add syntax highlight
 
 ### Syntax
-- [ ] Parser
-    - [ ] save node pos
-    - [ ] fix issue with last's tokens (peek(): out of range, if token missed)
 - [ ] Lexer
     - [ ] extend literals (0xFF, unicode, \xFF, etc)
 

@@ -1,5 +1,6 @@
 // #define PARSER_DEBUG
 
+#include <cstdio>
 #include <format>
 #include <string>
 #include <lang/utils/syntax_utils.h>
@@ -51,7 +52,7 @@ namespace lang::syntax::parser
         #else
             logger.set_level(common::utils::Logger::LogLevel::INFO | common::utils::Logger::LogLevel::WARN | common::utils::Logger::LogLevel::ERROR);
         #endif
-        // logger.set_level(common::utils::Logger::LogLevel::ALL); // just for now
+        logger.set_level(common::utils::Logger::LogLevel::ALL); // just for now
     }
 
     void Parser::breakpoint() {
@@ -338,28 +339,24 @@ namespace lang::syntax::parser
         ||  match(TokenType::FN))) {
             if(match(TokenType::FN)
             || match(TokenType::CONST)) {
-                if(words > 0) putback(words);
+                putback(words);
                 return true;
-            }
-            skip(); ++words;
+            } skip(); ++words;
         }
 
         // type name
         if(!is_end(1) && !match(TokenType::IDENTIFIER)) {
-            if(words > 0) putback(words);
-            return false;
+            putback(words); return false;
         }
         
         //  symbol name
         if(!is_end(2) && !match(TokenType::IDENTIFIER, 1)) {
-            if(words > 0) putback(words);
-            return false;
+            putback(words); return false;
         }
 
         // function declaration
         if(!is_end(3) && match(TokenType::LPAREN, 2)) {
-            if(words > 0) putback(words);
-            return true;
+            putback(words); return true;
         }
 
         // variable declaration
@@ -370,8 +367,7 @@ namespace lang::syntax::parser
         &&  match(TokenType::LARROW, 2)
         // check for stack also, so <- will not used as =
         &&  match(TokenType::STACK, 3)))) {
-            if(words > 0) putback(words);
-            return true;
+            putback(words); return true;
         } return false;
     }
 
@@ -541,9 +537,10 @@ namespace lang::syntax::parser
         return std::move(node);
     }
 
-    // expr's
+    // exprs
 
     std::unique_ptr<ast::ExprNode> Parser::process_expr() {
+        breakpoint(); logger.debug("process_expr");
         if(!is_end() && match(TokenType::STACK)) return process_stackalloc_expr();
         return process_operator();
     }
@@ -576,7 +573,7 @@ namespace lang::syntax::parser
     std::unique_ptr<ast::ExprNode> Parser::process_assign_expr() {
         breakpoint(); logger.debug("process_assign_expr()");
         auto left = process_logical_expr();
-        if(utils::is_operator(peek().ty)) {
+        if(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_assign_op(op)) { skip(); // skip op
                 return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_assign_expr());
@@ -586,7 +583,7 @@ namespace lang::syntax::parser
     std::unique_ptr<ast::ExprNode> Parser::process_logical_expr() {
         breakpoint(); logger.debug("process_logical_expr()");
         auto left = process_compare_expr();
-        while(utils::is_operator(peek().ty)) {
+        while(!is_end(1) &&  utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_logical_op(op)) { skip(); // skip op
                 return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_compare_expr());
@@ -596,7 +593,7 @@ namespace lang::syntax::parser
     std::unique_ptr<ast::ExprNode> Parser::process_compare_expr() {
         breakpoint(); logger.debug("process_compare_expr()");
         auto left = process_additive_expr();
-        while(utils::is_operator(peek().ty)) {
+        while(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_compare_op(op)) { skip(); // skip op
                 return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_additive_expr());
@@ -606,7 +603,7 @@ namespace lang::syntax::parser
     std::unique_ptr<ast::ExprNode> Parser::process_additive_expr() {
         breakpoint(); logger.debug("process_additive_expr()");
         auto left = process_multiple_expr();
-        while(utils::is_operator(peek().ty)) {
+        while(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_add_op(op)) { skip(); // skip op
                 return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_multiple_expr());
@@ -616,7 +613,7 @@ namespace lang::syntax::parser
     std::unique_ptr<ast::ExprNode> Parser::process_multiple_expr() {
         breakpoint(); logger.debug("process_multiple_expr()");
         auto left = process_unary_expr();
-        while(utils::is_operator(peek().ty)) {
+        while(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_mul_op(op)) { skip(); // skip op
                 return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_unary_expr());
@@ -627,7 +624,7 @@ namespace lang::syntax::parser
         breakpoint(); logger.debug("process_unary_expr()");
         
         // PREfix op
-        if(utils::is_operator(peek().ty)) {
+        if(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_prefix_op(op)) { skip(); // skip op
                 return std::make_unique<ast::PrefixUnaryOpExpr>(op, process_primary_expr());
@@ -637,7 +634,7 @@ namespace lang::syntax::parser
         auto node = process_primary_expr();
 
         // POSTfix op
-        if(utils::is_operator(peek().ty)) {
+        if(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_postfix_op(op)) return std::make_unique<ast::PostfixUnaryOpExpr>(utils::token_to_op(advance().ty), std::move(node));
             // throw expected_postfix_op(); conflict with binary operators
@@ -661,9 +658,9 @@ namespace lang::syntax::parser
 
     std::unique_ptr<ast::ExprNode> Parser::process_name() {
         breakpoint(); logger.debug("process_name()");
-        if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_identifier();
-        if(!is_end(1) && match(TokenType::DOUBLECOLON, 1)) return process_symbol_path();
-        if(!is_end(1) && match(TokenType::LPAREN, 1)) return process_function_expr();
+        if(!is_end(1) && !match(TokenType::IDENTIFIER)) throw expected_identifier();
+        if(!is_end(2) && match(TokenType::DOUBLECOLON, 1)) return process_symbol_path();
+        if(!is_end(2) && match(TokenType::LPAREN, 1)) return process_function_expr();
         return process_variable_expr();
     }
 
@@ -680,11 +677,11 @@ namespace lang::syntax::parser
 
     std::unique_ptr<ast::FunctionExpr> Parser::process_function_expr() {
         breakpoint(); logger.debug("process_function_expr()");
-        // if(!is_end() && !match(TokenType::IDENTIFIER) throw expected_function_name();
+        if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_function_name();
         std::string name = advance().sym;
 
         // useless - already checked by process_name() to call this
-        // if(!is_end() && !match(TokenType::LPAREN)) throw expected_lparen();
+        if(!is_end() && !match(TokenType::LPAREN)) throw expected_lparen();
         skip(); // skip '('
 
         // todo: file end check
@@ -701,7 +698,7 @@ namespace lang::syntax::parser
 
     std::unique_ptr<ast::VariableExpr> Parser::process_variable_expr() {
         breakpoint(); logger.debug("process_variable_expr()");
-        // if(!match(TokenT!match(TokenType::RPAREN ype::IDENTIFIER) throw expected_variable_name();
+        if(!is_end(1) && !match(TokenType::IDENTIFIER)) throw expected_variable_name();
         std::string name = advance().sym;
         return std::make_unique<ast::VariableExpr>(name);;
     }
@@ -745,118 +742,145 @@ namespace lang::syntax::parser
 // diagnostic creating
     
     diagnostic::ParserError Parser::tokens_nullptr(size_t offset) const noexcept {
-        return diagnostic::ParserError("tokens = nullptr", common::SourceLocation());
+        if(!is_end()) return diagnostic::ParserError("tokens = nullptr", common::SourceLocation());
+        else return diagnostic::ParserError("tokens = nullptr", common::SourceLocation());
     }
     diagnostic::ParserError Parser::is_end_with_zero(size_t offset) const noexcept {
-        return diagnostic::ParserError("is_end() called with 0", common::SourceLocation());
+        if(!is_end()) return diagnostic::ParserError("is_end() called with 0", common::SourceLocation());
+        else return diagnostic::ParserError("is_end() called with 0", common::SourceLocation());
     }
     diagnostic::ParserError Parser::peek_out_of_range(size_t offset) const noexcept {
-        return diagnostic::ParserError("peek(): out of range", common::SourceLocation());
+        if(!is_end()) return diagnostic::ParserError("peek(): out of range", common::SourceLocation());
+        else return diagnostic::ParserError("peek(): out of range", common::SourceLocation());
     }
     diagnostic::ParserError Parser::putback_out_of_range(size_t offset) const noexcept {
-        return diagnostic::ParserError("putback(): out of range", common::SourceLocation());
+        if(!is_end()) return diagnostic::ParserError("putback(): out of range", common::SourceLocation());
+        else return diagnostic::ParserError("putback(): out of range", common::SourceLocation());
     }
     diagnostic::ParserError Parser::end_reached(size_t offset) const noexcept {
-        return diagnostic::ParserError("end reached", common::SourceLocation());
+        if(!is_end()) return diagnostic::ParserError("end reached", common::SourceLocation());
+        else return diagnostic::ParserError("end reached", common::SourceLocation());
     }
     diagnostic::ParserError Parser::strcut_is_not_suported(size_t offset) const noexcept {
-        return diagnostic::ParserError("strcut is currently not suported", common::SourceLocation());
+        if(!is_end()) return diagnostic::ParserError("strcut is currently not suported", common::SourceLocation());
+        else return diagnostic::ParserError("strcut is currently not suported", common::SourceLocation());
     }
     diagnostic::ParserError Parser::enum_is_not_suported(size_t offset) const noexcept {
-        return diagnostic::ParserError("enum is currently not suported", common::SourceLocation());
+        if(!is_end()) return diagnostic::ParserError("enum is currently not suported", common::SourceLocation());
+        else return diagnostic::ParserError("enum is currently not suported", common::SourceLocation());
     }
     diagnostic::ParserError Parser::if_is_not_suported(size_t offset) const noexcept {
-        return diagnostic::ParserError("if is currently not suported", common::SourceLocation());
+        if(!is_end()) return diagnostic::ParserError("if is currently not suported", common::SourceLocation());
+        else return diagnostic::ParserError("if is currently not suported", common::SourceLocation());
     }
     diagnostic::ParserError Parser::else_is_not_suported(size_t offset) const noexcept {
-        return diagnostic::ParserError("else is currently not suported", common::SourceLocation());
+        if(!is_end()) return diagnostic::ParserError("else is currently not suported", common::SourceLocation());
+        else return diagnostic::ParserError("else is currently not suported", common::SourceLocation());
     }
     diagnostic::ParserError Parser::for_is_not_suported(size_t offset) const noexcept {
-        return diagnostic::ParserError("for is currently not suported", common::SourceLocation());
+        if(!is_end()) return diagnostic::ParserError("for is currently not suported", common::SourceLocation());
+        else return diagnostic::ParserError("for is currently not suported", common::SourceLocation());
     }
     diagnostic::ParserError Parser::while_is_not_suported(size_t offset) const noexcept {
-        return diagnostic::ParserError("while is currently not suported", common::SourceLocation());
+        if(!is_end()) return diagnostic::ParserError("while is currently not suported", common::SourceLocation());
+        else return diagnostic::ParserError("while is currently not suported", common::SourceLocation());
     }
     diagnostic::ParserError Parser::break_is_not_suported(size_t offset) const noexcept {
-        return diagnostic::ParserError("break is currently not suported", common::SourceLocation());
+        if(!is_end()) return diagnostic::ParserError("break is currently not suported", common::SourceLocation());
+        else return diagnostic::ParserError("break is currently not suported", common::SourceLocation());
     }
     diagnostic::ParserError Parser::continue_is_not_suported(size_t offset) const noexcept {
-        return diagnostic::ParserError("continue is currently not suported", common::SourceLocation());
+        if(!is_end()) return diagnostic::ParserError("continue is currently not suported", common::SourceLocation());
+        else return diagnostic::ParserError("continue is currently not suported", common::SourceLocation());
     }
     diagnostic::ParserError Parser::stack_initialization_not_supported(size_t offset) const noexcept {
-        return diagnostic::ParserError("stack initialization is currently not suported", common::SourceLocation());
+        if(!is_end()) return diagnostic::ParserError("stack initialization is currently not suported", common::SourceLocation());
+        else return diagnostic::ParserError("stack initialization is currently not suported", common::SourceLocation());
     }
-    diagnostic::ParserError Parser::multiple_module_decl_in_file(size_t offset) const noexcept {
-        return diagnostic::ParserError("multiple module in one file is not allowed", common::SourceLocation());
-    }
-
     diagnostic::ParserError Parser::expected_semicolon(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected ';', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected ';', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected ';', got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_lbracket(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected '[', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected '[', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected '[', got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_rbracket(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected ']', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected ']', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected ']', got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_lbrace(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected '{{', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected '{{', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected '{{', got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_rbrace(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected '}}', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected '}}', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected '}}', got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_lparen(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected '(', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected '(', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected '(', got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_rparen(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected ')', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected ')', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected ')', got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_comma(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected ',', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected ',', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected ',', got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_doublecolon(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected '::', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected '::', got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected '::', got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_unary_op(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected unary operator, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected unary operator, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected unary operator, got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_postfix_op(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected postfix operator, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected postfix operator, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected postfix operator, got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_identifier(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected identifier, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected identifier, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected identifier, got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_function_name(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected function name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected function name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected function name, got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_variable_name(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected variable name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected variable name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected variable name, got buf file had ended"), common::SourceLocation());
     }
-    // diagnostic::ParserError Parser::expected_namespace_name(size_t offset) const noexcept {
-    //     return diagnostic::ParserError(std::format("expected namespace name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
-    // }
     diagnostic::ParserError Parser::expected_module_name(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected module name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected module name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected module name, got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_submodule_name(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected submodule name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected submodule name, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected submodule name, got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_type(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected type, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected type, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected type, got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_number(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected number, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected number, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected number, got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_string(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected string, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected string, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected string, got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::expected_bool(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("expected bool, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        if(!is_end()) return diagnostic::ParserError(std::format("expected bool, got {}", utils::stringify(peek(offset).ty)), peek(offset).pos);
+        else return diagnostic::ParserError(std::format("expected bool, got buf file had ended"), common::SourceLocation());
     }
     diagnostic::ParserError Parser::unexpected_token(size_t offset) const noexcept {
-        return diagnostic::ParserError(std::format("unexpected token: {}"
+        if(!is_end()) return diagnostic::ParserError(std::format("unexpected token: {}"
         ,                       utils::stringify(peek(offset).ty))
         ,                   peek(offset).pos
-        );;
+        ); else return diagnostic::ParserError(std::format("unexpected token in end of file (strange error, possibly have some inter error in logic)"));;
     }
 }

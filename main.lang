@@ -1,3 +1,4 @@
+/*
 import std;
 import test; // run test BY IMPORT ONLY!!!!! DAMN YEAH
 import test_lib;
@@ -15,6 +16,7 @@ import std::io;
     block
 */
 
+/*
 export void foo() {
     
 }
@@ -47,6 +49,6 @@ int main() {
     **int matrix <- stack[10][10];
     
 }
-
-// lexer error: peak out of range
-// asdasd asdasd
+*/
+// parser error: peak out of range
+assas(

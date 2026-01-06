@@ -52,6 +52,8 @@
 - [X] remove clean.sh and run.sh and write one good script (not ai generated)
 - [X] decide gitignore generated doc or not - IGNORE
 - [X] mv doc -> docs
+- [X] write architecture overviews
+- [X] are we even need architecture_plan.txt ? - NO
 
 ## pre-semantic syntax updates (enough for now, but still not support a lot)
 - [X] Update stuff 
