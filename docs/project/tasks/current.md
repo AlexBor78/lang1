@@ -24,7 +24,7 @@
     - [ ] Optimizers (e.g. increment, blockstmt->one-stmt(if possible), etc)
 
 ## Tasks:
-- [ ] remove noexcept from ast visitors
-- [ ] reorganize codes in files
+- [X] remove noexcept from ast visitors
+- [ ] reorganize codes in files (specifically semantic types like scope, module, etc)
 - [ ] may be change semantic types a little bit if needed.
 - [ ] update SymbolCollector (there are some code already, and it is outdated a little bit)
