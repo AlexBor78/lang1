@@ -39,8 +39,11 @@ int main() {
     *a = 5;
 
     **int a = 5;
+    
+    a = b = c;
+    a + b + c;
 
-    // todo:
+    // todo: 
     //a + b + c;
     a + (b + c);
 

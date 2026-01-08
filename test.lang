@@ -15,8 +15,7 @@ import std;
     }
     
     int complex_calc(int x, int y) {
-        // not passed
-        // int result = (x * y) + (x / y) - (x % y);
+        int result = (x * y) + (x / y) - (x % y);
         result = result & (result | 15);
         result = result ^ 255;
         result = ~result;

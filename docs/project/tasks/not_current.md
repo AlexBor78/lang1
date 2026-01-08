@@ -16,6 +16,7 @@ just list of all task, just to not forget :)
 ## Code
 
 ### Diagnostic
+- [ ] lazy generating error (not needed yet, will need in future)
 - [ ] add colors to logger output
 - [ ] add colors to builded errors
 - [ ] add syntax highlight
@@ -36,6 +37,7 @@ improve structure with MI (multiple inherit)
     - [ ] extend literals (0xFF, unicode, \xFF, etc)
 - [ ] Parser
     - [ ] save import_list
+    - [ ] fix not passed very complex operators sequences in test.lang
 
 ### pipeline - drivers which control process of compilation
 - [X] SyntaxDriver - Lexer + parser

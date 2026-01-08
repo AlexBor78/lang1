@@ -99,6 +99,9 @@ namespace lang::syntax::parser
         std::unique_ptr<ast::ExprNode>          process_logical_expr();
         std::unique_ptr<ast::ExprNode>          process_compare_expr();
         std::unique_ptr<ast::ExprNode>          process_additive_expr();
+        /**
+         * @todo rename to process_multiply_expr()
+         */
         std::unique_ptr<ast::ExprNode>          process_multiple_expr();
         std::unique_ptr<ast::ExprNode>          process_unary_expr();
         std::unique_ptr<ast::ExprNode>          process_primary_expr();

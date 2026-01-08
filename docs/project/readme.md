@@ -9,9 +9,9 @@
 **All tasks in tasks folder**
 
 - [current](./tasks/current.md) - tasks in work now
-- [archive](./tasks/archive.md) - done tasks (overview of done work)
-- [future](./tasks/future.md) - that will be in far future, more like roadmap, but too detailed
 - [not current](./tasks/not_current.md) - tasks that is not in in far future, but not the target now
+- [future](./tasks/future.md) - that will be in far future, more like roadmap, but too detailed
+- [archive](./tasks/archive.md) - done tasks
 
 ## Issues
 

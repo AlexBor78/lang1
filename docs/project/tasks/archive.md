@@ -55,12 +55,19 @@
 - [X] write architecture overviews
 - [X] are we even need architecture_plan.txt ? - NO
 
-## pre-semantic syntax updates (enough for now, but still not support a lot)
-- [X] Update stuff 
-    - [X] update keywords
-    - [X] update type's syntax, and type's Types (better wrappers with OOP)
-    - [X] impl base modules and remove namespace's
-    - [X] impl stack allocations (as in doc)
+## pre-semantic syntax updates (enough for now, but still not supported a lot)
+- [X] update keywords
+- [X] update type's syntax, and type's Types (better wrappers with OOP)
+- [X] impl base modules and remove namespace's
+- [X] impl stack allocations (as in doc)
+- [X] new type's syntax AND ne type's Types architecture (to have infinity wrappers)
+- [X] remove namespaces at all
+- [X] update keywords
+- [X] add keywords, nodes, etc for new features
+- [X] pointer to function
+- [X] implement new modules (at list everything without increment build)
+- [X] `export import` support
+- [X] stack allocations syntax support
 
 ## Other
 

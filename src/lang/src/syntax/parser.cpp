@@ -700,7 +700,7 @@ namespace lang::syntax::parser
         while(!is_end(1) &&  utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_logical_op(op)) { auto op_loc = advance().pos; // skip op
-                return std::make_unique<ast::BinOpExpr>(
+                left = std::make_unique<ast::BinOpExpr>(
                     op,
                     std::move(left),
                     process_compare_expr(),
@@ -715,7 +715,7 @@ namespace lang::syntax::parser
         while(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_compare_op(op)) { auto op_loc = advance().pos; // skip op
-                return std::make_unique<ast::BinOpExpr>(op,
+                left = std::make_unique<ast::BinOpExpr>(op,
                     std::move(left),
                     process_additive_expr(),
                     std::move(op_loc)
@@ -729,7 +729,7 @@ namespace lang::syntax::parser
         while(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_add_op(op)) { auto op_loc = advance().pos; // skip op
-                return std::make_unique<ast::BinOpExpr>(
+                left = std::make_unique<ast::BinOpExpr>(
                     op,
                     std::move(left),
                     process_multiple_expr(),
@@ -743,8 +743,12 @@ namespace lang::syntax::parser
         auto left = process_unary_expr();
         while(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
-            if(utils::is_mul_op(op)) { skip(); // skip op
-                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_unary_expr());
+            if(utils::is_mul_op(op)) { auto op_loc = advance().pos; // skip op
+                return std::make_unique<ast::BinOpExpr>(op,
+                    std::move(left),
+                    process_unary_expr(),
+                    std::move(op_loc)
+                );
             } else break;
         } return std::move(left);
     }
