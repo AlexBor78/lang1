@@ -3,29 +3,23 @@
 #include <string_view>
 #include <common/common.h>
 #include <common/diagnostic/diagnostic.h> // Diagnostic, Error, InterError, Warn
-#include <common/diagnostic/diagnostic_builder.h> // DiagnosticBuilder
+#include <lang/utils/diagnostic_builder.h> // DiagnosticBuilder
 
 namespace lang::diagnostic
 {
     class CompileError : public common::diagnostic::Error
     {
     private:
-        common::diagnostic::DiagnosticBuilder builder;
+        DiagnosticBuilder builder;
 
     protected:
         CompileError(std::string_view _msg
         ,            common::SourceLocation   _pos
         ,            std::string_view name = ""
-        ):  Error(_msg)
-        ,   builder(name, _pos) {
+        ): Error(_msg)
+        ,  builder(name, _pos) {
             msg = builder.build(_msg);
         }
-
-    public: // api
-        // virtual CompileError& operator=(const CompileError& e) noexcept {
-        //     // todo
-        //     return *this;
-        // }
     };
 
     class SyntaxError : public CompileError
@@ -33,10 +27,10 @@ namespace lang::diagnostic
     protected:
         SyntaxError(std::string_view _msg
         ,             common::SourceLocation _pos = {}
-        ,             std::string_view _name = "FrontendError"
-        ):  CompileError(_msg
-        ,                std::move(_pos)
-        ,                _name
+        ,             std::string_view _name = "SyntaxError"
+        ): CompileError(_msg
+        ,               std::move(_pos)
+        ,               _name
         ) {}
     };
 
@@ -45,9 +39,9 @@ namespace lang::diagnostic
     public:
         explicit LexerError(std::string_view _msg
         ,                   common::SourceLocation _pos = {}
-        ):  SyntaxError(_msg
-        ,                 std::move(_pos)
-        ,                 "LexerError"
+        ): SyntaxError(_msg
+        ,                std::move(_pos)
+        ,                "LexerError"
         ) {}
     };
 
@@ -56,30 +50,29 @@ namespace lang::diagnostic
     public:
         explicit ParserError(std::string_view _msg
         ,                    common::SourceLocation   _pos = {}
-        ):  SyntaxError(_msg
-        ,                 std::move(_pos)
-        ,                 "ParserError"
+        ): SyntaxError(_msg
+        ,                std::move(_pos)
+        ,                "ParserError"
         ) {}
     };
     
-    // unused for now
-    // class SemanticError : public CompileError
-    // {
-    // protected:
-    //     MiddlendError(std::string_view _msg
-    //     ,             common::SourceLocation _pos = {}
-    //     ,             std::string_view name = ""
-    //     ):  CompileError(_msg
-    //     ,                std::move(_pos)
-    //     ,                "Middle"
-    //     )
-    //     {}
-    // };
+    class SemanticError : public CompileError
+    {
+    protected:
+        SemanticError(std::string_view _msg
+        ,             common::SourceLocation _pos = {}
+        ,             std::string_view _name = "SemanticError"
+        ):  CompileError(_msg
+        ,                std::move(_pos)
+        ,                _name
+        )
+        {}
+    };
 
     class CompileWarn : public common::diagnostic::Warn
     {
     private:
-        common::diagnostic::DiagnosticBuilder builder;
+        DiagnosticBuilder builder;
 
     protected:
         CompileWarn(std::string_view _msg
@@ -102,7 +95,7 @@ namespace lang::diagnostic
     protected:
         SyntaxWarn(std::string_view _msg
         ,             common::SourceLocation _pos = {}
-        ,             std::string_view _name = "FrontendWarn"
+        ,             std::string_view _name = "SyntaxWarn"
         ):  CompileWarn(_msg
         ,                std::move(_pos)
         ,                _name

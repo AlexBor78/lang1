@@ -161,7 +161,7 @@ namespace lang::syntax::lexer
     [[nodiscard("Lexer::update_pos() RETURN updated pos")]] common::SourceLocation Lexer::update_pos(common::SourceLocation pos, char c) noexcept {
         ++pos.length;
         ++pos.end.index;
-        if(c == 'n') {
+        if(c == '\n') {
             ++pos.end.line;
             pos.end.column = 0;
         } else ++pos.end.column;
@@ -203,22 +203,24 @@ namespace lang::syntax::lexer
 
     void Lexer::tokenize_word() {
         breakpoint(); logger.debug("tokenize_word()");
-        common::SourceLocation pos = get_pos();
+        common::SourceLocation loc = get_pos();
         std::string buf = read_word();
         
-        pos.length = get_pos().start.index - pos.start.index;
+        // todo: use merge, update api, 
+        loc.length = get_pos().start.index - loc.start.index;
+        loc.end = get_pos().start;
         
         if(auto it = keywords.find(buf); it != keywords.end()) {
             add_token({
                 .ty = it->second,
-                .pos = pos,
+                .pos = loc,
                 .sym = std::move(buf)
             }); return;
         }
 
         add_token({
             .ty = TokenType::IDENTIFIER,
-            .pos = pos,
+            .pos = loc,
             .sym = std::move(buf)
         });
     }
@@ -254,7 +256,7 @@ namespace lang::syntax::lexer
 
     void Lexer::tokenize_number() {
         breakpoint(); logger.debug("tokenize_number()");
-        common::SourceLocation pos = get_pos();
+        common::SourceLocation loc = get_pos();
         std::string buf;
         bool has_dot{false};
         if(peek() == '.') {
@@ -263,15 +265,16 @@ namespace lang::syntax::lexer
 
         while(!is_eof() && is_number()) {
             if(peek() == '.') {
-                pos = update_pos(pos, peek());
-                if(has_dot) throw wrong_number_format(pos);
+                loc = update_pos(loc, peek());
+
+                if(has_dot) throw wrong_number_format(loc);
                 has_dot = true;
             } buf += advance();
         }
 
         add_token({
             .ty = TokenType::NUMBER,
-            .pos = pos,
+            .pos = loc,
             .sym = std::move(buf)
         });
     }

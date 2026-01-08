@@ -4,16 +4,23 @@ just list of all task, just to not forget :)
 
 ### Tasks for future refactoring
 - [ ] updates api (private and public)
-    - [ ] rename Lexer::is_success() -> Lexer::had_errors()
+    - [ ] rename `Lexer::is_success()` -> `Lexer::had_errors()`
     - [ ] rename `is_end()` -> `can_read()`
     - [ ] chose only one of `offset` and `n` args
 - [ ] make naming more consistence
     - [ ] `ImportAnalyzer` -> `ImportsCollector`
+    - [ ] `FileLocation` -> `FilePosition`
+    - [ ] everywhere position to location where it is location (mainly in ast)
+    - [ ] `DiagnosticBuilder` -> `DiagnosticGenerator`
     
 - [ ] little improvement how code placed in files
 - [ ] use warn, not only errors (wars - not fall or fail, error - usually fall and fail)
 
 ## Code
+
+### other
+- [ ] use FileLocation in streams instead of SourceLocation
+- [ ] save line_start index(in symbols) in FileLocation to easier code in diagnostic builder
 
 ### Diagnostic
 - [ ] lazy generating error (not needed yet, will need in future)
@@ -38,6 +45,9 @@ improve structure with MI (multiple inherit)
 - [ ] Parser
     - [ ] save import_list
     - [ ] fix not passed very complex operators sequences in test.lang
+    - [ ] update error generating 
+        - [ ] pass location to generating func
+        - [ ] on error like expected X - location should be not next token, but after last token
 
 ### pipeline - drivers which control process of compilation
 - [X] SyntaxDriver - Lexer + parser

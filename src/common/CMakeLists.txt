@@ -13,7 +13,6 @@ set(sources
     src/streams/ostream.cpp
     src/streams/stream.cpp
     src/utils/logger.cpp
-    src/diagnostic/diagnostic_builder.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${sources})

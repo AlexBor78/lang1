@@ -37,6 +37,7 @@ set(sources
     src/pipeline/semantic_driver.cpp
     
     # utils
+    src/utils/diagnostic_builder.cpp
     src/utils/printast.cpp
     src/utils/utils.cpp
 

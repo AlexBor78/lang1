@@ -11,4 +11,4 @@ Right now we finalizing current codebase - fixing some bugs,
 - [X] fix parser error: peak out of range
 - [X] save node pos in parser
 - [X] fix `a + b + c` like exprs
-- [ ] fix falling while generating diagnostic message
+- [X] fix falling while generating diagnostic message

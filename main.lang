@@ -25,7 +25,6 @@ export void foo() {
 
 int x;
 
-
 int main() {
 
     // sdasd

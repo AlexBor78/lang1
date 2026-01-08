@@ -49,7 +49,7 @@ namespace common::streams
     }
 
     void InputStream::update_pos(char c) noexcept {
-        ++pos.start.column;
+        ++pos.start.index;
         if(c == '\n') {
             ++pos.start.line;
             pos.start.column = 0;
