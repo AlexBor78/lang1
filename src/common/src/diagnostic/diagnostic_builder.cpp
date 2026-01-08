@@ -16,7 +16,7 @@ namespace common::diagnostic
         std::string buf;
 
         // check if pos is default (empty)
-        if(pos == common::SourceLocation{}) {
+        if(pos == common::SourceLocation()) {
             return std::string(msg);
         }
         if(pos.path.empty()) buf = std::format("{} \n", msg);

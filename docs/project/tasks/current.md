@@ -1,4 +1,4 @@
-# Current working topic: Documentation
+# Current working topic: Finalizing. Preparation before semantic.
 
 ## [All tasks list](./not_current.md)
 
@@ -19,5 +19,6 @@ Change done stuff -> new and actual ideas
 - [X] stack allocations syntax support
 - [X] fix fail of lexer if one-line comment in end of file
 - [X] fix parser error: peak out of range
-- [ ] save node pos in parser
+- [X] save node pos in parser
+- [ ] fix `a + b + c` like exprs
 - [ ] fix falling while generating diagnostic message

@@ -61,5 +61,7 @@ namespace lang::pipeline {
          */
         semantic::ModuleID genid(const std::string&);
         std::string gen_path(const semantic::ModuleID&);
+
+        void debug_break();
     };
 }

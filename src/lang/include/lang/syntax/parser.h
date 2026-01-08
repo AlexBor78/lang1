@@ -6,8 +6,8 @@
 #include <unordered_set>
 
 #include <lang/ast/ast.h>
-#include <lang/ast/expr.h>
 #include <lang/ast/stmt.h>
+#include <lang/ast/expr.h>
 #include <lang/utils/diagnostic.h>
 #include <common/utils/logger.h>
 #include <lang/syntax/token.h>
@@ -19,7 +19,7 @@ namespace lang::syntax::parser
     class Parser {
     public: // api
         Parser() {
-            init_logger();
+            init();
         }
 
         SyntaxContainer parse(const std::vector<Token>&);
@@ -37,9 +37,9 @@ namespace lang::syntax::parser
         size_t pos{0};
     
     private: // api
-        // don't clear semantic_contexts
-        void reset_state();
+        void init();
         void init_logger();
+        void reset_state();
         void breakpoint();
 
         void save_type_to_context(ast::DeclStmt*, std::unique_ptr<AbstractType>);

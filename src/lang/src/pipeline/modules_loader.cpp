@@ -7,6 +7,8 @@
 #include <lang/pipeline/modules_loader.h>
 #include <lang/pipeline/syntax_driver.h>
 
+// # define MODULESLOADER_DEBUG
+
 /**
  * @todo rewrite that shitcode 
  */
@@ -19,8 +21,14 @@ namespace lang::pipeline
         }
     }
 
+    void ModulesLoader::debug_break() {
+        #ifdef MODULESLOADER_DEBUG
+            common::debug_break();
+        #endif
+    }
+
     void ModulesLoader::load(const std::string& file_path) {
-        common::debug_break();
+        debug_break();
         if(compile_state->processed_files.contains(file_path)) return;
         
         // process file
@@ -30,7 +38,7 @@ namespace lang::pipeline
         auto dependencies = import_processor.process(syntax_container.ast);
         compile_state->processed_files.emplace(file_path);
 
-        assert(file_name.size() >= id.path.normalized_path.size() + FILE_SUFFIX_SIZE);
+        assert(file_path.size() >= id.path.normalized_path.size() + FILE_SUFFIX_SIZE);
         current_path = file_path.substr(0, file_path.size() - id.path.normalized_path.size() - FILE_SUFFIX_SIZE);
 
         // save semantic info
@@ -47,7 +55,7 @@ namespace lang::pipeline
     }
 
     void ModulesLoader::load(const semantic::ModuleID& id) {
-        common::debug_break();
+        debug_break();
         // if module already loaded
         if(semantic_state->program.modules.contains(id)) return;
 

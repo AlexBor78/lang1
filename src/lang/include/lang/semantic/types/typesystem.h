@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <string_view>
 #include <unordered_map>
+#include <common/common.h>
 
 /**
  * @todo move to lang::semantic namespace
@@ -26,6 +27,8 @@ namespace lang
         virtual ~AbstractType() = default;
         virtual bool is_builtin() {return false;}
         // virtual AbstractType& operator=(AbstractType& other) = default;
+
+        common::SourceLocation get_source_loc() const;
     };
 
     /**
@@ -78,14 +81,16 @@ namespace lang
     private:
         std::vector<std::unique_ptr<AbstractType>> args_types;
         std::unique_ptr<AbstractType> return_type;
+        common::SourceLocation keyword_loc;
 
     public:
         FunctionType() = default;
-        FunctionType(
-            std::vector<std::unique_ptr<AbstractType>> _args_types,
-            std::unique_ptr<AbstractType> _return_type
+        FunctionType(std::vector<std::unique_ptr<AbstractType>> _args_types
+        ,            std::unique_ptr<AbstractType> _return_type
+        ,            common::SourceLocation _keyword_loc = common::SourceLocation()
         ): args_types(std::move(_args_types))
         ,  return_type(std::move(_return_type))
+        ,  keyword_loc(_keyword_loc)
         {}
     };
 
@@ -104,10 +109,13 @@ namespace lang
          * 
          */
         std::string name;
+        common::SourceLocation source_loc;
 
         UnresolvedType() = default;
-        UnresolvedType(std::string_view _name):  
-            name(_name)
+        UnresolvedType(std::string_view _name
+        ,              common::SourceLocation _loc = common::SourceLocation()
+        ):  name(_name)
+        ,   source_loc(_loc)
         {}
     };
 
@@ -123,6 +131,7 @@ namespace lang
         WrapperKind kind{WrapperKind::MUTABLE};
         std::unique_ptr<AbstractType> inner;
         const BaseType* base_type{nullptr};
+        common::SourceLocation source_loc;
 
         bool is_final() const noexcept; // return base_type; if (base_type) -> it's final wrapper
 
@@ -130,13 +139,18 @@ namespace lang
         WrapperType() = default;
         WrapperType(WrapperKind _kind
         ,           std::unique_ptr<AbstractType> _inner
+        ,           common::SourceLocation _loc = common::SourceLocation()
         ):  kind(_kind)
         ,   inner(std::move(_inner))
+        ,   source_loc(_loc)
         {}
+
         WrapperType(WrapperKind _kind
         ,           const BaseType* _base
+        ,           common::SourceLocation _loc = common::SourceLocation()
         ):  kind(_kind)
         ,   base_type(_base)
+        ,   source_loc(_loc)
         {}
         
         WrapperKind get_kind() const noexcept;

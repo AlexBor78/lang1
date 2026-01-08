@@ -7,19 +7,28 @@
 
 namespace common::diagnostic
 {
+    /**
+     * @brief build error messages
+     * @deprecated will be moved to lang module
+     * @todo move to lang module. rewrite implementation (impl now is shit)
+     */
     class DiagnosticBuilder
     {
     private: // vars
         common::utils::Logger logger{common::utils::Logger::LogLevel::ALL};
+        std::string error_message;
         std::string builded_msg;
-        bool is_builded{false}; 
         common::SourceLocation pos;
+        bool is_builded{false};
     
     private: // api
         void init_logger(std::string_view name = ""
         ,                common::utils::Logger::LogLevel level = common::utils::Logger::LogLevel::ALL);
 
+        
+
     public: // api
+        std::string build();
         std::string build(std::string_view);
         explicit DiagnosticBuilder(std::string_view name = ""
         ,                          const common::SourceLocation& _pos = {}

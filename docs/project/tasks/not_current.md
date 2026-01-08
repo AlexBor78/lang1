@@ -20,9 +20,22 @@ just list of all task, just to not forget :)
 - [ ] add colors to builded errors
 - [ ] add syntax highlight
 
+### AST
+improve structure with MI (multiple inherit)    
+- [ ] make more base node
+    - [ ] KeywordStmt
+    - [X] StructureStmt
+    - [ ] StmtWithCond
+- [ ] use them to create concrete nodes
+    - [ ] IfStmt with StructureStmt, StmtWithCond, KeywordStmt
+    - [ ] ElseStmt with StructureStmt, KeywordStmt 
+    - [ ] etc
+
 ### Syntax
 - [ ] Lexer
     - [ ] extend literals (0xFF, unicode, \xFF, etc)
+- [ ] Parser
+    - [ ] save import_list
 
 ### pipeline - drivers which control process of compilation
 - [X] SyntaxDriver - Lexer + parser
@@ -54,6 +67,10 @@ just list of all task, just to not forget :)
 
     - [ ] Semantic analyze
         - [X] Modules phase
+        <!-- 
+            ImportsCollector(better name for ImportAnalyzer) will be removed,
+            bcs easier to save imports_list in parser.
+         -->
             - [X] ImportAnalyzers - process ast return all imported modules
             - [ ] SymbolsCollector - collect all symbol declarations
             

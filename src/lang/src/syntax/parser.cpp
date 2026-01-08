@@ -1,11 +1,9 @@
-// #define PARSER_DEBUG
-
-#include <cstdio>
 #include <format>
-#include <string>
 #include <lang/utils/syntax_utils.h>
 #include <lang/utils/ast_utils.h>
 #include <lang/syntax/parser.h>
+
+// #define PARSER_DEBUG
 
 namespace lang::syntax::parser
 {
@@ -37,12 +35,9 @@ namespace lang::syntax::parser
     }
 
 // private api
-    
-    void Parser::reset_state() {
-        tokens = nullptr;
-        // module_declared = false;
-        success = true;
-        pos = 0;
+
+    void Parser::init() {
+        init_logger();
     }
 
     void Parser::init_logger() {
@@ -52,22 +47,30 @@ namespace lang::syntax::parser
         #else
             logger.set_level(common::utils::Logger::LogLevel::INFO | common::utils::Logger::LogLevel::WARN | common::utils::Logger::LogLevel::ERROR);
         #endif
-        logger.set_level(common::utils::Logger::LogLevel::ALL); // just for now
+        // logger.set_level(common::utils::Logger::LogLevel::ALL); // just for now
+    }
+    
+    void Parser::reset_state() {
+        tokens = nullptr;
+        success = true;
+        pos = 0;
+
+        types_context.clear();
+        export_list.clear();
+        extern_list.clear();
     }
 
     void Parser::breakpoint() {
         #ifdef PARSER_DEBUG
-            debug_break();
+            common::debug_break();
         #endif
     }
 
     bool Parser::is_end(size_t n) const {
         if(!tokens) throw tokens_nullptr();
         if(n == 0) throw is_end_with_zero();
-        // tokens->size() - 1 bcs of END token
-        // but end is not adding by lexer yet :)
-
-        return pos + n >= tokens->size();
+        // fix that shit
+        return pos + (n - 1) >= tokens->size();
     }
 
     void Parser::save_type_to_context(ast::DeclStmt* node, std::unique_ptr<AbstractType> type) {
@@ -112,6 +115,7 @@ namespace lang::syntax::parser
 
     ast::StmtPtr Parser::process_token() {
         breakpoint(); logger.debug("proccess_token()");
+        if(is_end()) throw end_reached();
         if(!is_end() && match(TokenType::END)) throw end_reached();
         if(!is_end() && match(TokenType::SEMICOLON)) skip(); // todo: warning: "extra semicolon"
         return process_stmt();
@@ -130,16 +134,23 @@ namespace lang::syntax::parser
         // modules
         // import
         if(!is_end() && match(TokenType::IMPORT)) {
+            auto pos = peek().pos;
             auto node = process_import_stmt();
+            if(!is_end()) pos.merge(peek().pos); // merging semicolon
             process_semicolon();
+            node->set_source_pos(pos);
             return std::move(node);
         }
         // export import
         if(!is_end(2) 
         && match(TokenType::EXPORT)
         && match(TokenType::IMPORT, 1)) { skip(); // skip export
+            auto export_pos = peek().pos;
+            auto import_pos = peek().pos;
             auto node = process_import_stmt();
+            if(!is_end()) import_pos.merge(peek().pos);
             process_semicolon();
+            node->set_source_pos(import_pos);
             extern_list.emplace(node.get());
             return std::move(node);
         }
@@ -159,7 +170,9 @@ namespace lang::syntax::parser
         if(!is_end() && match(TokenType::BREAK)) throw break_is_not_suported();
         if(!is_end() && match(TokenType::CONTINUE)) throw continue_is_not_suported();
         if(!is_end() && match(TokenType::RETURN)) {
+            auto loc = peek().pos;
             auto node = process_return_stmt();
+            if(!is_end()) loc.merge(peek().pos);
             process_semicolon();
             return std::move(node);
         }
@@ -184,18 +197,21 @@ namespace lang::syntax::parser
             is_relative = true;
         }
 
+
         std::vector<std::string> path;
         if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_module_name();
-        path.emplace_back(advance().sym);
+        auto path_loc = peek().pos;
 
+        path.emplace_back(advance().sym);
         while(!is_end() && match(TokenType::DOUBLECOLON)) { skip(); // skip ::
             if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_submodule_name();
+            path_loc.merge(peek().pos);
             path.emplace_back(advance().sym);
-        }
+        }   
 
         return std::make_unique<ast::ImportStmt>(SymbolPath{
             .path = std::move(path)
-        }, is_relative);
+        }, is_relative, path_loc);
     }
 
     // types stmts - unsupported for now
@@ -204,6 +220,8 @@ namespace lang::syntax::parser
 
     std::unique_ptr<ast::IfStmt> Parser::process_if_stmt() {
         breakpoint(); logger.debug("proccess_if_stmt()");
+        auto loc = peek().pos;
+        auto word_loc = peek().pos;
         skip(); // skip IF tok
 
         // condition
@@ -219,23 +237,40 @@ namespace lang::syntax::parser
         if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
         else body = process_token();
 
-        return std::make_unique<ast::IfStmt>(std::move(cond), std::move(body));
+        if(body->get_source_pos() != common::SourceLocation()) loc.merge(body->get_source_pos());
+
+        return std::make_unique<ast::IfStmt>(
+            std::move(cond), 
+            std::move(body), 
+            std::move(word_loc),
+            std::move(loc)
+        );
     }
 
     std::unique_ptr<ast::ElseStmt> Parser::process_else_stmt() {
         breakpoint(); logger.debug("proccess_else_stmt()");
-        skip(); // skip IF tok
+        auto loc = peek().pos;
+        auto word_loc = peek().pos;
+        skip(); // skip ELSE tok
 
         // body
         ast::StmtPtr body{nullptr};
         if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
         else body = process_token();
 
-        return std::make_unique<ast::ElseStmt>(std::move(body));
+        if(body->get_source_pos() != common::SourceLocation()) loc.merge(body->get_source_pos());
+
+        return std::make_unique<ast::ElseStmt>(
+            std::move(body),
+            std::move(word_loc),
+            std::move(loc)
+        );
     }
 
     std::unique_ptr<ast::ForStmt> Parser::process_for_stmt() {
         breakpoint(); logger.debug("proccess_for_stmt()");
+        auto loc = peek().pos;
+        auto word_loc = peek().pos;
         skip(); // skip IF tok
 
         if(!(!is_end() && match(TokenType::LPAREN))) throw expected_lparen();
@@ -262,11 +297,22 @@ namespace lang::syntax::parser
         if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
         else body = process_token();
 
-        return std::make_unique<ast::ForStmt>(std::move(decl), std::move(cond), std::move(incr), std::move(body));
+        if(body->get_source_pos() != common::SourceLocation()) loc.merge(body->get_source_pos());
+
+        return std::make_unique<ast::ForStmt>(
+            std::move(decl),
+            std::move(cond),
+            std::move(incr),
+            std::move(body),
+            std::move(word_loc),
+            std::move(loc)
+        );
     }
 
     std::unique_ptr<ast::WhileStmt> Parser::process_while_stmt() {
         breakpoint(); logger.debug("proccess_while_stmt()");
+        auto loc = peek().pos;
+        auto word_loc = peek().pos;
         skip(); // skip IF tok
 
         // condition
@@ -282,7 +328,13 @@ namespace lang::syntax::parser
         if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
         else body = process_token();
 
-        return std::make_unique<ast::WhileStmt>(std::move(cond), std::move(body));
+        if(body->get_source_pos() != common::SourceLocation()) loc.merge(body->get_source_pos());
+        return std::make_unique<ast::WhileStmt>(
+            std::move(cond),
+            std::move(body),
+            std::move(word_loc),
+            std::move(loc)
+        );
     }
 
     // other stmts
@@ -293,11 +345,12 @@ namespace lang::syntax::parser
         
         auto block = std::make_unique<ast::BlockStmt>();
 
-        skip(); // skip '{'
+        auto loc = advance().pos;  // skip '{'
         while(!is_end() && !match(TokenType::RBRACE)) block->add_tobody(process_token());
         if(!is_end() && !match(TokenType::RBRACE)) throw expected_rbrace();
-        skip(); // '}'
+        loc.merge(advance().pos); // '}'
 
+        block->set_source_pos(loc);
         return std::move(block);
     }
 
@@ -423,24 +476,41 @@ namespace lang::syntax::parser
     std::unique_ptr<AbstractType> Parser::process_type() {
         breakpoint(); logger.debug("process_type()");
 
+        auto loc = peek().pos;
         if(!is_end() && match(TokenType::AMPERSAND)) { skip();
-            return std::make_unique<WrapperType>(WrapperType::WrapperKind::REFERENCE, process_type());
+            return std::make_unique<WrapperType>(
+                WrapperType::WrapperKind::REFERENCE,
+                process_type(),
+                loc
+            );
         }
 
         if(!is_end() && match(TokenType::STAR)) { skip();
-            return std::make_unique<WrapperType>(WrapperType::WrapperKind::POINTER, process_type());
+            return std::make_unique<WrapperType>(
+                WrapperType::WrapperKind::POINTER,
+                process_type(),
+                loc
+            );
         }
 
         if(!is_end() && match(TokenType::CONST)) { skip();
-            return std::make_unique<WrapperType>(WrapperType::WrapperKind::CONST, process_type());
+            return std::make_unique<WrapperType>(
+                WrapperType::WrapperKind::CONST,
+                process_type(),
+                loc
+            );
         }
 
         if(!is_end() && match(TokenType::MUTABLE)) { skip();
-            return std::make_unique<WrapperType>(WrapperType::WrapperKind::MUTABLE, process_type());
+            return std::make_unique<WrapperType>(
+                WrapperType::WrapperKind::MUTABLE,
+                process_type(),
+                loc
+            );
         }
         
         if(!is_end() && match(TokenType::IDENTIFIER)) {
-            return std::make_unique<UnresolvedType>(advance().sym);
+            return std::make_unique<UnresolvedType>(advance().sym, loc);
         }
 
         /*
@@ -470,19 +540,22 @@ namespace lang::syntax::parser
             
             return std::make_unique<FunctionType>(
                 std::move(args_types),
-                std::move(return_type)
+                std::move(return_type),
+                loc
             );
         } throw unexpected_token();
     }
 
     std::unique_ptr<ast::DeclVariable> Parser::process_variable_decl() {
         breakpoint(); logger.debug("process_variable_decl()");
+        auto loc = peek().pos;
 
         // get type of variable
         auto type = process_type();
 
         // save variable name
         if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_variable_name();
+        auto name_loc = peek().pos;
         auto name = advance().sym;
 
         // if variable has initialization
@@ -492,23 +565,38 @@ namespace lang::syntax::parser
         // check for stack also, so <- will not used as =
         &&  match(TokenType::STACK, 1)))) {skip(); // skip = or <-
             auto init_expr = process_expr();
-            auto node = std::make_unique<ast::DeclVariable>(name, std::move(init_expr));
+            if(init_expr->get_source_pos() != common::SourceLocation()) loc.merge(init_expr->get_source_pos());
+            auto node = std::make_unique<ast::DeclVariable>(
+                name,
+                name_loc,
+                std::move(init_expr),
+                loc
+            );
             save_type_to_context(node.get(), std::move(type));
             return std::move(node);
         }
 
-        auto node = std::make_unique<ast::DeclVariable>(name);
+        // can merge just to name loc, here no init expr 
+        loc.merge(name_loc);
+        auto node = std::make_unique<ast::DeclVariable>(
+            name,
+            name_loc,
+            nullptr,
+            loc
+        );
         save_type_to_context(node.get(), std::move(type));
         return std::move(node);
     }
 
     std::unique_ptr<ast::DeclFunction> Parser::process_function_decl() {
         breakpoint(); logger.debug("process_function_decl()");
+        auto loc = peek().pos;
         
         auto type = process_type();
 
         // save name
         if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_function_name();
+        auto name_loc = peek().pos;
         auto name = advance().sym;
 
         
@@ -526,19 +614,36 @@ namespace lang::syntax::parser
         skip(); // skip ')'
 
         // if forward declaration
-        if(!is_end() && match(TokenType::SEMICOLON)) { skip(); // skip ';'
-            auto node = std::make_unique<ast::DeclFunction>(name, std::move(args), nullptr);
+        if(!is_end() && match(TokenType::SEMICOLON)) { 
+            loc.merge(advance().pos); // skip ';'
+            auto node = std::make_unique<ast::DeclFunction>(
+                name, 
+                std::move(args), 
+                std::move(name_loc),
+                nullptr,
+                std::move(loc)
+            );
             save_type_to_context(node.get(), std::move(type));
             return std::move(node);
         } 
         
-        auto node = std::make_unique<ast::DeclFunction>(name, std::move(args), process_scope());
+        auto body = process_scope();
+        if(body->get_source_pos() != common::SourceLocation()) loc.merge(body->get_source_pos());
+        auto node = std::make_unique<ast::DeclFunction>(
+            name,
+            std::move(args),
+            std::move(name_loc),
+            std::move(body),
+            std::move(loc)
+        );
         save_type_to_context(node.get(), std::move(type));
         return std::move(node);
     }
 
     // exprs
 
+    // TODO:
+    // can process location for ALL expr just here 
     std::unique_ptr<ast::ExprNode> Parser::process_expr() {
         breakpoint(); logger.debug("process_expr");
         if(!is_end() && match(TokenType::STACK)) return process_stackalloc_expr();
@@ -551,18 +656,22 @@ namespace lang::syntax::parser
         if(!is_end() && !match(TokenType::LBRACKET)) throw expected_lbracket();
 
         std::vector<size_t> dimensions;
-        while(!is_end() && match(TokenType::LBRACKET)) { skip(); // skip [
+        std::vector<common::SourceLocation> locs;
+        while(!is_end() && match(TokenType::LBRACKET)) { 
+            auto loc = advance().pos; // skip [
             if(!is_end() && !match(TokenType::NUMBER)) throw expected_number();
             dimensions.emplace_back(std::stoull(advance().sym));
             if(!is_end() && !match(TokenType::RBRACKET)) throw expected_rbracket();
-            skip(); // skip ]
+            loc.merge(advance().pos); // skip ]
+            locs.emplace_back(loc);
         }
 
         // check for initialization
         if(!is_end() && match(TokenType::ASSIGN)) throw stack_initialization_not_supported();
 
         return std::make_unique<ast::StackAllocExpr>(
-            std::move(dimensions)
+            std::move(dimensions),
+            std::move(locs)
         );
     }
     
@@ -575,8 +684,13 @@ namespace lang::syntax::parser
         auto left = process_logical_expr();
         if(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
-            if(utils::is_assign_op(op)) { skip(); // skip op
-                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_assign_expr());
+            if(utils::is_assign_op(op)) { auto op_loc = advance().pos; // skip op
+                return std::make_unique<ast::BinOpExpr>(
+                    op,
+                    std::move(left),
+                    process_assign_expr(),
+                    std::move(op_loc)
+                );
             }   
         } return std::move(left);
     }
@@ -585,8 +699,13 @@ namespace lang::syntax::parser
         auto left = process_compare_expr();
         while(!is_end(1) &&  utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
-            if(utils::is_logical_op(op)) { skip(); // skip op
-                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_compare_expr());
+            if(utils::is_logical_op(op)) { auto op_loc = advance().pos; // skip op
+                return std::make_unique<ast::BinOpExpr>(
+                    op,
+                    std::move(left),
+                    process_compare_expr(),
+                    std::move(op_loc)
+                );
             } else break;
         } return std::move(left);
     }
@@ -595,8 +714,12 @@ namespace lang::syntax::parser
         auto left = process_additive_expr();
         while(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
-            if(utils::is_compare_op(op)) { skip(); // skip op
-                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_additive_expr());
+            if(utils::is_compare_op(op)) { auto op_loc = advance().pos; // skip op
+                return std::make_unique<ast::BinOpExpr>(op,
+                    std::move(left),
+                    process_additive_expr(),
+                    std::move(op_loc)
+                );
             } else break;
         } return std::move(left);
     }
@@ -605,8 +728,13 @@ namespace lang::syntax::parser
         auto left = process_multiple_expr();
         while(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
-            if(utils::is_add_op(op)) { skip(); // skip op
-                return std::make_unique<ast::BinOpExpr>(op, std::move(left), process_multiple_expr());
+            if(utils::is_add_op(op)) { auto op_loc = advance().pos; // skip op
+                return std::make_unique<ast::BinOpExpr>(
+                    op,
+                    std::move(left),
+                    process_multiple_expr(),
+                    std::move(op_loc)
+                );
             } else break;
         } return std::move(left);
     }
@@ -626,8 +754,12 @@ namespace lang::syntax::parser
         // PREfix op
         if(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
-            if(utils::is_prefix_op(op)) { skip(); // skip op
-                return std::make_unique<ast::PrefixUnaryOpExpr>(op, process_primary_expr());
+            if(utils::is_prefix_op(op)) { auto op_loc = advance().pos; // skip op
+                return std::make_unique<ast::PrefixUnaryOpExpr>(
+                    op,
+                    process_primary_expr(),
+                    std::move(op_loc)
+                );
             } throw expected_unary_op(); // bcs only prefix operator can be here
         }
 
@@ -635,17 +767,23 @@ namespace lang::syntax::parser
 
         // POSTfix op
         if(!is_end(1) && utils::is_operator(peek().ty)) {
+            auto op_loc = peek().pos;
             auto op = utils::token_to_op(peek().ty);
-            if(utils::is_postfix_op(op)) return std::make_unique<ast::PostfixUnaryOpExpr>(utils::token_to_op(advance().ty), std::move(node));
-            // throw expected_postfix_op(); conflict with binary operators
+            if(utils::is_postfix_op(op)) return std::make_unique<ast::PostfixUnaryOpExpr>(
+                utils::token_to_op(advance().ty),
+                std::move(node),
+                std::move(op_loc)
+            ); // throw expected_postfix_op(); conflict with binary operators
         } return std::move(node);
     }
     std::unique_ptr<ast::ExprNode> Parser::process_primary_expr() {
         breakpoint(); logger.debug("process_primary_expr()");
-        if(!is_end() && match(TokenType::LPAREN)) { skip(); // skip '('
+        if(!is_end() && match(TokenType::LPAREN)) {
+            auto node_loc = advance().pos; // skip '('
             auto node = process_expr();
             if(!is_end() && !match(TokenType::RPAREN)) throw expected_rparen();
-            skip(); // skip ')'
+            node_loc.merge(advance().pos); // skip ')'
+            node->set_source_pos(std::move(node_loc));
             return std::move(node);
         }
         if(!is_end() && match(TokenType::IDENTIFIER)) return process_name();
@@ -666,18 +804,27 @@ namespace lang::syntax::parser
 
     std::unique_ptr<ast::SymbolPathExpr> Parser::process_symbol_path() {
         breakpoint(); logger.debug("process_namespace_expr()");
+
+        auto name_loc = peek().pos;
         std::string name = advance().sym;
         
         // useless - already checked by process_name() to call this
         // if(!is_end() && !match(TokenType::DOUBLECOLON)) throw expected_doublecolon();
         skip(); // skip '::'
 
-        return std::make_unique<ast::SymbolPathExpr>(name, process_name());
+        return std::make_unique<ast::SymbolPathExpr>(
+            name,
+            process_name(),
+            std::move(name_loc)
+        );
     }
 
     std::unique_ptr<ast::FunctionExpr> Parser::process_function_expr() {
         breakpoint(); logger.debug("process_function_expr()");
         if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_function_name();
+
+        auto name_loc = peek().pos;
+        auto node_loc = name_loc;
         std::string name = advance().sym;
 
         // useless - already checked by process_name() to call this
@@ -692,15 +839,24 @@ namespace lang::syntax::parser
             if(!is_end() && !match(TokenType::COMMA)) throw expected_comma();
             skip(); // skip comma
         } if(is_end()) throw expected_rparen();
-        skip(); // skip ')'
-        return std::make_unique<ast::FunctionExpr>(name, std::move(args));
+        node_loc.merge(advance().pos); // skip ')'
+        return std::make_unique<ast::FunctionExpr>(
+            std::string_view(name),
+            std::move(args),
+            std::move(name_loc),
+            std::move(node_loc)
+        );
     }
 
     std::unique_ptr<ast::VariableExpr> Parser::process_variable_expr() {
         breakpoint(); logger.debug("process_variable_expr()");
         if(!is_end(1) && !match(TokenType::IDENTIFIER)) throw expected_variable_name();
+        auto name_loc = peek().pos;
         std::string name = advance().sym;
-        return std::make_unique<ast::VariableExpr>(name);;
+        return std::make_unique<ast::VariableExpr>(
+            name,
+            std::move(name_loc)
+        );
     }
 
     // literals
@@ -722,21 +878,30 @@ namespace lang::syntax::parser
         breakpoint(); logger.debug("process_number_literal()");
         // useless - already checked by process_literal() to call this
         // if(!is_end() && !match(TokenType::NUMBER)) throw expected_number();
-        return std::make_unique<ast::NumberLiteral>(advance().sym);
+        return std::make_unique<ast::NumberLiteral>(
+            peek().sym,
+            advance().pos
+        );
     }
 
     std::unique_ptr<ast::StringLiteral> Parser::process_string_literal() {
         breakpoint(); logger.debug("process_string_literal()");
         // useless - already checked by process_literal() to call this
         // if(!is_end() && !match(TokenType::STRING)) throw expected_string();
-        return std::make_unique<ast::StringLiteral>(advance().sym);
+        return std::make_unique<ast::StringLiteral>(
+            peek().sym,
+            advance().pos
+        );
     }
 
     std::unique_ptr<ast::BoolLiteral> Parser::process_bool_literal() {
         breakpoint(); logger.debug("process_bool_literal()");
         // useless - already checked by process_literal() to call this
         // if(!is_end() && !match(TokenType::TRUE) || !match(TokenType::FALSE)) throw expected_bool();
-        return std::make_unique<ast::BoolLiteral>(advance().sym);
+        return std::make_unique<ast::BoolLiteral>(
+            peek().sym,
+            advance().pos
+        );
     }
 
 // diagnostic creating

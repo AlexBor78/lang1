@@ -45,12 +45,15 @@ namespace lang::ast
     {
     private:
         StmtPtr body;
+        common::SourceLocation keyword_loc;
 
     protected:
         explicit StructureStmt(StmtPtr _body
+        ,                      common::SourceLocation _word_loc = default_pos()
         ,                      common::SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
         ,   body(std::move(_body))
+        ,   keyword_loc(_word_loc)
         {}
 
     public:
@@ -59,6 +62,8 @@ namespace lang::ast
 
         const StmtNode* get_body() const;
         StmtNode* get_body();
+
+        const common::SourceLocation& get_keyword_loc() const noexcept;
     };
 
     class StructureStmtWithCond : public StructureStmt
@@ -69,8 +74,10 @@ namespace lang::ast
     protected:
         StructureStmtWithCond(ExprPtr _cond
         ,                     StmtPtr _body
+        ,                     common::SourceLocation _word_loc = default_pos()
         ,                     common::SourceLocation _pos = default_pos()
         ):  StructureStmt(std::move(_body)
+            ,             std::move(_word_loc)
             ,             std::move(_pos)
             )
         ,   cond(std::move(_cond))
@@ -89,9 +96,11 @@ namespace lang::ast
     public:
         IfStmt(ExprPtr _cond
         ,      StmtPtr _body
+        ,      common::SourceLocation _word_loc = default_pos()
         ,      common::SourceLocation _pos = default_pos()
         ):  StructureStmtWithCond(std::move(_cond)
             ,                     std::move(_body)
+            ,                     std::move(_word_loc)
             ,                     std::move(_pos)
             )
         {}
@@ -104,8 +113,10 @@ namespace lang::ast
     {
     public:
         explicit ElseStmt(StmtPtr _body
+        ,                 common::SourceLocation _word_loc = default_pos()
         ,                 common::SourceLocation _pos = default_pos()
         ):  StructureStmt(std::move(_body)
+            ,             std::move(_word_loc)
             ,             std::move(_pos)
             )
         {}
@@ -125,9 +136,11 @@ namespace lang::ast
         ,       ExprPtr _cond
         ,       StmtPtr _incr
         ,       StmtPtr _body
+        ,       common::SourceLocation _word_loc = default_pos()
         ,       common::SourceLocation _pos = default_pos()
         ):  StructureStmtWithCond(std::move(_cond)
             ,             std::move(_body)
+            ,             std::move(_word_loc)
             ,             std::move(_pos)
             )
         ,   decl(std::move(_decl))
@@ -139,6 +152,7 @@ namespace lang::ast
 
         const StmtNode* get_decl() const;
         StmtNode* get_decl();
+
         const StmtNode* get_incr() const;
         StmtNode* get_incr();
     };
@@ -148,9 +162,11 @@ namespace lang::ast
     public:
         WhileStmt(ExprPtr _cond
         ,         StmtPtr _body
+        ,         common::SourceLocation _word_loc = default_pos()
         ,         common::SourceLocation _pos = default_pos()
         ):  StructureStmtWithCond(std::move(_cond)
             ,             std::move(_body)
+            ,             std::move(_word_loc)
             ,             std::move(_pos)
             )
         {}
@@ -163,12 +179,15 @@ namespace lang::ast
     {
     private:
         std::string name;
+        common::SourceLocation name_loc;
 
     protected:
         DeclStmt(std::string_view _name
+        ,        common::SourceLocation _name_loc = default_pos()
         ,        common::SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
         ,   name(_name)
+        ,   name_loc(_name_loc)
         {}
 
     public:
@@ -176,15 +195,19 @@ namespace lang::ast
         virtual void accept(ASTVisitor&) noexcept override = 0;
 
         std::string_view get_name() const noexcept;
+        const common::SourceLocation& get_name_loc() const noexcept;
     };
     
     class DeclName : public DeclStmt
     {
     protected:
         DeclName(std::string_view _name
+        ,        common::SourceLocation _name_loc = default_pos()
         ,        common::SourceLocation _pos = default_pos()
         ):  DeclStmt(_name
-            ,        std::move(_pos))
+            ,        std::move(_name_loc)
+            ,        std::move(_pos)
+            )
         {}
 
     public:
@@ -201,9 +224,11 @@ namespace lang::ast
 
     public:
         explicit DeclVariable(std::string_view _name
+        ,                common::SourceLocation _name_loc = default_pos()
         ,                ExprPtr _init = nullptr
         ,                common::SourceLocation _pos = default_pos()
         ):  DeclName(_name
+            ,        std::move(_name_loc)
             ,        std::move(_pos)
             )
         ,   init_expr(std::move(_init))
@@ -219,15 +244,16 @@ namespace lang::ast
     {
     private:
         std::vector<std::unique_ptr<DeclVariable>> args;
-        bool it_extern{false};
         StmtPtr body;
 
     public:
         DeclFunction(std::string_view _name
-        ,        std::vector<std::unique_ptr<DeclVariable>> _args = {}
+        ,        std::vector<std::unique_ptr<DeclVariable>> _args
+        ,        common::SourceLocation _name_loc = default_pos()
         ,        StmtPtr _body = nullptr
         ,        common::SourceLocation _pos = default_pos()
         ):  DeclName(_name
+            ,        std::move(_name_loc)
             ,        std::move(_pos)
             )
         ,   args(std::move(_args))
@@ -244,24 +270,29 @@ namespace lang::ast
     class ImportStmt : public StmtNode
     {
     private:
+        common::SourceLocation name_loc;
         SymbolPath path;
         bool m_is_relative;
         
     public:
         explicit ImportStmt(std::string_view _imported
         ,                   bool _relative = false
+        ,                   common::SourceLocation _name_pos = default_pos()
         ,                   common::SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
         ,   path{.path = {std::string(_imported)}}
         ,   m_is_relative(_relative)
+        ,   name_loc(_name_pos)
         {}
 
         explicit ImportStmt(SymbolPath _imported
         ,                   bool _relative = false
+        ,                   common::SourceLocation _name_pos = default_pos()
         ,                   common::SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
         ,   path(std::move(_imported))
         ,   m_is_relative(_relative)
+        ,   name_loc(_name_pos)
         {}
 
         virtual void accept(ConstASTVisitor&) const noexcept override;
@@ -274,12 +305,24 @@ namespace lang::ast
 
         const SymbolPath& get_path() const noexcept;
         bool is_relative() const noexcept;
+
+        /**
+         * @brief Get the module path location in source code
+         * @return common::SourceLocation 
+         */
+        common::SourceLocation get_name_location();
+
+        /**
+         * @brief Set the module path location in source code
+         */
+        void set_name_location();
     };
 
     class ReturnStmt : public StmtNode
     {
     private:
         ExprPtr ret_expr{nullptr};
+        
     public:
         explicit ReturnStmt(ExprPtr _ret = nullptr
         ,                   common::SourceLocation _pos = default_pos()

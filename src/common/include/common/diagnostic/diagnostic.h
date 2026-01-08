@@ -15,7 +15,7 @@ namespace common::diagnostic
             msg(_msg)
         {}
     
-    public: // part of future api (will impl in inheritors)
+    public:
         virtual ~Diagnostic() = default;
         Diagnostic(const Diagnostic& other) {
             msg = other.msg;
@@ -45,17 +45,11 @@ namespace common::diagnostic
         {}
     };
 
-
     class Warn : public Diagnostic
     {
-    protected: // vars
+    protected:
         Warn(std::string_view _msg): 
             Diagnostic(_msg)
-        {}
-
-    public: // part of future api (will impl in inheritors)
-        Warn(const Warn& e): 
-            Warn(e.what())
         {}
     };   
 }
