@@ -7,7 +7,7 @@
 
 #include <lang/semantic/types/typesystem.h>
 
-// bcf of that include clang going crazy, but code still WORK
+// bcf of that include clangd going crazy, but code still WORK
 // #include <lang/semantic/types/identifier.h>
 
 namespace lang::semantic 

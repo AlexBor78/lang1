@@ -9,8 +9,7 @@
 #include <common/common.h>
 
 /**
- * @todo move to lang::semantic namespace
- * 
+ * @todo move to lang::semantic namespace or something like that
  */
 namespace lang
 {

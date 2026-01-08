@@ -7,7 +7,7 @@
 #include <lang/common/symbol_path.h>
 #include <lang/semantic/types/scope.h>
 
-// without that clang going crazy with errors, 
+// without that clangd going crazy with errors, 
 // but code still compile IF include that file
 #include <lang/semantic/types/identifier.h>
 
@@ -45,6 +45,13 @@ namespace lang::semantic
             std::unordered_set<ast::BaseNode*> exports = {}
         );
 
+        ModuleID id;
+
+        /**
+         * @brief path to module from global scope
+         * @deprecated stored in id, save for now
+         * @todo remove path from Module structure
+         */
         SymbolPath path;
         ast::AST ast;
 
@@ -55,9 +62,8 @@ namespace lang::semantic
         std::vector<ModuleID> dependencies;
         std::unique_ptr<Scope> scope{nullptr};
 
-        /**
+        /**std::unordered_set<ast::BaseNode*> export_list;
          * @brief temporary list for exports, then it will be in scopes
-         * 
          */
         std::unordered_set<ast::BaseNode*> export_list;
 

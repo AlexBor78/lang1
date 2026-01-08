@@ -22,7 +22,7 @@ namespace lang::semantic
     class SemanticState {
     public:
         Program program;
-        SemanticContext context; // for anonymous BlockStmt
+        SemanticContext context;
         Scope* curr_scope{nullptr};
 
     public: // api
@@ -41,6 +41,14 @@ namespace lang::semantic
         void leave_scope();
     };
 
+    /**
+     * @brief Initialize semantic types
+     * @todo update SemanticInitializer as in note
+     * @note i think this should be separated visitor, that initializing everything
+             why:
+                - to create scopes, it needs to go over the ast
+                - more consistence usage in SemanticDrivers
+     */
     class SemanticInitializer
     {
     public:

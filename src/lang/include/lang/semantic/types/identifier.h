@@ -1,5 +1,6 @@
 #pragma once
 
+#include "lang/common/symbol_path.h"
 #include <memory>
 #include <lang/ast/ast.h>
 #include <lang/semantic/types/scope.h>
@@ -13,7 +14,7 @@ namespace lang::semantic
             VARIABLE,
             FUNCTOIN,
             TYPE,
-            NAMESPACE
+            MODULE
         };
     public:
         static std::unique_ptr<Identifier> create(
@@ -27,7 +28,14 @@ namespace lang::semantic
         Kind kind;
         ast::DeclStmt* decl{nullptr};
 
-        // for namespace or function
+        /**
+         * @brief path to identifier from global scope
+         */
+        SymbolPath full_name;
+
+        /**
+         * @brief for module or function (and structs in future i think)
+         */
         std::unique_ptr<Scope> inner{nullptr};
 
         Identifier(std::string_view _name

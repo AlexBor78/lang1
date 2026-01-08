@@ -25,6 +25,6 @@
 
 ## Tasks:
 - [X] remove noexcept from ast visitors
-- [ ] reorganize codes in files (specifically semantic types like scope, module, etc)
-- [ ] may be change semantic types a little bit if needed.
+- [X] may be change semantic types a little bit if needed.
+- [ ] write SemanticInitializers (rewrite)
 - [ ] update SymbolCollector (there are some code already, and it is outdated a little bit)
