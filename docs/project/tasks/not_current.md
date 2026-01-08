@@ -21,6 +21,7 @@ just list of all task, just to not forget :)
 ### other
 - [ ] use FileLocation in streams instead of SourceLocation
 - [ ] save line_start index(in symbols) in FileLocation to easier code in diagnostic builder
+- [ ] update and improve PrintAST.
 
 ### Diagnostic
 - [ ] lazy generating error (not needed yet, will need in future)
@@ -62,40 +63,8 @@ improve structure with MI (multiple inherit)
     - [ ] Codegen 
 
 ### semantic
-<!-- DOCUMENTATION DOWN -->
-<!-- TODO: move to documentation -->
-- Semantic phases:
-    1. Modules - build ast for every module in project, and then collect all symbols
-    2. Names - check if name exist
-    3. types - fill TypeTable with types, check if types exists, fill types context
-    4. Optimize
-<!-- DOCUMENTATION UP -->
 
-- [ ] fix problems founded
-    - [ ] remove noexcept from ast visitors
-
-- [ ] create semantic analyzers
-    - [X] ProgramInitializer (Program name, global_scope, etc)
-
-    - [ ] Semantic analyze
-        - [X] Modules phase
-        <!-- 
-            ImportsCollector(better name for ImportAnalyzer) will be removed,
-            bcs easier to save imports_list in parser.
-         -->
-            - [X] ImportAnalyzers - process ast return all imported modules
-            - [ ] SymbolsCollector - collect all symbol declarations
-            
-        - [ ] Names phase
-            - [ ] NameChecker check if identifier exists (var and functions)
-
-        - [ ] Types phase
-            - [ ] TypeBuilder - fill TypeTable with types (not supported for now, in future: aliases, structs, enum)
-            - [ ] TypeInitializer - create QualType from SyntaxType (BTW check if  type exists)
-            - [ ] TypeResolver - resolve types (e.g. bool -> int, uint -> int, etc)
-
-        - [ ] optimize phase
-            - [ ] Optimizers (e.g. increment, blockstmt->one-stmt(if possible), etc)
+semantic is now current stage
 
 ## Documentation
 - [^] write doc in code

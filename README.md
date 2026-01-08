@@ -25,7 +25,7 @@ My **Reasons** to create that:
 
 ## Project state
 Currently project is in early development. it cannot compile or execute code yet.
-I've implement Lexer, Parser, common stuff (details [here](./docs/project/tasks/archive.md) and [here](./docs/project/tasks/not_current.md));
+I've implemented Lexer, Parser, common stuff (details [here](./docs/project/tasks/archive.md) and [here](./docs/project/tasks/not_current.md));
 Pipeline, ClI-app, and Semantic is our current target to implement.
 
 ##  How to navigate over the project

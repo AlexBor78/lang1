@@ -12,4 +12,4 @@
 - [X] not working not binary operations (`a + b + c` is ont working, but `a + (b + c)` is working)
 
 ## Diagnostic
-- [ ] usual fail to generate detailed error
+- [X] usual fail to generate detailed error

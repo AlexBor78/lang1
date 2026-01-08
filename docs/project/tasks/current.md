@@ -2,13 +2,29 @@
 
 ## [All tasks list](./not_current.md)
 
-## Current stage
-Right now we finalizing current codebase - fixing some bugs, 
-- [^] fixing some bugs
+<!-- DOCUMENTATION DOWN -->
+<!-- TODO: move to documentation -->
+- Semantic phases:
+    1. Modules - build ast for every module in project, and then collect all symbols
+    2. Names - check if name exist
+    3. types - fill TypeTable with types, check if types exists, fill types context
+    4. Optimize
+<!-- DOCUMENTATION UP -->
+
+## Current stage - semantic stage
+1. clean up existed code
+2. implement base semantic stage
+- [ ] SymbolsCollector - collect all symbol declarations
+- [ ] NameChecker check if identifier exists (var and functions)
+- [ ] TypeBuilder - fill TypeTable with types (not supported for now, in future: aliases, structs, enum)
+- [ ] TypeInitializer - create real types from UnsolvedTypes (BTW check if type exists)
+- [ ] TypeResolver - resolve types (e.g. bool -> int, uint -> int, etc)
+
+- [ ] optinal
+    - [ ] Optimizers (e.g. increment, blockstmt->one-stmt(if possible), etc)
 
 ## Tasks:
-- [X] fix fail of lexer if one-line comment in end of file
-- [X] fix parser error: peak out of range
-- [X] save node pos in parser
-- [X] fix `a + b + c` like exprs
-- [X] fix falling while generating diagnostic message
+- [ ] remove noexcept from ast visitors
+- [ ] reorganize codes in files
+- [ ] may be change semantic types a little bit if needed.
+- [ ] update SymbolCollector (there are some code already, and it is outdated a little bit)

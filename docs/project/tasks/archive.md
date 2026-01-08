@@ -40,6 +40,8 @@
     - [X] scope
     - [X] module
     - [X] program
+    - [X] ProgramInitializer (Program name, global_scope, etc)
+
 
 ## Documentation stage
 - [X] add doxygen
@@ -68,6 +70,13 @@
 - [X] implement new modules (at list everything without increment build)
 - [X] `export import` support
 - [X] stack allocations syntax support
+
+## pre-semantic finalization
+- [X] fix fail of lexer if one-line comment in end of file
+- [X] fix parser error: peak out of range
+- [X] save node pos in parser
+- [X] fix `a + b + c` like exprs
+- [X] fix falling while generating diagnostic message
 
 ## Other
 
