@@ -6,13 +6,14 @@
 namespace lang {
 
     /**
+     * @brief just simple path, without any additional info
      * @todo use hash to optimize 
      */
-    struct SymbolPath {
+    struct SymbolPathRaw {
         std::vector<std::string> path;
         std::string normalized_path;
 
-        bool operator==(const SymbolPath& other) const noexcept {
+        bool operator==(const SymbolPathRaw& other) const noexcept {
             if(normalized_path.empty() || other.normalized_path.empty()) return path == other.path;
             return normalized_path == other.normalized_path;
         }
@@ -32,6 +33,35 @@ namespace lang {
                 normalized_path += path[i];
             } return normalized_path;
         }
+    };
+    /**
+     * @brief temporay, to don't break old code
+     */
+    using SymbolPath = SymbolPathRaw;
+
+    /**
+     * @brief complex path, with absolute and relative paths, and other info
+     * 
+     */
+    struct SymbolPath_
+    {
+        /**
+         * @brief absolute path to symbol
+         * 
+         */
+        SymbolPathRaw absolute_path;
+
+        /**
+         * @brief flag to easier code
+         * 
+         */
+        bool is_relative{false};
+
+        /**
+         * @brief relative path to same symbol as absolute
+         * @note without initialized absolute path can make problems
+         */
+        SymbolPathRaw relative_path;
     };
 }
 

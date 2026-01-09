@@ -28,20 +28,25 @@
 - [X] may be change semantic types a little bit if needed.
 - [X] save export-import to context IN parser
 - [X] remove ImportAnalyzer (basically - ImportsCollector)
-- [ ] may be update SymbolPath Structure
+- [X] clean up files organisation:
+    - [X] move compile_options to common
+    - [X] move compile state to common
+    - [X] move Program to common
+    - [X] create CompileUnit in common
+- [X] update SymbolPath Structure
     (or create one more, that have absolute and relative SymbolPath, and bool flag)
     and use instead of SymbolPath (like FileLocation -> SourceLocation in past)
 - [^] update semantic types architecture
-    - [ ] make `semantic::Identifier` into universal SymbolID in semantic stage (instead of SymbolPath, ModuleID, pointer to node)
-    - [ ] divide `semantic::Module` into 2 separated structure:
-        - [ ] CompileUnit - compile unit. not symbol 
-                use it's own ModuleID
+    - [X] divide `semantic::Module` into 1 separated structure and SymbolID:
+        - [X] CompileUnit - compile unit. not symbol 
+                use it's own UnitID
                 stored in Program data structure
-        - [ ] ModuleSym   - semantic symbol of module (like namespace)
-                use SymbolID
-                stored in GlobalScope
-    - [ ] make GlobalScope(or DeclContext, etc) that used to store all identifiers (using scope, context, TypesTable, etc, and have api)
-        - [ ] store all symbol (AND ModuleSym) in that GlobalScope
+        - [X] ModuleSym   - semantic symbol of module (like namespace)
+                not needed as dedicated structure - SymbolID + context save all data
+    - [X] make `semantic::Identifier` into universal SymbolID in semantic stage (instead of SymbolPath, ModuleID, pointer to node)
+    - [ ] integrate update SymbolPath into existing codebase
+    - [ ] make SymbolsContext that used to store all symbols (using scope, context, TypesTable, etc, and have api)
+        - [ ] store all symbol (AND ModuleSym) in that SymbolsContext
 
 - [ ] write SemanticInitializers (rewrite)
 - [ ] update SymbolCollector (there are some code already, and it is outdated a little bit)

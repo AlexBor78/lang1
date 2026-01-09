@@ -28,7 +28,7 @@ set(sources
 
     # semantic analyzers
     src/semantic/analyzers/semantic_initializer.cpp
-    # src/semantic/analyzers/import_processor.cpp
+    # src/semantic/analyzers/import_processor.cpp # removed
     # src/semantic/analyzers/symbols_collector.cpp # not in use yet
 
     # pipeline

@@ -1,12 +1,12 @@
-// #include <lang/semantic/types/identifier.h>
-// #include <lang/utils/diagnostic.h>
-// #include <lang/semantic/types/scope.h>
+#include <lang/semantic/types/identifier.h>
+#include <lang/utils/diagnostic.h>
+#include <lang/semantic/types/scope.h>
 
 namespace lang::semantic
 {
-    // bool Scope::is_global() const noexcept {
-    //     return parent == nullptr;
-    // }
+    bool Scope::is_global() const noexcept {
+        return parent == nullptr;
+    }
 
     // bool Scope::contains_local(const std::string& name) const noexcept {
     //     return  identifiers.contains(name) || typetable.contains(name);
@@ -45,12 +45,12 @@ namespace lang::semantic
     //     return parent->get_type(name);
     // }
 
-    // const Scope* Scope::get_parent() const noexcept {
-    //     return  parent;
-    // }
-    // Scope* Scope::get_parent() noexcept {
-    //     return  parent;
-    // }
+    const Scope* Scope::get_parent() const noexcept {
+        return  parent;
+    }
+    Scope* Scope::get_parent() noexcept {
+        return  parent;
+    }
 
     // const TypeTable& Scope::get_typetable() const noexcept {
     //     return typetable;

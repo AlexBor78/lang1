@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include <lang/semantic/types/scope.h>
-#include <lang/semantic/types/program.h>
+#include <lang/common/compile/program.h>
 #include <lang/semantic/types/typesystem.h>
 
 namespace lang::semantic

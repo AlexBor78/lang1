@@ -1,9 +1,8 @@
 #pragma once
 
-#include "lang/semantic/types/module.h"
 #include <lang/ast/visitor.h>
 #include <lang/semantic/types/semantic_types.h>
-#include <lang/pipeline/compile_options.h>
+#include <lang/common/compile/options.h>
 
 namespace lang::semantic
 {
@@ -18,13 +17,13 @@ namespace lang::semantic
     class SemanticInitializer : public ast::ConstASTVisitor
     {
     private:
-        const pipeline::CompileOptions* compile_options;
+        const CompileOptions* compile_options;
         SemanticState* semantic_state;
 
         void init_module(Module&);
 
     public:
-        SemanticInitializer(const pipeline::CompileOptions* _compile_options
+        SemanticInitializer(const CompileOptions* _compile_options
         ,                   SemanticState* _semantic_state
         ): compile_options(_compile_options)
         ,  semantic_state(_semantic_state)

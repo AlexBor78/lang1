@@ -11,6 +11,11 @@
 // but code still compile IF include that file
 #include <lang/semantic/types/identifier.h>
 
+
+/**
+ * @brief saved all old code down, will be removes
+ * @todo remove old code
+ */
 namespace lang::semantic
 {
     /**
@@ -36,6 +41,11 @@ namespace lang::semantic
         }
     };
 
+    /**
+     * @brief combination of CompileUnit and ModuleSym
+     * @deprecated will  be removed, and replaced with CompileUnit and 
+     * 
+     */
     struct Module {
 
         /**

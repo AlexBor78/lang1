@@ -1,7 +1,3 @@
-#include "common/diagnostic/diagnostic.h"
-#include "lang/ast/stmt.h"
-#include "lang/semantic/types/module.h"
-#include <cstdio>
 #include <memory>
 #include <string>
 #include <format>

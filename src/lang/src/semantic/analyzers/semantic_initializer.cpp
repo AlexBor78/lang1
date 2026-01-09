@@ -1,41 +1,41 @@
-#include <lang/semantic/analyzers/semantic_initializer.h>
-#include <memory>
+// #include <lang/semantic/analyzers/semantic_initializer.h>
+// #include <memory>
 
 namespace lang::semantic
 {
-    void SemanticInitializer::init() {
-        // initializing context
-        semantic_state->context.scope_context.clear();
-        semantic_state->context.types_context.clear();
-        // extern list is already initialized by ModulesLoader
+    // void SemanticInitializer::init() {
+    //     // initializing context
+    //     semantic_state->context.scope_context.clear();
+    //     semantic_state->context.types_context.clear();
+    //     // extern list is already initialized by ModulesLoader
 
-        // initializing program
-        semantic_state->program.name = compile_options->output_name;
-        semantic_state->program.global_scope = std::make_unique<Scope>();
-        // modules(list) is already initialized by ModulesLoader
+    //     // initializing program
+    //     semantic_state->program.name = compile_options->output_name;
+    //     semantic_state->program.global_scope = std::make_unique<Scope>();
+    //     // modules(list) is already initialized by ModulesLoader
 
-        semantic_state->enter_scope(semantic_state->program.global_scope.get());
-        for(auto& it : semantic_state->program.modules) {
-            init_module(*it.second);
-        }
+    //     semantic_state->enter_scope(semantic_state->program.global_scope.get());
+    //     for(auto& it : semantic_state->program.modules) {
+    //         init_module(*it.second);
+    //     }
 
         
-    }
+    // }
 
-    void SemanticInitializer::init_module(Module& module) {
-        // if module already initialized
-        if(module.interface_scope) return; 
-        module.interface_scope = std::make_unique<Scope>(semantic_state->curr_scope);
-        module.internal_scope = std::make_unique<Scope>(module.interface_scope.get());
+    // void SemanticInitializer::init_module(Module& module) {
+    //     // if module already initialized
+    //     if(module.interface_scope) return; 
+    //     module.interface_scope = std::make_unique<Scope>(semantic_state->curr_scope);
+    //     module.internal_scope = std::make_unique<Scope>(module.interface_scope.get());
         
-        // initializing dependency modules
-        for(auto depid : module.dependencies) init_module(*semantic_state->program.modules[depid]);
+    //     // initializing dependency modules
+    //     for(auto depid : module.dependencies) init_module(*semantic_state->program.modules[depid]);
         
-        // initializing submodules
-        semantic_state->enter_scope(module.interface_scope.get());
-        for(auto subid : module.submodules) init_module(*semantic_state->program.modules[subid]);
-        semantic_state->leave_scope();
-    }
+    //     // initializing submodules
+    //     semantic_state->enter_scope(module.interface_scope.get());
+    //     for(auto subid : module.submodules) init_module(*semantic_state->program.modules[subid]);
+    //     semantic_state->leave_scope();
+    // }
 
 /*
 Types table:

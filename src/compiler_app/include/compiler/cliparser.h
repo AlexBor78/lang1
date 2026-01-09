@@ -4,7 +4,7 @@
 #include <vector>
 #include <string_view>
 
-#include <lang/pipeline/compile_options.h>
+#include <lang/common/compile/options.h>
 
 namespace compiler_app
 {
@@ -18,10 +18,10 @@ namespace compiler_app
 
     class CLIParser {
     public: // api
-        lang::pipeline::CompileOptions process(const std::vector<std::string>&);
+        lang::CompileOptions process(const std::vector<std::string>&);
     
     private: // var
-        lang::pipeline::CompileOptions optoins;
+        lang::CompileOptions optoins;
         std::vector<ParsedFlag> flags;
         
     private: // api

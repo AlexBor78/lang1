@@ -5,10 +5,9 @@
 #include <unordered_set>
 
 #include <lang/pipeline/syntax_driver.h>
-#include <lang/pipeline/compile_state.h>
-#include <lang/pipeline/compile_options.h>
+#include <lang/common/compile/state.h>
+#include <lang/common/compile/options.h>
 #include <lang/semantic/types/semantic_types.h>
-// #include <lang/semantic/analyzers/import_analyzer.h>
 
 constexpr const char FILE_SUFFIX[] = ".lang";
 constexpr size_t FILE_SUFFIX_SIZE = (sizeof(FILE_SUFFIX) - 1);

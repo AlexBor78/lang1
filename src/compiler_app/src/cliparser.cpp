@@ -3,7 +3,7 @@
 #include <compiler/cliparser.h>
 
 namespace compiler_app {
-    lang::pipeline::CompileOptions CLIParser::process(const std::vector<std::string>& args)
+    lang::CompileOptions CLIParser::process(const std::vector<std::string>& args)
     {
         parse(args);
 

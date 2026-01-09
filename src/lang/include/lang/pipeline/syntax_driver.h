@@ -1,8 +1,8 @@
 #pragma once
 
 #include <lang/syntax/syntax_container.h>
-#include <lang/pipeline/compile_state.h>
-#include <lang/pipeline/compile_options.h>
+#include <lang/common/compile/state.h>
+#include <lang/common/compile/options.h>
 #include <lang/semantic/types/semantic_types.h>
 #include <lang/semantic/types/module.h>
 

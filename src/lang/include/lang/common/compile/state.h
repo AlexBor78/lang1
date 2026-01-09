@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_set>
 
-namespace lang::pipeline {
+namespace lang {
     struct CompileState {
         /**
          * @brief list of files already processed

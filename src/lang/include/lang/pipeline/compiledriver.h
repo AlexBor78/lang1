@@ -1,7 +1,7 @@
 #pragma once
 
-#include <lang/pipeline/compile_state.h>
-#include <lang/pipeline/compile_options.h>
+#include <lang/common/compile/state.h>
+#include <lang/common/compile/options.h>
 
 namespace lang::pipeline
 {
