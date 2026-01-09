@@ -2,8 +2,6 @@
 
 #include <cstddef>
 #include <memory>
-#include <unordered_map>
-#include <unordered_set>
 
 #include <lang/ast/ast.h>
 #include <lang/ast/stmt.h>
@@ -27,12 +25,9 @@ namespace lang::syntax::parser
 
     private: // vars
         common::utils::Logger logger{common::utils::Logger::LogLevel::ALL};
-        std::unordered_map<ast::BaseNode*, std::unique_ptr<AbstractType>> types_context;
-        std::unordered_set<ast::BaseNode*> export_list;
-        std::unordered_set<ast::BaseNode*> extern_list;
+        SyntaxContainer syntax_container;
 
         const std::vector<Token>* tokens{nullptr};    
-        // bool module_declared{false}; // deprecated
         bool success{true};
         size_t pos{0};
     
@@ -45,6 +40,8 @@ namespace lang::syntax::parser
         void save_type_to_context(ast::DeclStmt*, std::unique_ptr<AbstractType>);
         void add_to_extern_list(ast::DeclStmt*);
         void add_to_export_list(ast::DeclStmt*);
+        void add_to_imports_list(ast::ImportStmt*);
+        void add_to_submodules(ast::ImportStmt*);
 
         bool         is_end(size_t n = 1) const;
         bool         match(TokenType, size_t offset = 0) const;

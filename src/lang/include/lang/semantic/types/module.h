@@ -14,9 +14,9 @@
 namespace lang::semantic
 {
     /**
-     * @brief module id, to identify module (bcs name can be repeat)
+     * @brief module id, to identify module (bcs name can repeat)
               and allow to use hash in future easily
-        @todo generate hash by default, and use it instead
+     * @todo generate hash by default, and use it instead
      */
     struct ModuleID {
         /**
@@ -37,45 +37,57 @@ namespace lang::semantic
     };
 
     struct Module {
-        static std::unique_ptr<Module> create(
-            SymbolPath path,
-            Scope* global_scope,
-            std::vector<std::unique_ptr<ast::BaseNode>> ast = {},
-            std::vector<ModuleID> depends = {},
-            std::unordered_set<ast::BaseNode*> exports = {}
-        );
 
+        /**
+         * @brief id of itself, may be needed in future, idk
+         */
         ModuleID id;
 
         /**
-         * @brief path to module from global scope
-         * @deprecated stored in id, save for now
-         * @todo remove path from Module structure
+         * @brief ast of that module, will be processed in semantic stage
          */
-        SymbolPath path;
         ast::AST ast;
 
         /**
+         * @brief list of dependencies (not sure will be submodules included)
          * @todo optimize (std::vector here is better/equal as std::unordered_set, so only optimization: sort it, and then us binary search)
          */
-        // std::vector<std::unique_ptr<ast::BaseNode>
         std::vector<ModuleID> dependencies;
-        std::unique_ptr<Scope> scope{nullptr};
 
-        /**std::unordered_set<ast::BaseNode*> export_list;
-         * @brief temporary list for exports, then it will be in scopes
+        /**
+         * @brief scope with exported identifiers
+         */
+        std::unique_ptr<Scope> interface_scope{nullptr};
+        
+        /**
+         * @brief scope with internal stuff, not exported, not available out module
+         */
+        std::unique_ptr<Scope> internal_scope{nullptr};
+
+        /**
+         * @brief list for exports, then it will be in scopes
+         * @note not sure will be here vector + binary search better
          */
         std::unordered_set<ast::BaseNode*> export_list;
 
-        Module(SymbolPath _path
-        ,      std::unique_ptr<Scope> _scope
-        ,      std::vector<std::unique_ptr<ast::BaseNode>> _ast = {}
+        /**
+         * @brief list of submodules
+         * @todo sort and use binary search
+         */
+        std::vector<ModuleID> submodules;
+
+        Module(ModuleID _id
+        ,      std::vector<std::unique_ptr<ast::BaseNode>> _ast
         ,      std::vector<ModuleID> depends = {}
+        ,      std::vector<ModuleID> _submodules = {}
         ,      std::unordered_set<ast::BaseNode*> exports = {}
-        ):  path(_path)
+        ,      std::unique_ptr<Scope> _inner = nullptr
+        ):  id(_id)
         ,   ast(std::move(_ast))
-        ,   scope(std::move(_scope))
         ,   dependencies(std::move(depends))
+        ,   submodules(std::move(_submodules))
+        ,   export_list(std::move(exports))
+        ,   interface_scope(std::move(_inner))
         {}
     };
 }

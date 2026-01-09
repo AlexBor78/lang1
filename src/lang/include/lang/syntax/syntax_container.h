@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <lang/ast/ast.h>
+#include <lang/ast/stmt.h>
 #include <lang/semantic/types/typesystem.h>
 
 namespace lang::syntax {
@@ -23,5 +24,15 @@ namespace lang::syntax {
          * @brief DeclNode of something -> is it extern
          */
         std::unordered_set<ast::BaseNode*> extern_list;
+
+        /**
+         * @brief list of all imported modules (without submodule)
+         */
+        std::unordered_set<ast::ImportStmt*> imports_list;
+
+        /**
+         * @brief list of submodules, `export import` nodes will be here
+         */
+        std::unordered_set<ast::ImportStmt*> submodules_list;
     };
 }

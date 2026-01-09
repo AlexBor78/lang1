@@ -20,15 +20,16 @@ set(sources
     src/ast/ast.cpp
 
     # semantic types
-    src/semantic/types/semantic_initializer.cpp
+    src/semantic/types/semantic_types.cpp
     src/semantic/types/typesystem.cpp
     src/semantic/types/identifier.cpp
     src/semantic/types/module.cpp
     src/semantic/types/scope.cpp
 
     # semantic analyzers
-    src/semantic/analyzers/import_processor.cpp
-    src/semantic/analyzers/symbols_collector.cpp
+    src/semantic/analyzers/semantic_initializer.cpp
+    # src/semantic/analyzers/import_processor.cpp
+    # src/semantic/analyzers/symbols_collector.cpp # not in use yet
 
     # pipeline
     src/pipeline/compiledriver.cpp

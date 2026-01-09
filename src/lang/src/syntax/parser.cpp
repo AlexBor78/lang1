@@ -12,9 +12,8 @@ namespace lang::syntax::parser
     SyntaxContainer Parser::parse(const std::vector<Token>& _tokens) {
         reset_state();
         tokens = &_tokens;
-        std::vector<std::unique_ptr<ast::BaseNode>> ast;
         while(!is_end()) { try {
-            ast.emplace_back(process_token());
+            syntax_container.ast.emplace_back(process_token());
         } catch(const diagnostic::ParserError& e) {
             success = false;
             logger.error("{}", e.what());
@@ -23,11 +22,7 @@ namespace lang::syntax::parser
             success = false;
             logger.error("inter error while parsing: {}", e.what());
             return {};
-        }} return SyntaxContainer{
-            .ast = std::move(ast),
-            .types_context = std::move(types_context),
-            .extern_list = std::move(extern_list)
-        };
+        }} return std::move(syntax_container);
     }
 
     bool Parser::had_errors() const noexcept {
@@ -55,9 +50,11 @@ namespace lang::syntax::parser
         success = true;
         pos = 0;
 
-        types_context.clear();
-        export_list.clear();
-        extern_list.clear();
+        syntax_container.types_context.clear();
+        syntax_container.export_list.clear();
+        syntax_container.extern_list.clear();
+        syntax_container.imports_list.clear();
+        syntax_container.submodules_list.clear();
     }
 
     void Parser::breakpoint() {
@@ -74,13 +71,19 @@ namespace lang::syntax::parser
     }
 
     void Parser::save_type_to_context(ast::DeclStmt* node, std::unique_ptr<AbstractType> type) {
-        types_context[node] = std::move(type);
+        syntax_container.types_context[node] = std::move(type);
     }
     void Parser::add_to_extern_list(ast::DeclStmt* node) {
-        extern_list.emplace(node);
+        syntax_container.extern_list.emplace(node);
     }
     void Parser::add_to_export_list(ast::DeclStmt* node) {
-        export_list.emplace(node);
+        syntax_container.export_list.emplace(node);
+    }
+    void Parser::add_to_imports_list(ast::ImportStmt* node) {
+        syntax_container.imports_list.emplace(node);
+    }
+    void Parser::add_to_submodules(ast::ImportStmt* node) {
+        syntax_container.submodules_list.emplace(node);
     }
 
     bool Parser::match(TokenType tt, size_t offset) const {
@@ -139,6 +142,7 @@ namespace lang::syntax::parser
             if(!is_end()) pos.merge(peek().pos); // merging semicolon
             process_semicolon();
             node->set_source_pos(pos);
+            add_to_imports_list(node.get());
             return std::move(node);
         }
         // export import
@@ -151,7 +155,7 @@ namespace lang::syntax::parser
             if(!is_end()) import_pos.merge(peek().pos);
             process_semicolon();
             node->set_source_pos(import_pos);
-            extern_list.emplace(node.get());
+            add_to_submodules(node.get());
             return std::move(node);
         }
         

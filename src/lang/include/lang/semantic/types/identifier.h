@@ -1,7 +1,6 @@
 #pragma once
 
 #include "lang/common/symbol_path.h"
-#include <memory>
 #include <lang/ast/ast.h>
 #include <lang/semantic/types/scope.h>
 
@@ -13,39 +12,32 @@ namespace lang::semantic
         enum class Kind {
             VARIABLE,
             FUNCTOIN,
-            TYPE,
-            MODULE
+            MODULE,
+            TYPE
         };
     public:
-        static std::unique_ptr<Identifier> create(
-            std::string_view name,
-            Kind kind,
-            ast::DeclStmt* decl,
-            Scope* parent_scope = nullptr
-        );
 
-        std::string name;
+        /**
+         * @brief kind of identifier: var, func, module or types
+         */
         Kind kind;
+        
+        /**
+         * @brief pointer to node where it were declared, for modules - nullptr
+         */
         ast::DeclStmt* decl{nullptr};
 
         /**
-         * @brief path to identifier from global scope
+         * @brief absolute path to identifier (from global scope)
          */
-        SymbolPath full_name;
+        SymbolPath name;
 
-        /**
-         * @brief for module or function (and structs in future i think)
-         */
-        std::unique_ptr<Scope> inner{nullptr};
-
-        Identifier(std::string_view _name
+        Identifier(SymbolPath _name
         ,          Kind _kind
-        ,          ast::DeclStmt* _decl
-        ,          std::unique_ptr<Scope> _inner = nullptr
-        ):  name(_name)
+        ,          ast::DeclStmt* _decl = nullptr
+        ):  name(std::move(_name))
         ,   kind(_kind)
         ,   decl(_decl)
-        ,   inner(std::move(_inner))
         {}
     };
 }

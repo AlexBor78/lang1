@@ -1,29 +1,40 @@
-#include "lang/semantic/types/scope.h"
-#include <lang/semantic/types/semantic_types.h>
+#include <lang/semantic/analyzers/semantic_initializer.h>
+#include <memory>
 
 namespace lang::semantic
 {
-// SemanticState
+    void SemanticInitializer::init() {
+        // initializing context
+        semantic_state->context.scope_context.clear();
+        semantic_state->context.types_context.clear();
+        // extern list is already initialized by ModulesLoader
 
-    void SemanticState::enter_scope(Scope* scope) {
-        curr_scope = scope;
+        // initializing program
+        semantic_state->program.name = compile_options->output_name;
+        semantic_state->program.global_scope = std::make_unique<Scope>();
+        // modules(list) is already initialized by ModulesLoader
+
+        semantic_state->enter_scope(semantic_state->program.global_scope.get());
+        for(auto& it : semantic_state->program.modules) {
+            init_module(*it.second);
+        }
+
+        
     }
 
-    void SemanticState::leave_scope() {
-        curr_scope = curr_scope->get_parent();
-    }
-
-// SemanticInitializer
-
-    SemanticState SemanticInitializer::init_state(std::string_view name) {
-        SemanticState state;
-
-        // program
-        state.program.name = name;
-        state.program.global_scope = init_global_scope();
-        state.curr_scope = state.program.global_scope.get();
-
-        return state;
+    void SemanticInitializer::init_module(Module& module) {
+        // if module already initialized
+        if(module.interface_scope) return; 
+        module.interface_scope = std::make_unique<Scope>(semantic_state->curr_scope);
+        module.internal_scope = std::make_unique<Scope>(module.interface_scope.get());
+        
+        // initializing dependency modules
+        for(auto depid : module.dependencies) init_module(*semantic_state->program.modules[depid]);
+        
+        // initializing submodules
+        semantic_state->enter_scope(module.interface_scope.get());
+        for(auto subid : module.submodules) init_module(*semantic_state->program.modules[subid]);
+        semantic_state->leave_scope();
     }
 
 /*
@@ -38,7 +49,9 @@ half    - float16
 float   - float32
 double  - float64
 */
-    std::unique_ptr<Scope> SemanticInitializer::init_global_scope() {
+/*
+    todo: move to types initializer
+    void SemanticInitializer::init_global_scope() {
         auto scope = std::make_unique<Scope>();
         
         TypeInfo int_info = TypeInfo{
@@ -97,6 +110,7 @@ double  - float64
         scope->get_typetable().add_builtin_type("float64", float_info);
         scope->get_typetable().add_builtin_type("float128", float_info);
 
-        return std::move(scope);
+        // return std::move(scope);
     }
+*/
 }

@@ -1,3 +1,8 @@
+#include "common/diagnostic/diagnostic.h"
+#include "lang/ast/stmt.h"
+#include "lang/semantic/types/module.h"
+#include <cstdio>
+#include <memory>
 #include <string>
 #include <format>
 #include <cassert>
@@ -6,6 +11,7 @@
 #include <lang/utils/diagnostic.h>
 #include <lang/pipeline/modules_loader.h>
 #include <lang/pipeline/syntax_driver.h>
+#include <vector>
 
 // # define MODULESLOADER_DEBUG
 
@@ -33,12 +39,15 @@ namespace lang::pipeline
         
         // process file
         auto syntax_container = syntax_driver.process_file(file_path);
-        auto id = genid(file_path);
-        import_processor.set_current_path(id.path);
-        auto dependencies = import_processor.process(syntax_container.ast);
         compile_state->processed_files.emplace(file_path);
+        auto id = genid(file_path);
+        
+        // auto dependencies = syntax_container.imports_list;
+        auto dependencies = process_imports(syntax_container.imports_list);
+        auto submodules = process_imports(syntax_container.submodules_list);
 
         assert(file_path.size() >= id.path.normalized_path.size() + FILE_SUFFIX_SIZE);
+        current_id = id;
         current_path = file_path.substr(0, file_path.size() - id.path.normalized_path.size() - FILE_SUFFIX_SIZE);
 
         // save semantic info
@@ -46,47 +55,77 @@ namespace lang::pipeline
             syntax_container.extern_list.begin(),
             syntax_container.extern_list.end()
         );
-        semantic_state->program.modules[id] = semantic::Module::create(
-            id.path,
-            semantic_state->program.global_scope.get(),
+        semantic_state->program.modules[id] = std::make_unique<semantic::Module>(
+            id,
             std::move(syntax_container.ast),
-            std::move(dependencies)
-        ); load(semantic_state->program.modules[id]->dependencies);
+            std::move(dependencies),
+            std::move(submodules),
+            std::move(syntax_container.export_list)
+        ); 
+        load(semantic_state->program.modules[id]->dependencies);
+        load(semantic_state->program.modules[id]->submodules);
     }
 
     void ModulesLoader::load(const semantic::ModuleID& id) {
         debug_break();
+        
         // if module already loaded
         if(semantic_state->program.modules.contains(id)) return;
 
         // generating file paths
         std::string file_path = gen_path(id);
+        current_id = id;
 
         // check just in case if file was already processed
         if(compile_state->processed_files.contains(file_path)) return;
 
         // process files
         auto syntax_container = syntax_driver.process_file(file_path);
-        import_processor.set_current_path(id.path);
-        auto dependencies = import_processor.process(syntax_container.ast);
-        
+        compile_state->processed_files.emplace(file_path);
+        auto dependencies = process_imports(syntax_container.imports_list);
+        auto submodules = process_imports(syntax_container.submodules_list);
+
         // save semantic info
         semantic_state->context.extern_list.insert(
             syntax_container.extern_list.begin(),
             syntax_container.extern_list.end()
         );
-        semantic_state->program.modules[id] = semantic::Module::create(
-            id.path,
-            semantic_state->program.global_scope.get(),
+        semantic_state->program.modules[id] = std::make_unique<semantic::Module>(
+            id,
             std::move(syntax_container.ast),
-            std::move(dependencies)
-        ); load(semantic_state->program.modules[id]->dependencies);
+            std::move(dependencies),
+            std::move(submodules),
+            std::move(syntax_container.export_list)
+        ); 
+        load(semantic_state->program.modules[id]->dependencies);
+        load(semantic_state->program.modules[id]->submodules);
     }
 
     void ModulesLoader::load(const std::vector<semantic::ModuleID>& modules) {
         for(const auto& module_ : modules) {
             load(module_);
         }
+    }
+
+    std::vector<semantic::ModuleID> ModulesLoader::process_imports(const std::unordered_set<ast::ImportStmt*>& imports) {
+        std::vector<semantic::ModuleID> output;
+        for(const auto* node : imports) {
+            semantic::ModuleID depend_id;
+            if(node->is_relative()) {
+                depend_id.is_relative = true;
+                depend_id.relative_path = node->get_path();
+
+                depend_id.path = current_id.path;
+                depend_id.path.path.insert(
+                    depend_id.path.path.end(),
+                    node->get_path().path.begin(),
+                    node->get_path().path.end()
+                );
+            } else depend_id.path = node->get_path();
+
+            depend_id.path.normalize();
+            output.emplace_back(depend_id);
+        } return std::move(output);
     }
 
     semantic::ModuleID ModulesLoader::genid(const std::string& file_name) {
@@ -107,8 +146,11 @@ namespace lang::pipeline
     static std::string gen_path_(const semantic::ModuleID& id, std::string start_path) {
         std::string file_path = start_path;
 
-        assert(!id.path.path.empty());
-        for(size_t i = 0; i < id.path.path.size() - 1; ++i) file_path += id.path.path[i] + "/";
+        if(id.path.path.empty()) {
+            throw common::diagnostic::InterError("gen_path_(): path is empty");
+        }
+
+        for(size_t i = 0; i + 1 < id.path.path.size(); ++i) file_path += id.path.path[i] + "/";
             
         file_path += id.path.path.back();
 
@@ -132,7 +174,7 @@ namespace lang::pipeline
             return gen_path_(id, current_path);
         }
 
-        if(import_paths) for(const auto path : *import_paths) {
+        for(const auto path : compile_options->import_paths) {
             try {
                 std::string buf = gen_path_(id, path);
                 return buf;
@@ -147,7 +189,6 @@ namespace lang::pipeline
         
         // // not sure should i try relative path, if absolute don't work
         return gen_path_(id, current_path);
-
-        throw common::diagnostic::InterError(std::format("Cannot open file of {} ", id.path.normalize()));
+        throw common::diagnostic::InterError(std::format("Cannot open file of {} module", id.path.normalize()));
     }
 }

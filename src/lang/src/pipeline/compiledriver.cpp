@@ -1,4 +1,5 @@
 // other drivers
+#include "lang/semantic/types/semantic_types.h"
 #include <lang/pipeline/modules_loader.h>
 #include <lang/pipeline/semantic_driver.h>
 
@@ -16,7 +17,7 @@ namespace lang::pipeline {
 
     void CompileDriver::run()
     {
-       auto semantic_state = semantic::SemanticInitializer::init_state(compile_options.output_name);
+       semantic::SemanticState semantic_state;
 
         {   // parsing all files (loading them as modules to semantic info)
             ModulesLoader loader(
@@ -28,8 +29,10 @@ namespace lang::pipeline {
         }
         
         {   // semantic analyze
-            SemanticDriver analyzer(&semantic_state);
-            analyzer.analyze();
+            SemanticDriver analyzer(
+                &compile_options,
+                &semantic_state
+            ); analyzer.analyze();
             if(compile_options.semantic_only) return;
         }
 

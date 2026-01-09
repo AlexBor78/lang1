@@ -10,8 +10,33 @@
 namespace lang::semantic
 {
     struct SemanticContext {
-        std::unordered_map<const ast::BaseNode*, std::unique_ptr<Scope>> scope_context;
-        std::unordered_map<const ast::BaseNode*, std::unique_ptr<AbstractType>> types_context; // in future
+        /**
+         * @brief save almost ALL scopes. 
+         * @note algorithm to find scope by SymbolPath:
+            1. go to global scope
+            2. find Identifier
+            3. in Identifier usably there is pointer to Node
+                1. if there is: go to context and get scope
+                2. if not - it is module, find module by ModuleID in program, in module there is it's scope
+         */
+        std::unordered_map<ast::BaseNode*, std::unique_ptr<Scope>> scope_context;
+
+        /**
+         * @brief save's types of declarations, bcs ast dont
+         * @note full types, with wrappers, but BASE type is stored in types_table
+         */
+        std::unordered_map<ast::BaseNode*, std::unique_ptr<AbstractType>> types_context;
+        
+        /**
+         * @brief table of types, save BASE types only, not conflict with types_context.
+         * 
+         */
+        TypeTable types_table;
+
+        /**
+         * @brief one list of all external stuff is a lot more convenient then every in every module, will be used in codegen
+         * 
+         */
         std::unordered_set<ast::BaseNode*> extern_list;
 
     public: // some methods 
@@ -39,22 +64,5 @@ namespace lang::semantic
         // scope
         void enter_scope(Scope*);
         void leave_scope();
-    };
-
-    /**
-     * @brief Initialize semantic types
-     * @todo update SemanticInitializer as in note
-     * @note i think this should be separated visitor, that initializing everything
-             why:
-                - to create scopes, it needs to go over the ast
-                - more consistence usage in SemanticDrivers
-     */
-    class SemanticInitializer
-    {
-    public:
-        static SemanticState init_state(std::string_view name = "main");
-
-    private:
-        static std::unique_ptr<Scope> init_global_scope();
     };
 }

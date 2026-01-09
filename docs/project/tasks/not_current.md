@@ -12,6 +12,9 @@ just list of all task, just to not forget :)
     - [ ] `FileLocation` -> `FilePosition`
     - [ ] everywhere position to location where it is location (mainly in ast)
     - [ ] `DiagnosticBuilder` -> `DiagnosticGenerator`
+    - [ ] `TypeTable` -> `TypesTable`
+- [ ] rewrite shitcode
+    - [ ] rewrite `ModulesLoader` implementation
     
 - [ ] little improvement how code placed in files
 - [ ] use warn, not only errors (wars - not fall or fail, error - usually fall and fail)

@@ -25,7 +25,6 @@ namespace lang::semantic
             global_scope(std::move(other.global_scope))
         {}
 
-        // default constructor
         Program(std::string_view _name = "main"
         ,       std::unique_ptr<Scope> _global_scope = nullptr
         ,       std::unordered_map<ModuleID, std::unique_ptr<Module>> _modules = {}
