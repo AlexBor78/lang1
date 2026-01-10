@@ -272,26 +272,13 @@ namespace lang::ast
     private:
         common::SourceLocation name_loc;
         SymbolPath path;
-        bool m_is_relative;
         
     public:
-        explicit ImportStmt(std::string_view _imported
-        ,                   bool _relative = false
-        ,                   common::SourceLocation _name_pos = default_pos()
-        ,                   common::SourceLocation _pos = default_pos()
-        ):  StmtNode(std::move(_pos))
-        ,   path{.path = {std::string(_imported)}}
-        ,   m_is_relative(_relative)
-        ,   name_loc(_name_pos)
-        {}
-
         explicit ImportStmt(SymbolPath _imported
-        ,                   bool _relative = false
         ,                   common::SourceLocation _name_pos = default_pos()
         ,                   common::SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
         ,   path(std::move(_imported))
-        ,   m_is_relative(_relative)
         ,   name_loc(_name_pos)
         {}
 
@@ -304,7 +291,8 @@ namespace lang::ast
         std::string_view get_imported() const noexcept;
 
         const SymbolPath& get_path() const noexcept;
-        bool is_relative() const noexcept;
+
+        // bool is_relative() const noexcept;
 
         /**
          * @brief Get the module path location in source code

@@ -16,7 +16,7 @@
 namespace lang::pipeline {
     syntax::SyntaxContainer SyntaxDriver::process_file(const std::string& file_path) {
         // check if module already processed
-        if(compile_state->processed_files.contains(file_path)) throw common::diagnostic::InterError(std::format("file {} overloading", file_path));
+        if(program->compile_state.processed_files.contains(file_path)) throw common::diagnostic::InterError(std::format("file {} overloading", file_path));
 
         // tring to open file
         std::unique_ptr<common::streams::FileIStream> file = std::make_unique<common::streams::FileIStream>(file_path);

@@ -163,18 +163,18 @@ namespace lang::ast
         visitor.visit_import_stmt(*this);
     }
 
-    std::string_view ImportStmt::get_imported() const noexcept
-    {
-        std::println(std::cerr, "using deprecated ImportStmt::get_imported() method");
-        return path.path[0];
-    }
+    // std::string_view ImportStmt::get_imported() const noexcept
+    // {
+    //     std::println(std::cerr, "using deprecated ImportStmt::get_imported() method");
+    //     return path.path[0];
+    // }
 
     const SymbolPath& ImportStmt::get_path() const noexcept {
         return path;
     }
-    bool ImportStmt::is_relative() const noexcept {
-        return m_is_relative;
-    }
+    // bool ImportStmt::is_relative() const noexcept {
+    //     return m_is_relative;
+    // }
 
 // ReturnStmt
 

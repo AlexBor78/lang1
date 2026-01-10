@@ -15,66 +15,65 @@ constexpr size_t FILE_SUFFIX_SIZE = (sizeof(FILE_SUFFIX) - 1);
 namespace lang::pipeline 
 {
     /**
-     * @brief loads all modules included from main files
-     * @todo  rewrite implementation - right now it is shit
+     * @brief recursively loads all imported modules from root files
      */
     class ModulesLoader
     {
     public: // api
-        /**
-        * @brief Construct a new Modules Loader object
-        * 
-        * @param _compile_options 
-        * @param _compile_state 
-        * @param _semantic_state 
-        * @param _paths 
-        * @todo remove _paths param, bcs it is in compile options already
-        */
-        explicit ModulesLoader(const CompileOptions* _compile_options
-        ,                      CompileState* _compile_state
-        ,                      semantic::SemanticState* _semantic_state
-        ):  compile_options(_compile_options)
-        ,   compile_state(_compile_state)
-        ,   semantic_state(_semantic_state)
-        ,   syntax_driver(
-                compile_options,
-                compile_state,
-                semantic_state
-        )
+        
+        explicit ModulesLoader(Program* _program
+        ):  program(_program)
+        ,   syntax_driver(_program)
         {}
 
         void load();
 
     private: // vars
-        const CompileOptions* compile_options{nullptr};
-        CompileState* compile_state{nullptr};
-        semantic::SemanticState* semantic_state{nullptr};
 
-        std::string current_path;
-        semantic::ModuleID current_id;
-        // semantic::ImportAnalyzer import_processor;
+        /**
+         * @brief   all main data is store here
+         * 
+         */
+        Program* program;
+
+        /**
+         * @brief   path to dir we are working in
+         */
+        std::string working_dir;
+
+        /**
+         * @brief   sympath to module we are working on
+         */
+        SymbolPath  working_sympath;
+        
         SyntaxDriver syntax_driver;
 
     private: // api
         /**
-         * @brief load files, accept only root files e.g. main file or inner of library
-         * @param file_path
+         * @brief   load files, accept only root files e.g. main file or main-inner of library
+         * @param   file_path
          * @warning file must be root file e.g. main file or inner of library
          */
         void load(const std::string&);
-        void load(const semantic::ModuleID&);
-        void load(const std::vector<semantic::ModuleID>&);
+        void load(UnitID);
+        void load(const std::vector<UnitID>&);
 
-        std::vector<semantic::ModuleID> process_imports(const std::unordered_set<ast::ImportStmt*>&);
+        std::vector<UnitID> process_imports(const std::unordered_set<ast::ImportStmt*>&);
 
         /**
-         * @brief generating module id by file path (file must be root file e.g. main file or inner of library)
-         * @param file_path
-         * @return semantic::ModuleID moduleID of that file
+         * @brief   generating module id by file path (file must be root file e.g. main file or inner of library)
+         * @param   file_path
+         * @return  semantic::ModuleID moduleID of that file
          * @warning file must be root file e.g. main file or inner of library, bcs it's just ignore's full path, and use only file_name
+         * @todo    rename to show that it'is only for root files
          */
-        semantic::ModuleID genid(const std::string&);
-        std::string gen_path(const semantic::ModuleID&);
+        SymbolPath gen_sympath(const std::string&);
+
+        /**
+         * @brief   generating file path from SymbolPath
+         * @return  std::string 
+         */
+        std::string gen_path(const SymbolPath&);
 
         void debug_break();
     };

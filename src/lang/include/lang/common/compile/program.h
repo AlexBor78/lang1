@@ -62,7 +62,7 @@ namespace lang
          * @brief container with all CompileUnits
          * @note  will replace `modules` field
          */
-        std::unordered_map<UnitID, CompileUnit> compile_units;
+        CompileUnitsManager compile_units_manager;
 
         /**
          * @brief temporary store semantic data until it will be processed by semantic

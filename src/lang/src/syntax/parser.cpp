@@ -196,26 +196,27 @@ namespace lang::syntax::parser
         breakpoint(); logger.debug("proccess_import_stmt()");
         skip(); // skip IMPORT TOK
 
-        bool is_relative{false};
+        SymbolPath sympath;
         if(!is_end() && match(TokenType::DOT)) { skip(); // skip .
-            is_relative = true;
+            sympath.is_relative = true;
         }
 
-
-        std::vector<std::string> path;
+        SymbolPathRaw rawpath;
         if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_module_name();
         auto path_loc = peek().pos;
 
-        path.emplace_back(advance().sym);
+        rawpath.path.emplace_back(advance().sym);
         while(!is_end() && match(TokenType::DOUBLECOLON)) { skip(); // skip ::
             if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_submodule_name();
             path_loc.merge(peek().pos);
-            path.emplace_back(advance().sym);
-        }   
+            rawpath.path.emplace_back(advance().sym);
+        }
 
-        return std::make_unique<ast::ImportStmt>(SymbolPath{
-            .path = std::move(path)
-        }, is_relative, path_loc);
+        if(sympath.is_relative) sympath.relative_path = rawpath;
+        else sympath.absolute_path = rawpath;
+        sympath.normalize();
+
+        return std::make_unique<ast::ImportStmt>(sympath, path_loc);
     }
 
     // types stmts - unsupported for now

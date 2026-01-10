@@ -10,6 +10,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 set(sources
+    # common
+    src/common/units_manager.cpp
+
     # syntax
     src/syntax/parser.cpp
     src/syntax/lexer.cpp
@@ -41,8 +44,6 @@ set(sources
     src/utils/diagnostic_builder.cpp
     src/utils/printast.cpp
     src/utils/utils.cpp
-
-    # common
     src/utils/error.cpp
 )
 

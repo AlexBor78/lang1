@@ -17,15 +17,15 @@ namespace lang::pipeline {
     void CompileDriver::run()
     {
        semantic::SemanticState semantic_state;
+       Program program;
+       program.compile_options = compile_options;
 
         {   // parsing all files (loading them as modules to semantic info)
-            ModulesLoader loader(
-                &compile_options,
-                &compile_state,
-                &semantic_state
-            ); loader.load();
+            ModulesLoader loader(&program);
+            loader.load();
             if(compile_options.syntax_only) return;
         }
+        return;
         
         {   // semantic analyze
             SemanticDriver analyzer(

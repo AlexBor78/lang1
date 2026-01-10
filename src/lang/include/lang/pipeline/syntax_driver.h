@@ -1,22 +1,15 @@
 #pragma once
 
+#include <lang/common/compile/program.h>
 #include <lang/syntax/syntax_container.h>
-#include <lang/common/compile/state.h>
-#include <lang/common/compile/options.h>
-#include <lang/semantic/types/semantic_types.h>
-#include <lang/semantic/types/module.h>
 
 namespace lang::pipeline
 {
     class SyntaxDriver
     {
     public:
-        explicit SyntaxDriver(const CompileOptions* _compile_options // unused for now
-        ,                     CompileState* _compile_state
-        ,                     semantic::SemanticState* _semantic_state
-        ):  compile_options(_compile_options)
-        ,   compile_state(_compile_state)
-        ,   semantic_state(_semantic_state)
+        explicit SyntaxDriver(Program* _program
+        ):  program(_program)
         {}
 
         // receive file name
@@ -35,8 +28,6 @@ namespace lang::pipeline
         semantic::ModuleID process_module(const semantic::ModuleID&);
 
     private: // var
-        const CompileOptions* compile_options;
-        CompileState* compile_state{nullptr};
-        semantic::SemanticState* semantic_state{nullptr};
+        Program* program;
     };
 }
