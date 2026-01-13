@@ -43,11 +43,12 @@
                 stored in Program data structure
         - [X] ModuleSym   - semantic symbol of module (like namespace)
                 not needed as dedicated structure - SymbolID + context save all data
-    - [ ] remove deprecated shit from `Program`, save semantic context in it.
+    - [X] remove deprecated shit from `Program`, save semantic context in it.
     - [X] make `semantic::Identifier` into universal SymbolID in semantic stage (instead of SymbolPath, ModuleID, pointer to node)
     - [X] integrate update SymbolPath into existing codebase
-    - [ ] make SymbolsContext that used to store all symbols (using scope, context, TypesTable, etc, and have api)
-        - [ ] store all symbol (AND ModuleSym) in that SymbolsContext
+    - [X] make SymbolsContext that will be used to store all symbols (using scope, context, TypesTable, etc, and have api)
+        note: SymbolsCon
+    - [ ] clean up files a little bit and reorganize code in them
 
 - [ ] write SemanticInitializers (rewrite)
 - [ ] update SymbolCollector (there are some code already, and it is outdated a little bit)

@@ -2,11 +2,11 @@
 
 namespace lang::semantic
 {
-    void SemanticState::enter_scope(Scope* scope) {
-        curr_scope = scope;
-    }
+    // void SemanticState::enter_scope(Scope* scope) {
+    //     curr_scope = scope;
+    // }
 
-    void SemanticState::leave_scope() {
-        curr_scope = curr_scope->get_parent();
-    }
+    // void SemanticState::leave_scope() {
+    //     curr_scope = curr_scope->get_parent();
+    // }
 }
