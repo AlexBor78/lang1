@@ -1,42 +1,50 @@
 #!/usr/bin/env bash
 
 # defaults
-LOC=0
-RUN=0
-TEST=0
-HELP=0
-BUILD=0
-CLEAN=0
-CLEAN_DOCS=0
-GENERATE_DOCS=0
+declare -A cmd
+cmd[name]=""
+cmd[flags]=""
 
-generate_docs() {
+# toolchain
+
+has_flag() {
+    local flag="$1"
+    [[ " ${cmd[flags]} " == *" ${flag} "* ]]
+}
+
+# logic functoins
+
+build() {
+	mkdir -p build
+
+	if has_flag "--release"; then
+		# release configuration
+    echo "Building Release version with $JOBS jobs..."
+    cmake -B build -DCMAKE_BUILD_TYPE=Release
+	elif has_flag "--debug"; then
+		# debug configuration
+    echo "Building Debug version with $JOBS jobs..."
+    cmake -B build -DCMAKE_BUILD_TYPE=Debug -DDEBUGGING=1
+	else
+		# default configuration (release)
+    echo "Building Release version with $JOBS jobs..."
+    cmake -B build -DCMAKE_BUILD_TYPE=Release
+	fi
+
+
+	if ! cmake --build build --parallel "$(nproc)"; then
+		echo "Build failed"
+		exit 1
+	fi
+  echo "Build completed!"
+
+	cmake --install build --prefix "$(pwd)"
+}
+
+gen-docs() {
     echo "Generating documentation..."
     cmake --build build --target docs
     echo "Documentation generated in doc/api/generated"
-}
-
-build() {
-    case $BUILD_TYPE in
-        "Release") build_release ;;
-        "Debug") build_debug ;;
-    esac
-}
-
-build_release() {
-    echo "Building Release version with $JOBS jobs..."
-    mkdir -p build
-    cmake -B build -DCMAKE_BUILD_TYPE=Release
-    cmake --build build --parallel $JOBS
-    echo "Build completed!"
-}
-
-build_debug() {
-    echo "Building Debug version with $JOBS jobs..."
-    mkdir -p build
-    cmake -B build -DCMAKE_BUILD_TYPE=Debug -DDEBUGGING=1
-    cmake --build build --parallel $JOBS
-    echo "Build completed!"
 }
 
 run() {
@@ -44,9 +52,8 @@ run() {
 }
 
 clean() {
-    rm -rf build
-    rm -rf .cache
-    if [[ $CLEAN_DOCS -eq 1 ]]; then
+    rm -rf build .cache bin
+    if has_flag "--docs"; then
         rm -rf docs/api/generated
     fi
 }
@@ -72,94 +79,83 @@ test() {
 }
 
 loc() {
-    CLEAN_DOCS=1
-    clean
-    tree
-    git ls-files | xargs wc -l
+	# cleanup
+	cmd[flags]+=" --docs"
+  clean
+	# loc
+  tree
+  git ls-files | xargs wc -l
 }
 
-# process args
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --help)
-            HELP=1
-            shift
-            ;;
-        build)
-            BUILD=1
-            BUILD_TYPE="Release"
-            JOBS=$(nproc)
-            shift
-            ;;
-        --debug)
-            BUILD_TYPE="Debug"
-            shift
-            ;;
-        --release)
-            BUILD_TYPE="Release" 
-            shift
-            ;;
-        -j|--jobs)
-            JOBS="$2"
-            shift 2
-            ;;
-        loc)
-            LOC=1
-            shift
-            ;;
-        test)
-            TEST=1
-            shift
-            ;;
-        run)
-            RUN=1
-            shift
-            ;;
-        clean)
-            CLEAN=1
-            shift
-            ;;
-        --docs)
-            CLEAN_DOCS=1
-            shift
-            ;;
-        generate-docs)
-            GENERATE_DOCS=1
-            shift
-            ;;
-        *)
-            echo "Unknown option: $1"
-            echo "Usage: $0 [command] [--flags]"
-            echo "Try --help for help"
-            exit 1
-            ;;
-    esac
-done
+parse-args() {
+	#local done-flags=0
+	while [[ $# -gt 0 ]]; do
+		local arg="$1"
+		
+		# if its --
+		# we dont have any args yet, so just ignore anything after
+		if [ "${arg}" = "--" ]; then
+		#	local done-flags=1;
+		#	shift 1
+		#	continue
+			shift 1
+			break
+		fi
 
-if [[ $BUILD -eq 1 ]]; then
-    build
-fi
+		# if its flag (started with -)
+		if [ "${arg:0:1}" = "-" ]; then
+			cmd["flags"]+=" $1"
+			shift 1
+			continue
+		fi
 
-if [[ $RUN -eq 1 ]]; then
-    run
-fi
+		# if it is command (just word)
+		
+		# if command is not empty (cmd overriding)
+		if [ -n "${cmd["name"]}" ]; then
+			echo "error commnd overriding."
+			echo "use --help for help"
+			exit 1
+		fi
 
-if [[ $GENERATE_DOCS -eq 1 ]]; then
-    generate_docs
-fi
+		cmd["name"]="$1"
 
-if [[ $CLEAN -eq 1 ]]; then 
-    clean
-fi
+		# to don't loop forever
+		shift 1
+	done
+}
 
-if [[ $TEST -eq 1 ]]; then 
-    test
-fi
+main() {
+	# parsing args
+	parse-args "$@"
 
-if [[ $LOC -eq 1 ]]; then
-    loc
-fi
 
-if [[ $HELP -eq 1 ]]; then
-    print_help
-fi
+	#	todo: help
+
+	if [ "${cmd["name"]}" = "build" ]; then
+		build
+	elif [ "${cmd["name"]}" = "run" ]; then
+		run
+	elif [ "${cmd["name"]}" = "clean" ]; then
+		clean
+	elif [ "${cmd["name"]}" = "gen-docs" ]; then
+		gen-docs
+	fi
+
+
+	
+	
+#	if [[ $TEST -eq 1 ]]; then 
+#	    test
+#	fi
+#	
+#	if [[ $LOC -eq 1 ]]; then
+#	    loc
+#	fi
+#	
+#	if [[ $HELP -eq 1 ]]; then
+#	    print_help
+#	fi
+}
+
+main "$@"
