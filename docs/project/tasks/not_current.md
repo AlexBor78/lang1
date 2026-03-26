@@ -78,6 +78,10 @@ semantic is now current stage
 ### upgrade build.sh script
 - [ ] make symlink to compiler in project-root dir
 - [ ] pass arguments to compiler in `run` command
+- [ ] check exit code after build
+- [ ] add --ninja build flag
+- [ ] rename flag `--generate-docs` to command `gen-docs`
+- [ ] add docker build option
 
 ### add user-api to compiler cli app (POSIX like, or even use POSIX standard)
 - [ ] make POSIX-like cli compiler with support of:
