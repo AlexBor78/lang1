@@ -102,7 +102,7 @@ namespace common::streams
             !is_eof() && (isalnum(c) || c == '_'); 
             c = peek()) { word += advance();
             if(is_eof()) break;
-        } return std::move(word);
+        } return word;
     }
     
     void InputStream::skip_whitespace() {

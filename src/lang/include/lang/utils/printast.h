@@ -13,7 +13,7 @@ namespace lang::utils
         std::string prefix{""};
         bool need_prefix{true};
 
-        void remove_from_prefix(int count = 2) noexcept;
+        void remove_from_prefix(size_t count = 2) noexcept;
         void add_to_prefix(std::string_view str = "  ") noexcept;
         void clean_prefix() noexcept;
 

@@ -96,7 +96,7 @@ namespace lang::syntax::parser
     Token Parser::advance() {
         auto tok = peek();
         ++pos;
-        return std::move(tok);
+        return tok;
     }
     void Parser::putback(size_t n) {
         if(pos >= n) pos -= n;
@@ -143,7 +143,7 @@ namespace lang::syntax::parser
             process_semicolon();
             node->set_source_pos(pos);
             add_to_imports_list(node.get());
-            return std::move(node);
+            return node;
         }
         // export import
         if(!is_end(2) 
@@ -156,7 +156,7 @@ namespace lang::syntax::parser
             process_semicolon();
             node->set_source_pos(import_pos);
             add_to_submodules(node.get());
-            return std::move(node);
+            return node;
         }
         
         // types
@@ -178,7 +178,7 @@ namespace lang::syntax::parser
             auto node = process_return_stmt();
             if(!is_end()) loc.merge(peek().pos);
             process_semicolon();
-            return std::move(node);
+            return node;
         }
 
         // declarations        
@@ -188,7 +188,7 @@ namespace lang::syntax::parser
         auto node = process_expr();
         process_semicolon();
 
-        return std::move(node);
+        return node;
     }
 
     // modules stmts
@@ -356,7 +356,7 @@ namespace lang::syntax::parser
         loc.merge(advance().pos); // '}'
 
         block->set_source_pos(loc);
-        return std::move(block);
+        return block;
     }
 
     std::unique_ptr<ast::ReturnStmt> Parser::process_return_stmt() {
@@ -458,7 +458,7 @@ namespace lang::syntax::parser
             auto node = process_function_decl();
             if(is_export) add_to_export_list(node.get());
             if(is_extern) add_to_extern_list(node.get());
-            return std::move(node);
+            return node;
         }
 
         // variable declaration
@@ -474,7 +474,7 @@ namespace lang::syntax::parser
             if(is_export) add_to_export_list(node.get());
             if(is_extern) add_to_extern_list(node.get());
             process_semicolon();
-            return std::move(node);
+            return node;
         } throw unexpected_token(2);
     }
 
@@ -578,7 +578,7 @@ namespace lang::syntax::parser
                 loc
             );
             save_type_to_context(node.get(), std::move(type));
-            return std::move(node);
+            return node;
         }
 
         // can merge just to name loc, here no init expr 
@@ -590,7 +590,7 @@ namespace lang::syntax::parser
             loc
         );
         save_type_to_context(node.get(), std::move(type));
-        return std::move(node);
+        return node;
     }
 
     std::unique_ptr<ast::DeclFunction> Parser::process_function_decl() {
@@ -629,7 +629,7 @@ namespace lang::syntax::parser
                 std::move(loc)
             );
             save_type_to_context(node.get(), std::move(type));
-            return std::move(node);
+            return node;
         } 
         
         auto body = process_scope();
@@ -642,7 +642,7 @@ namespace lang::syntax::parser
             std::move(loc)
         );
         save_type_to_context(node.get(), std::move(type));
-        return std::move(node);
+        return node;
     }
 
     // exprs
@@ -697,7 +697,7 @@ namespace lang::syntax::parser
                     std::move(op_loc)
                 );
             }   
-        } return std::move(left);
+        } return left;
     }
     std::unique_ptr<ast::ExprNode> Parser::process_logical_expr() {
         breakpoint(); logger.debug("process_logical_expr()");
@@ -712,7 +712,7 @@ namespace lang::syntax::parser
                     std::move(op_loc)
                 );
             } else break;
-        } return std::move(left);
+        } return left;
     }
     std::unique_ptr<ast::ExprNode> Parser::process_compare_expr() {
         breakpoint(); logger.debug("process_compare_expr()");
@@ -726,7 +726,7 @@ namespace lang::syntax::parser
                     std::move(op_loc)
                 );
             } else break;
-        } return std::move(left);
+        } return left;
     }
     std::unique_ptr<ast::ExprNode> Parser::process_additive_expr() {
         breakpoint(); logger.debug("process_additive_expr()");
@@ -741,7 +741,7 @@ namespace lang::syntax::parser
                     std::move(op_loc)
                 );
             } else break;
-        } return std::move(left);
+        } return left;
     }
     std::unique_ptr<ast::ExprNode> Parser::process_multiple_expr() {
         breakpoint(); logger.debug("process_multiple_expr()");
@@ -755,7 +755,7 @@ namespace lang::syntax::parser
                     std::move(op_loc)
                 );
             } else break;
-        } return std::move(left);
+        } return left;
     }
     std::unique_ptr<ast::ExprNode> Parser::process_unary_expr() {
         breakpoint(); logger.debug("process_unary_expr()");
@@ -783,7 +783,7 @@ namespace lang::syntax::parser
                 std::move(node),
                 std::move(op_loc)
             ); // throw expected_postfix_op(); conflict with binary operators
-        } return std::move(node);
+        } return node;
     }
     std::unique_ptr<ast::ExprNode> Parser::process_primary_expr() {
         breakpoint(); logger.debug("process_primary_expr()");
@@ -793,7 +793,7 @@ namespace lang::syntax::parser
             if(!is_end() && !match(TokenType::RPAREN)) throw expected_rparen();
             node_loc.merge(advance().pos); // skip ')'
             node->set_source_pos(std::move(node_loc));
-            return std::move(node);
+            return node;
         }
         if(!is_end() && match(TokenType::IDENTIFIER)) return process_name();
         if(utils::is_literal(peek().ty)) return process_literal();
@@ -915,59 +915,59 @@ namespace lang::syntax::parser
 
 // diagnostic creating
     
-    diagnostic::ParserError Parser::tokens_nullptr(size_t offset) const noexcept {
+    diagnostic::ParserError Parser::tokens_nullptr([[maybe_unused]] size_t offset) const noexcept {
         if(!is_end()) return diagnostic::ParserError("tokens = nullptr", common::SourceLocation());
         else return diagnostic::ParserError("tokens = nullptr", common::SourceLocation());
     }
-    diagnostic::ParserError Parser::is_end_with_zero(size_t offset) const noexcept {
+    diagnostic::ParserError Parser::is_end_with_zero([[maybe_unused]] size_t offset) const noexcept {
         if(!is_end()) return diagnostic::ParserError("is_end() called with 0", common::SourceLocation());
         else return diagnostic::ParserError("is_end() called with 0", common::SourceLocation());
     }
-    diagnostic::ParserError Parser::peek_out_of_range(size_t offset) const noexcept {
+    diagnostic::ParserError Parser::peek_out_of_range([[maybe_unused]] size_t offset) const noexcept {
         if(!is_end()) return diagnostic::ParserError("peek(): out of range", common::SourceLocation());
         else return diagnostic::ParserError("peek(): out of range", common::SourceLocation());
     }
-    diagnostic::ParserError Parser::putback_out_of_range(size_t offset) const noexcept {
+    diagnostic::ParserError Parser::putback_out_of_range([[maybe_unused]] size_t offset) const noexcept {
         if(!is_end()) return diagnostic::ParserError("putback(): out of range", common::SourceLocation());
         else return diagnostic::ParserError("putback(): out of range", common::SourceLocation());
     }
-    diagnostic::ParserError Parser::end_reached(size_t offset) const noexcept {
+    diagnostic::ParserError Parser::end_reached([[maybe_unused]] size_t offset) const noexcept {
         if(!is_end()) return diagnostic::ParserError("end reached", common::SourceLocation());
         else return diagnostic::ParserError("end reached", common::SourceLocation());
     }
-    diagnostic::ParserError Parser::strcut_is_not_suported(size_t offset) const noexcept {
+    diagnostic::ParserError Parser::strcut_is_not_suported([[maybe_unused]] size_t offset) const noexcept {
         if(!is_end()) return diagnostic::ParserError("strcut is currently not suported", common::SourceLocation());
         else return diagnostic::ParserError("strcut is currently not suported", common::SourceLocation());
     }
-    diagnostic::ParserError Parser::enum_is_not_suported(size_t offset) const noexcept {
+    diagnostic::ParserError Parser::enum_is_not_suported([[maybe_unused]] size_t offset) const noexcept {
         if(!is_end()) return diagnostic::ParserError("enum is currently not suported", common::SourceLocation());
         else return diagnostic::ParserError("enum is currently not suported", common::SourceLocation());
     }
-    diagnostic::ParserError Parser::if_is_not_suported(size_t offset) const noexcept {
+    diagnostic::ParserError Parser::if_is_not_suported([[maybe_unused]] size_t offset) const noexcept {
         if(!is_end()) return diagnostic::ParserError("if is currently not suported", common::SourceLocation());
         else return diagnostic::ParserError("if is currently not suported", common::SourceLocation());
     }
-    diagnostic::ParserError Parser::else_is_not_suported(size_t offset) const noexcept {
+    diagnostic::ParserError Parser::else_is_not_suported([[maybe_unused]] size_t offset) const noexcept {
         if(!is_end()) return diagnostic::ParserError("else is currently not suported", common::SourceLocation());
         else return diagnostic::ParserError("else is currently not suported", common::SourceLocation());
     }
-    diagnostic::ParserError Parser::for_is_not_suported(size_t offset) const noexcept {
+    diagnostic::ParserError Parser::for_is_not_suported([[maybe_unused]] size_t offset) const noexcept {
         if(!is_end()) return diagnostic::ParserError("for is currently not suported", common::SourceLocation());
         else return diagnostic::ParserError("for is currently not suported", common::SourceLocation());
     }
-    diagnostic::ParserError Parser::while_is_not_suported(size_t offset) const noexcept {
+    diagnostic::ParserError Parser::while_is_not_suported([[maybe_unused]] size_t offset) const noexcept {
         if(!is_end()) return diagnostic::ParserError("while is currently not suported", common::SourceLocation());
         else return diagnostic::ParserError("while is currently not suported", common::SourceLocation());
     }
-    diagnostic::ParserError Parser::break_is_not_suported(size_t offset) const noexcept {
+    diagnostic::ParserError Parser::break_is_not_suported([[maybe_unused]] size_t offset) const noexcept {
         if(!is_end()) return diagnostic::ParserError("break is currently not suported", common::SourceLocation());
         else return diagnostic::ParserError("break is currently not suported", common::SourceLocation());
     }
-    diagnostic::ParserError Parser::continue_is_not_suported(size_t offset) const noexcept {
+    diagnostic::ParserError Parser::continue_is_not_suported([[maybe_unused]] size_t offset) const noexcept {
         if(!is_end()) return diagnostic::ParserError("continue is currently not suported", common::SourceLocation());
         else return diagnostic::ParserError("continue is currently not suported", common::SourceLocation());
     }
-    diagnostic::ParserError Parser::stack_initialization_not_supported(size_t offset) const noexcept {
+    diagnostic::ParserError Parser::stack_initialization_not_supported([[maybe_unused]] size_t offset) const noexcept {
         if(!is_end()) return diagnostic::ParserError("stack initialization is currently not suported", common::SourceLocation());
         else return diagnostic::ParserError("stack initialization is currently not suported", common::SourceLocation());
     }

@@ -278,8 +278,8 @@ namespace lang::ast
         ,                   common::SourceLocation _name_pos = default_pos()
         ,                   common::SourceLocation _pos = default_pos()
         ):  StmtNode(std::move(_pos))
-        ,   path(std::move(_imported))
         ,   name_loc(_name_pos)
+        ,   path(std::move(_imported))
         {}
 
         virtual void accept(ConstASTVisitor&) const noexcept override;
