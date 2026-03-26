@@ -17,3 +17,8 @@ set(sources
 
 add_library(${PROJECT_NAME} STATIC ${sources})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_compile_options(${PROJECT_NAME} PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+)
