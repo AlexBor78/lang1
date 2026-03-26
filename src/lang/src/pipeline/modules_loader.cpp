@@ -14,7 +14,7 @@
 namespace lang::pipeline
 {
     void ModulesLoader::load() {
-        for(const auto file : program->compile_options.inputs_files) {
+        for(const auto& file : program->compile_options.inputs_files) {
             load(file);
         }
     }
@@ -170,7 +170,7 @@ namespace lang::pipeline
             program->compile_units_manager.update_contexts(id);
 
             output.emplace_back(std::move(id));
-        } return std::move(output);
+        } return output;
     }
 
     SymbolPath ModulesLoader::gen_sympath(const std::string& file_name) {
@@ -180,7 +180,13 @@ namespace lang::pipeline
         if(file_name.contains('/')) module_name = file_name.substr(file_name.find_last_of("/") + 1, file_name.size() - FILE_SUFFIX_SIZE);
         else module_name = file_name.substr(0, file_name.size() - FILE_SUFFIX_SIZE);
         
-        SymbolPath path{.absolute_path = {.path = {module_name}}};
+        SymbolPath path{
+					.absolute_path = {
+						.path = {module_name},
+						.normalized_path = {}
+					},
+					.relative_path = {}
+				};
         path.normalize(); // optimize
 
         return path;
@@ -224,7 +230,7 @@ namespace lang::pipeline
             return gen_path_(sympath, working_dir);
         }
 
-        for(const auto path : program->compile_options.import_paths) {
+        for(const auto& path : program->compile_options.import_paths) {
             try {
                 std::string buf = gen_path_(sympath, path);
                 return buf;

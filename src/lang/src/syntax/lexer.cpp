@@ -187,7 +187,7 @@ namespace lang::syntax::lexer
     bool Lexer::is_number() const noexcept {
         if(is_eof()) return false;
         return isdigit(peek())
-        ||     peek() == '.' && isdigit(peek(1));
+        ||     (peek() == '.' && isdigit(peek(1)));
     }
 
     bool Lexer::is_string() const noexcept {

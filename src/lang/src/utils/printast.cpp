@@ -5,13 +5,12 @@
 
 namespace lang::utils
 {
-    void PrintAST::remove_from_prefix(int count) noexcept
+    void PrintAST::remove_from_prefix(size_t count) noexcept
     {
         if(count > prefix.length())
             return;
         
-        for(int i =0; i < count; ++i)
-            prefix.pop_back();
+        for(size_t i = 0; i < count; ++i) prefix.pop_back();
     }
 
     void PrintAST::add_to_prefix(std::string_view str) noexcept

@@ -84,7 +84,7 @@ namespace lang::diagnostic
         }
 
     public: // api
-        virtual CompileWarn& operator=(const CompileWarn& e) noexcept {
+        virtual CompileWarn& operator=([[maybe_unused]] const CompileWarn& e) noexcept {
             // todo
             return *this;
         }
@@ -100,11 +100,14 @@ namespace lang::diagnostic
         ,                std::move(_pos)
         ,                _name
         ) {}
+		public:
+				using CompileWarn::operator=;
     };
 
     class LexerWarn : public SyntaxWarn
     {
     public:
+				using CompileWarn::operator=;
         explicit LexerWarn(std::string_view _msg
         ,                   common::SourceLocation _pos = {}
         ):  SyntaxWarn(_msg
@@ -116,6 +119,7 @@ namespace lang::diagnostic
     class ParserWarn : public SyntaxWarn
     {
     public:
+				using CompileWarn::operator=;
         explicit ParserWarn(std::string_view _msg
         ,                    common::SourceLocation   _pos = {}
         ):  SyntaxWarn(_msg

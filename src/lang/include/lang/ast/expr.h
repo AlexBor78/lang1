@@ -140,8 +140,8 @@ namespace lang::ast
         ,        common::SourceLocation _name_loc = default_pos()
         ,        common::SourceLocation _pos = default_pos()
         ):  ExprNode(std::move(_pos))
-        ,   args(std::move(_args))
         ,   callee(_callee)
+        ,   args(std::move(_args))
         ,   name_loc(_name_loc)
         {}
 
@@ -149,8 +149,8 @@ namespace lang::ast
         ,        std::vector<ExprPtr> _args
         ,        common::SourceLocation _pos = default_pos()
         ):  ExprNode(std::move(_pos))
-        ,   args(std::move(_args))
         ,   callee(_callee)
+        ,   args(std::move(_args))
         {}
 
         virtual void accept(ConstASTVisitor&) const noexcept override;
