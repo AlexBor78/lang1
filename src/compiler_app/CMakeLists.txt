@@ -16,7 +16,10 @@ set(sources
 add_executable(${PROJECT_NAME} ${sources})
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 target_link_libraries(${PROJECT_NAME} PUBLIC Lang)
-
+install(
+	TARGETS ${PROJECT_NAME}
+    RUNTIME DESTINATION bin
+)
 # for breakpoints in code for debug
 if(DEBUGGING)
     target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUGGING)
