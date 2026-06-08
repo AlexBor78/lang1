@@ -7,6 +7,7 @@ pkgs.mkShell {
   buildInputs = with pkgs; [
     clang
     cmake
+    gnumake
     ninja
     clang-tools
     doxygen 
