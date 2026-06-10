@@ -5,33 +5,30 @@
 #include <string_view>
 #include <lang/ast/ast.h>
 #include <lang/common/symbol_path.h>
-#include <lang/semantic/types/typesystem.h>
 
-/**
- * @todo rename _pos to _full_range_loc, all pos like to loc like.
- */
 namespace lang::ast
 {   
-    class BlockStmt : public StmtNode {
+    class BlockStmt : public StmtNode
+    {
     private:
         std::vector<StmtPtr> m_body;
         
     public:
-        explicit BlockStmt(common::SourceLocation _full_range_loc = default_pos()):
-            StmtNode(std::move(_full_range_loc))
+        explicit BlockStmt(common::SourceLocation _pos = default_pos()):
+            StmtNode(std::move(_pos))
         {}
 
         explicit BlockStmt(
             std::vector<StmtPtr>& _body
-        ,   common::SourceLocation _full_range_loc = default_pos()
-        ):  StmtNode(std::move(_full_range_loc))
+        ,   common::SourceLocation _pos = default_pos()
+        ):  StmtNode(std::move(_pos))
         ,   m_body(std::move(_body))
         {}
 
         explicit BlockStmt(
             std::vector<StmtPtr> _body
-        ,   common::SourceLocation _full_range_loc = default_pos()
-        ):  StmtNode(std::move(_full_range_loc))
+        ,   common::SourceLocation _pos = default_pos()
+        ):  StmtNode(std::move(_pos))
         ,   m_body(std::move(_body))
         {}
         
@@ -44,33 +41,33 @@ namespace lang::ast
         void add_tobody(StmtPtr) noexcept;
     };
 
-		/**
-		 * rename to ControlFlow
-		 */
-    class StructureStmt : public StmtNode {
+    class StructureStmt : public StmtNode
+    {
     private:
         StmtPtr body;
+        common::SourceLocation keyword_loc;
 
     protected:
         explicit StructureStmt(StmtPtr _body
         ,                      common::SourceLocation _word_loc = default_pos()
-        ,                      common::SourceLocation _full_range_loc = default_pos()
-        ):  StmtNode(std::move(_full_range_loc))
+        ,                      common::SourceLocation _pos = default_pos()
+        ):  StmtNode(std::move(_pos))
         ,   body(std::move(_body))
         ,   keyword_loc(_word_loc)
         {}
 
     public:
+        virtual void accept(ConstASTVisitor&) const noexcept override = 0;
+        virtual void accept(ASTVisitor&) noexcept override = 0;
+
         const StmtNode* get_body() const;
         StmtNode* get_body();
 
-        common::SourceLocation keyword_loc;
+        const common::SourceLocation& get_keyword_loc() const noexcept;
     };
 
-		/**
-		 * @todo rename to ConditionalStmt
-		 */
-    class StructureStmtWithCond : public StructureStmt {
+    class StructureStmtWithCond : public StructureStmt
+    {
     private:
         ExprPtr cond;
 
@@ -78,31 +75,33 @@ namespace lang::ast
         StructureStmtWithCond(ExprPtr _cond
         ,                     StmtPtr _body
         ,                     common::SourceLocation _word_loc = default_pos()
-        ,                     common::SourceLocation _full_range_loc = default_pos()
+        ,                     common::SourceLocation _pos = default_pos()
         ):  StructureStmt(std::move(_body)
             ,             std::move(_word_loc)
-            ,             std::move(_full_range_loc)
+            ,             std::move(_pos)
             )
         ,   cond(std::move(_cond))
         {}
 
     public:
+        virtual void accept(ConstASTVisitor&) const noexcept override = 0;
+        virtual void accept(ASTVisitor&) noexcept override = 0;
 
         const ExprNode* get_cond() const;
         ExprNode* get_cond();
     };
 
-    class IfStmt : public StructureStmtWithCond {
+    class IfStmt : public StructureStmtWithCond
+    {
     public:
         IfStmt(ExprPtr _cond
-        ,                     StmtPtr _body
-        ,                     common::SourceLocation _word_loc = default_pos()
-        ,                     common::SourceLocation _full_range_loc = default_pos()
-        ):  StructureStmtWithCond(        		
-													std::move(_cond)
-						,							std::move(_body)
-            ,             std::move(_word_loc)
-            ,             std::move(_full_range_loc)
+        ,      StmtPtr _body
+        ,      common::SourceLocation _word_loc = default_pos()
+        ,      common::SourceLocation _pos = default_pos()
+        ):  StructureStmtWithCond(std::move(_cond)
+            ,                     std::move(_body)
+            ,                     std::move(_word_loc)
+            ,                     std::move(_pos)
             )
         {}
 
@@ -110,15 +109,15 @@ namespace lang::ast
         virtual void accept(ASTVisitor&) noexcept override;
     };
 
-    class ElseStmt : public StructureStmt {
+    class ElseStmt : public StructureStmt
+    {
     public:
-        ElseStmt(
-        			StmtPtr _body
-        ,     common::SourceLocation _word_loc = default_pos()
-        ,     common::SourceLocation _full_range_loc = default_pos()
+        explicit ElseStmt(StmtPtr _body
+        ,                 common::SourceLocation _word_loc = default_pos()
+        ,                 common::SourceLocation _pos = default_pos()
         ):  StructureStmt(std::move(_body)
             ,             std::move(_word_loc)
-            ,             std::move(_full_range_loc)
+            ,             std::move(_pos)
             )
         {}
 
@@ -126,7 +125,8 @@ namespace lang::ast
         virtual void accept(ASTVisitor&) noexcept override;
     };
 
-    class ForStmt : public StructureStmtWithCond {
+    class ForStmt : public StructureStmtWithCond
+    {
     private:
         StmtPtr decl;
         StmtPtr incr;
@@ -137,11 +137,11 @@ namespace lang::ast
         ,       StmtPtr _incr
         ,       StmtPtr _body
         ,       common::SourceLocation _word_loc = default_pos()
-        ,       common::SourceLocation _full_range_loc = default_pos()
+        ,       common::SourceLocation _pos = default_pos()
         ):  StructureStmtWithCond(std::move(_cond)
             ,             std::move(_body)
             ,             std::move(_word_loc)
-            ,             std::move(_full_range_loc)
+            ,             std::move(_pos)
             )
         ,   decl(std::move(_decl))
         ,   incr(std::move(_incr))
@@ -157,17 +157,17 @@ namespace lang::ast
         StmtNode* get_incr();
     };
 
-    class WhileStmt : public StructureStmtWithCond {
+    class WhileStmt : public StructureStmtWithCond
+    {
     public:
         WhileStmt(ExprPtr _cond
-        ,      		StmtPtr _body
-        ,      		common::SourceLocation _word_loc = default_pos()
-        ,      		common::SourceLocation _full_range_loc = default_pos()
-        ):  StructureStmtWithCond(        		
-													std::move(_cond)
-						,							std::move(_body)
+        ,         StmtPtr _body
+        ,         common::SourceLocation _word_loc = default_pos()
+        ,         common::SourceLocation _pos = default_pos()
+        ):  StructureStmtWithCond(std::move(_cond)
+            ,             std::move(_body)
             ,             std::move(_word_loc)
-            ,             std::move(_full_range_loc)
+            ,             std::move(_pos)
             )
         {}
 
@@ -175,32 +175,50 @@ namespace lang::ast
         virtual void accept(ASTVisitor&) noexcept override;
     };
 
-    class DeclStmt : public StmtNode {
+    class DeclStmt : public StmtNode
+    {
     private:
         std::string name;
+        common::SourceLocation name_loc;
 
     protected:
         DeclStmt(std::string_view _name
         ,        common::SourceLocation _name_loc = default_pos()
-        ,        common::SourceLocation _full_range_loc = default_pos()
-        ):  StmtNode(std::move(_full_range_loc))
+        ,        common::SourceLocation _pos = default_pos()
+        ):  StmtNode(std::move(_pos))
         ,   name(_name)
         ,   name_loc(_name_loc)
         {}
 
     public:
+        virtual void accept(ConstASTVisitor&) const noexcept override = 0;
+        virtual void accept(ASTVisitor&) noexcept override = 0;
+
         std::string_view get_name() const noexcept;
-        common::SourceLocation name_loc;
+        const common::SourceLocation& get_name_loc() const noexcept;
     };
     
-    class DeclName : public DeclStmt {
+    class DeclName : public DeclStmt
+    {
     protected:
-				using DeclStmt::DeclStmt;
-		public:
-				std::unique_ptr<AbstractType> type;
+        DeclName(std::string_view _name
+        ,        common::SourceLocation _name_loc = default_pos()
+        ,        common::SourceLocation _pos = default_pos()
+        ):  DeclStmt(_name
+            ,        std::move(_name_loc)
+            ,        std::move(_pos)
+            )
+        {}
+
+    public:
+        virtual void accept(ConstASTVisitor&) const noexcept override = 0;
+        virtual void accept(ASTVisitor&) noexcept override = 0;
+
+        bool is_extern() const noexcept;
     };
 
-    class DeclVariable : public DeclName {
+    class DeclVariable : public DeclName
+    {
     private:
         ExprPtr init_expr;
 
@@ -208,10 +226,10 @@ namespace lang::ast
         explicit DeclVariable(std::string_view _name
         ,                common::SourceLocation _name_loc = default_pos()
         ,                ExprPtr _init = nullptr
-        ,                common::SourceLocation _full_range_loc = default_pos()
+        ,                common::SourceLocation _pos = default_pos()
         ):  DeclName(_name
             ,        std::move(_name_loc)
-            ,        std::move(_full_range_loc)
+            ,        std::move(_pos)
             )
         ,   init_expr(std::move(_init))
         {}
@@ -222,7 +240,8 @@ namespace lang::ast
         const ExprNode* get_init_expr() const noexcept;
     };
 
-    class DeclFunction : public DeclName {
+    class DeclFunction : public DeclName
+    {
     private:
         std::vector<std::unique_ptr<DeclVariable>> args;
         StmtPtr body;
@@ -232,10 +251,10 @@ namespace lang::ast
         ,        std::vector<std::unique_ptr<DeclVariable>> _args
         ,        common::SourceLocation _name_loc = default_pos()
         ,        StmtPtr _body = nullptr
-        ,        common::SourceLocation _full_range_loc = default_pos()
+        ,        common::SourceLocation _pos = default_pos()
         ):  DeclName(_name
             ,        std::move(_name_loc)
-            ,        std::move(_full_range_loc)
+            ,        std::move(_pos)
             )
         ,   args(std::move(_args))
         ,   body(std::move(_body))
@@ -248,17 +267,19 @@ namespace lang::ast
         const StmtNode* get_body() const noexcept;
     };
 
-    class ImportStmt : public StmtNode {
+    class ImportStmt : public StmtNode
+    {
     private:
+        common::SourceLocation name_loc;
         SymbolPath path;
         
     public:
         explicit ImportStmt(SymbolPath _imported
         ,                   common::SourceLocation _name_pos = default_pos()
-        ,                   common::SourceLocation _full_range_loc = default_pos()
-        ):  StmtNode(std::move(_full_range_loc))
-        ,   path(std::move(_imported))
+        ,                   common::SourceLocation _pos = default_pos()
+        ):  StmtNode(std::move(_pos))
         ,   name_loc(_name_pos)
+        ,   path(std::move(_imported))
         {}
 
         virtual void accept(ConstASTVisitor&) const noexcept override;
@@ -274,19 +295,26 @@ namespace lang::ast
         // bool is_relative() const noexcept;
 
         /**
-         * @brief location of the "name" in source code
+         * @brief Get the module path location in source code
+         * @return common::SourceLocation 
          */
-        common::SourceLocation name_loc;
+        common::SourceLocation get_name_location();
+
+        /**
+         * @brief Set the module path location in source code
+         */
+        void set_name_location();
     };
 
-    class ReturnStmt : public StmtNode {
+    class ReturnStmt : public StmtNode
+    {
     private:
         ExprPtr ret_expr{nullptr};
         
     public:
         explicit ReturnStmt(ExprPtr _ret = nullptr
-        ,                   common::SourceLocation _full_range_loc = default_pos()
-        ):  StmtNode(std::move(_full_range_loc))
+        ,                   common::SourceLocation _pos = default_pos()
+        ):  StmtNode(std::move(_pos))
         ,   ret_expr(std::move(_ret))
         {}
         

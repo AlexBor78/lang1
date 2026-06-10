@@ -6,7 +6,7 @@
 namespace lang::syntax
 {
     /**
-     * @warning using values of enum in utils functions, don't change if dont know how
+     * @warning using order of enum in utils functions, don't change if dont know how
      * 
      */
     enum class TokenType

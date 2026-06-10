@@ -66,6 +66,19 @@ improve structure with MI (multiple inherit)
     - [ ] Codegen 
 
 ### semantic
+1. clean up existed code
+2. implement base semantic stage
+- [ ] SymbolsCollector - collect all symbol declarations
+- [ ] NameChecker check if identifier exists (var and functions)
+- [ ] TypeBuilder - fill TypeTable with types (not supported for now, in future: aliases, structs, enum)
+- [ ] TypeInitializer - create real types from UnsolvedTypes (BTW check if type exists)
+- [ ] TypeResolver - resolve types (e.g. bool -> int, uint -> int, etc)
+
+- [ ] optinal
+    - [ ] Optimizers (e.g. increment, blockstmt->one-stmt(if possible), etc)
+    - [ ] clean up files a little bit and reorganize code in them
+- [ ] write SemanticInitializers (rewrite)
+- [ ] update SymbolCollector (there are some code already, and it is outdated a little bit)
 
 semantic is now current stage
 

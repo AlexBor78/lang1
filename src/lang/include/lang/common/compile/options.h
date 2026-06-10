@@ -27,11 +27,16 @@ namespace lang
         bool help{false};
         bool syntax_only{false};
         bool semantic_only{false};
+				bool dry_run{false};
 
         // debug flags
         bool trace_lexer{false}; // todo: SyntaxDriver, Lexer support
         bool trace_parser{false}; // todo: SyntaxDriver, Parser support
         std::vector<std::string> print_modules_ast;
         std::vector<std::string> print_modules_tokens;
+
+				// other options
+				size_t arena_init_size{64 * 1024}; // by defalt arena starts from 64kb
+				std::string extension{".lang"};
     };
 }

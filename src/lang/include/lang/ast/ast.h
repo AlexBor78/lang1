@@ -17,47 +17,31 @@ namespace lang::ast
     using ExprPtr = std::unique_ptr<ExprNode>;
     using AST = std::vector<std::unique_ptr<BaseNode>>;
 
-    class BaseNode
-    {
-    private:
-        common::SourceLocation source_pos = {};
+    class BaseNode {
     protected:
         static constexpr inline common::SourceLocation default_pos() noexcept {
             return common::SourceLocation{};
         }
-        explicit BaseNode(common::SourceLocation _pos = default_pos()): 
-            source_pos(std::move(_pos))
+        explicit BaseNode(common::SourceLocation _full_range_loc = default_pos()): 
+            source_pos(std::move(_full_range_loc))
         {}
 
     public:
         virtual void accept(ConstASTVisitor&) const noexcept = 0;
         virtual void accept(ASTVisitor&) noexcept = 0;
         virtual ~BaseNode() = default;
-        common::SourceLocation get_source_pos() const noexcept;
-        void set_source_pos(const common::SourceLocation& pos) noexcept;
+        common::SourceLocation source_pos = {};
     };
 
     class StmtNode : public BaseNode
     {
     protected:
-        explicit StmtNode(common::SourceLocation _pos = default_pos()):
-            BaseNode(std::move(_pos))
-        {}
-    
-    public:
-        virtual void accept(ConstASTVisitor&) const noexcept override = 0;
-        virtual void accept(ASTVisitor&) noexcept override = 0;
+			using BaseNode::BaseNode;
     };
 
     class ExprNode : public StmtNode
     {
     protected:
-        explicit ExprNode(common::SourceLocation _pos = default_pos()):
-            StmtNode(std::move(_pos))
-        {}
-
-    public:
-        virtual void accept(ConstASTVisitor&) const noexcept override = 0;
-        virtual void accept(ASTVisitor&) noexcept override = 0;
+			using StmtNode::StmtNode;
     };
 }

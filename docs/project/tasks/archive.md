@@ -41,6 +41,30 @@
     - [X] module
     - [X] program
     - [X] ProgramInitializer (Program name, global_scope, etc)
+- [X] remove noexcept from ast visitors
+- [X] may be change semantic types a little bit if needed.
+- [X] save export-import to context IN parser
+- [X] remove ImportAnalyzer (basically - ImportsCollector)
+- [X] clean up files organisation:
+    - [X] move compile_options to common
+    - [X] move compile state to common
+    - [X] move Program to common
+    - [X] create CompileUnit in common
+- [X] update SymbolPath Structure
+    (or create one more, that have absolute and relative SymbolPath, and bool flag)
+    and use instead of SymbolPath (like FileLocation -> SourceLocation in past)
+- [^] update semantic types architecture
+    - [X] divide `semantic::Module` into 1 separated structure and SymbolID:
+        - [X] CompileUnit - compile unit. not symbol 
+                use it's own UnitID
+                stored in Program data structure
+        - [X] ModuleSym   - semantic symbol of module (like namespace)
+                not needed as dedicated structure - SymbolID + context save all data
+    - [X] remove deprecated shit from `Program`, save semantic context in it.
+    - [X] make `semantic::Identifier` into universal SymbolID in semantic stage (instead of SymbolPath, ModuleID, pointer to node)
+    - [X] integrate update SymbolPath into existing codebase
+    - [X] make SymbolsContext that will be used to store all symbols (using scope, context, TypesTable, etc, and have api)
+        note: SymbolsCon
 
 
 ## Documentation stage

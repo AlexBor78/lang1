@@ -9,8 +9,8 @@
 #include <lang/common/compile/options.h>
 #include <lang/semantic/types/semantic_types.h>
 
-constexpr const char FILE_SUFFIX[] = ".lang";
-constexpr size_t FILE_SUFFIX_SIZE = (sizeof(FILE_SUFFIX) - 1);
+// constexpr const char FILE_SUFFIX[] = ".lang";
+// constexpr size_t FILE_SUFFIX_SIZE = (sizeof(FILE_SUFFIX) - 1);
 
 namespace lang::pipeline 
 {
@@ -24,20 +24,20 @@ namespace lang::pipeline
         explicit ModulesLoader(Program* _program
         ):  program(_program)
         ,   syntax_driver(_program)
+				,		ext_len(program->compile_options.extension.size())
         {}
 
         void load();
 
     private: // vars
-
         /**
-         * @brief   all main data is store here
+         * @brief   all main data is stored here
          * 
          */
         Program* program;
 
         /**
-         * @brief   path to dir we are working in
+         * @brief   path to pwd
          */
         std::string working_dir;
 
@@ -48,6 +48,10 @@ namespace lang::pipeline
         
         SyntaxDriver syntax_driver;
 
+				/**
+				 * @brief lenth of file extension
+				 */
+				size_t ext_len{0};
     private: // api
         /**
          * @brief   load files, accept only root files e.g. main file or main-inner of library

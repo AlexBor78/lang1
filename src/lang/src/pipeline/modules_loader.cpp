@@ -55,7 +55,7 @@ namespace lang::pipeline
 
         // updating data for relative paths solving
         working_sympath = id.symbolpath;        
-        working_dir = file_path.substr(0, file_path.size() - id.symbolpath.absolute_path.normalized_path.size() - FILE_SUFFIX_SIZE);
+        working_dir = file_path.substr(0, file_path.size() - id.symbolpath.absolute_path.normalized_path.size() - ext_len);
         
         // save semantic info
         program->pre_semantic_data.extern_list.insert(
@@ -177,8 +177,8 @@ namespace lang::pipeline
         assert(file_name.substr(file_name.size() - FILE_SUFFIX_SIZE, FILE_SUFFIX_SIZE) ==  FILE_SUFFIX);
 
         std::string module_name;
-        if(file_name.contains('/')) module_name = file_name.substr(file_name.find_last_of("/") + 1, file_name.size() - FILE_SUFFIX_SIZE);
-        else module_name = file_name.substr(0, file_name.size() - FILE_SUFFIX_SIZE);
+        if(file_name.contains('/')) module_name = file_name.substr(file_name.find_last_of("/") + 1, file_name.size() - ext_len);
+        else module_name = file_name.substr(0, file_name.size() - ext_len);
         
         SymbolPath path{
 					.absolute_path = {
@@ -199,7 +199,11 @@ namespace lang::pipeline
      * @param start_path start of path
      * @return std::string 
      */
-    static std::string gen_path_(const SymbolPath& sympath, std::string start_path = "./") {
+    static std::string gen_path_(
+			const SymbolPath& sympath
+		, std::string extension
+		, std::string start_path = "./"
+		) {
 
         if(sympath.absolute_path.empty()) {
             throw common::diagnostic::InterError("gen_path_(): needs absolute sympath to module to generate");
@@ -212,13 +216,13 @@ namespace lang::pipeline
 
         // if it's library
         if(std::filesystem::is_directory(file_path)) {
-            file_path += "/" + sympath.absolute_path.path.back() + FILE_SUFFIX;
+            file_path += "/" + sympath.absolute_path.path.back() + extension;
             if(!std::filesystem::exists(file_path)) throw common::diagnostic::InterError(std::format("file {} doesn't exists", file_path));
             return file_path;
         }
         
         // just module, without submodule
-        file_path += FILE_SUFFIX;
+        file_path += extension;
         if(!std::filesystem::exists(file_path)) throw common::diagnostic::InterError(std::format("file {} doesn't exists", file_path));
         return file_path;
     }
@@ -227,12 +231,16 @@ namespace lang::pipeline
         assert(!id.path.path.empty());
 
         if(sympath.is_relative) {
-            return gen_path_(sympath, working_dir);
+            return gen_path_(
+							sympath
+						,	program->compile_options.extension
+						, working_dir
+						);
         }
 
         for(const auto& path : program->compile_options.import_paths) {
             try {
-                std::string buf = gen_path_(sympath, path);
+                std::string buf = gen_path_(sympath, program->compile_options.extension, path);
                 return buf;
             } catch(const common::diagnostic::InterError& e) {
                 continue;
@@ -244,7 +252,7 @@ namespace lang::pipeline
         } 
         
         // // not sure should i try relative path, if absolute don't work
-        return gen_path_(sympath, working_dir);
+        return gen_path_(sympath, program->compile_options.extension, working_dir);
         throw common::diagnostic::InterError(std::format("Cannot open file of {} module", sympath.absolute_path.normalize()));
     }
 }

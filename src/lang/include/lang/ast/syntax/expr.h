@@ -13,8 +13,8 @@ namespace lang::ast
 
     protected:
         explicit LiteralExpr(std::string_view _literal
-        ,                    common::SourceLocation _full_range_loc = default_pos()
-        ):  ExprNode(std::move(_full_range_loc))
+        ,                    common::SourceLocation _pos = default_pos()
+        ):  ExprNode(std::move(_pos))
         ,   literal(_literal)
         {}
 
@@ -30,9 +30,9 @@ namespace lang::ast
     {
     public:
         explicit NumberLiteral(std::string_view _literal
-        ,                      common::SourceLocation _full_range_loc = default_pos()
+        ,                      common::SourceLocation _pos = default_pos()
         ):  LiteralExpr(_literal
-            ,           std::move(_full_range_loc)
+            ,           std::move(_pos)
             )
         {}
 
@@ -44,9 +44,9 @@ namespace lang::ast
     {
     public:
         explicit StringLiteral(std::string_view _literal
-        ,                      common::SourceLocation _full_range_loc = default_pos()
+        ,                      common::SourceLocation _pos = default_pos()
         ):  LiteralExpr(_literal
-            ,           std::move(_full_range_loc)
+            ,           std::move(_pos)
             )
         {}
 
@@ -58,9 +58,9 @@ namespace lang::ast
     {
     public:
         explicit BoolLiteral(std::string_view _literal
-        ,                    common::SourceLocation _full_range_loc = default_pos()
+        ,                    common::SourceLocation _pos = default_pos()
         ):  LiteralExpr(_literal
-            ,           std::move(_full_range_loc)
+            ,           std::move(_pos)
             )
         {}
 
@@ -75,8 +75,8 @@ namespace lang::ast
 
     public:
         explicit IdentifierExpr(std::string_view _name
-        ,                       common::SourceLocation _full_range_loc = default_pos()
-        ):  ExprNode(std::move(_full_range_loc))
+        ,                       common::SourceLocation _pos = default_pos()
+        ):  ExprNode(std::move(_pos))
         ,   name(_name)
         {}
 
@@ -90,9 +90,9 @@ namespace lang::ast
     {
     public:
         explicit VariableExpr(std::string_view _name
-        ,                     common::SourceLocation _full_range_loc = default_pos()
+        ,                     common::SourceLocation _pos = default_pos()
         ):  IdentifierExpr(_name
-            ,              std::move(_full_range_loc)
+            ,              std::move(_pos)
             )
         {}
 
@@ -104,14 +104,15 @@ namespace lang::ast
     {
     private:
         ExprPtr identifier;
+        common::SourceLocation name_loc;
 
     public:
         SymbolPathExpr(std::string_view _name
         ,             ExprPtr _identifier
         ,             common::SourceLocation _name_loc = default_pos()
-        ,             common::SourceLocation _full_range_loc = default_pos()
+        ,             common::SourceLocation _pos = default_pos()
         ):  IdentifierExpr(_name
-            ,              std::move(_full_range_loc)
+            ,              std::move(_pos)
             )
         ,   identifier(std::move(_identifier))
         ,   name_loc(_name_loc)
@@ -123,7 +124,7 @@ namespace lang::ast
         const ExprNode* get_identifier() const noexcept;
         ExprNode* get_identifier() noexcept;
 
-        common::SourceLocation name_loc;
+        const common::SourceLocation& get_name_loc() const noexcept;
     };
 
     class FunctionExpr : public ExprNode
@@ -131,13 +132,14 @@ namespace lang::ast
     private:
         std::string callee;
         std::vector<ExprPtr> args;
+        common::SourceLocation name_loc;
 
     public:
         FunctionExpr(std::string_view _callee
         ,        std::vector<ExprPtr> _args
         ,        common::SourceLocation _name_loc = default_pos()
-        ,        common::SourceLocation _full_range_loc = default_pos()
-        ):  ExprNode(std::move(_full_range_loc))
+        ,        common::SourceLocation _pos = default_pos()
+        ):  ExprNode(std::move(_pos))
         ,   callee(_callee)
         ,   args(std::move(_args))
         ,   name_loc(_name_loc)
@@ -145,8 +147,8 @@ namespace lang::ast
 
         FunctionExpr(std::string_view _callee
         ,        std::vector<ExprPtr> _args
-        ,        common::SourceLocation _full_range_loc = default_pos()
-        ):  ExprNode(std::move(_full_range_loc))
+        ,        common::SourceLocation _pos = default_pos()
+        ):  ExprNode(std::move(_pos))
         ,   callee(_callee)
         ,   args(std::move(_args))
         {}
@@ -158,7 +160,7 @@ namespace lang::ast
         const std::vector<ExprPtr>& get_args() const noexcept;
         std::vector<ExprPtr>& get_args() noexcept;
       
-        common::SourceLocation name_loc;
+        const common::SourceLocation& get_name_loc() const noexcept;
     };
 
     class OperatorExpr : public ExprNode
@@ -216,12 +218,13 @@ namespace lang::ast
 
     private:
         OperatorKind op;
+        common::SourceLocation op_loc;
         
     protected:
         explicit OperatorExpr(OperatorKind _op
         ,                     common::SourceLocation _op_loc = default_pos()
-        ,                     common::SourceLocation _full_range_loc = default_pos()
-        ):  ExprNode(std::move(_full_range_loc))
+        ,                     common::SourceLocation _pos = default_pos()
+        ):  ExprNode(std::move(_pos))
         ,   op(_op)
         ,   op_loc(_op_loc)
         {}
@@ -231,7 +234,7 @@ namespace lang::ast
         virtual void accept(ASTVisitor&) noexcept override = 0;
 
         OperatorKind get_op() const noexcept;
-        common::SourceLocation op_loc;
+        const common::SourceLocation& get_op_loc() const noexcept;
     };
 
     class BinOpExpr : public OperatorExpr
@@ -245,9 +248,9 @@ namespace lang::ast
         ,         ExprPtr _left
         ,         ExprPtr _right
         ,         common::SourceLocation _op_loc = default_pos()
-        ,         common::SourceLocation _full_range_loc = default_pos()
+        ,         common::SourceLocation _pos = default_pos()
         ):  OperatorExpr(_op
-            ,           std::move(_full_range_loc)
+            ,           std::move(_pos)
             ,           std::move(_op_loc)
             )
         ,   left(std::move(_left))
@@ -274,9 +277,9 @@ namespace lang::ast
         UnaryOpExpr(OperatorKind _op
         ,           ExprPtr _operand
         ,           common::SourceLocation _op_loc = default_pos()
-        ,           common::SourceLocation _full_range_loc = default_pos()
+        ,           common::SourceLocation _pos = default_pos()
         ):  OperatorExpr(_op
-            ,           std::move(_full_range_loc)
+            ,           std::move(_pos)
             ,           std::move(_op_loc)
             )
         ,   operand(std::move(_operand))
@@ -296,10 +299,10 @@ namespace lang::ast
         PrefixUnaryOpExpr(OperatorKind _op
         ,                 ExprPtr _operand
         ,                 common::SourceLocation _op_loc = default_pos()
-        ,                 common::SourceLocation _full_range_loc = default_pos()
+        ,                 common::SourceLocation _pos = default_pos()
         ):  UnaryOpExpr(_op
             ,           std::move(_operand)
-            ,           std::move(_full_range_loc)
+            ,           std::move(_pos)
             ,           std::move(_op_loc)
             )
         {}
@@ -314,10 +317,10 @@ namespace lang::ast
         PostfixUnaryOpExpr(OperatorKind _op
         ,                  ExprPtr _operand
         ,                  common::SourceLocation _op_loc = default_pos()
-        ,                  common::SourceLocation _full_range_loc = default_pos()
+        ,                  common::SourceLocation _pos = default_pos()
         ):  UnaryOpExpr(_op
             ,           std::move(_operand)
-            ,           std::move(_full_range_loc)
+            ,           std::move(_pos)
             ,           std::move(_op_loc)
             )
         {}
@@ -328,13 +331,14 @@ namespace lang::ast
 
     class StackAllocExpr : public ExprNode {
         std::vector<size_t> dimensions;
+        std::vector<common::SourceLocation> locs;
 
     public:
 
         explicit StackAllocExpr(std::vector<size_t> _dimensions
         ,                       std::vector<common::SourceLocation> _locs = std::vector<common::SourceLocation>()
-        ,                       common::SourceLocation _full_range_loc = default_pos()
-        ):  ExprNode(_full_range_loc)
+        ,                       common::SourceLocation _pos = default_pos()
+        ):  ExprNode(_pos)
         ,   dimensions(std::move(_dimensions))
         ,   locs(std::move(_locs))
         {}
@@ -344,6 +348,6 @@ namespace lang::ast
         virtual void accept(ConstASTVisitor&) const noexcept override;
         virtual void accept(ASTVisitor&) noexcept override;
 
-        std::vector<common::SourceLocation> locs;
+        const std::vector<common::SourceLocation>& get_dimensions_loc() const noexcept;
     };
 }

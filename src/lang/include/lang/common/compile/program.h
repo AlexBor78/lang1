@@ -5,6 +5,8 @@
 #include <unordered_set>
 #include <unordered_map>
 
+#include <common/memory/arena_aloc.h>
+
 #include <lang/common/compile/unit.h>
 #include <lang/common/compile/state.h>
 #include <lang/common/compile/options.h>
@@ -46,23 +48,25 @@ namespace lang
      */
     struct Program {        
         /**
-         * @brief   name of program, and name of output binary
+         * @brief   name of output binary
          */
         std::string name{"main"};
 
-        /**
-         * @brief   compile optoins of program
-         */
         CompileOptions compile_options;
 
-        /**
-         * @brief   compile state of program
-         */
         CompileState compile_state;
+
+
+				/**
+				 * @brief 	arena to alocate ast
+				 * @note		initialized by CompileDriver
+				 */
+				std::unique_ptr<common::memory::ArenaAloc> syntax_arena;
 
         /**
          * @brief   container with all CompileUnits
          * @note    will replace `modules` field
+				 * @notw 		all data after syntax here
          */
         CompileUnitsManager compile_units_manager;
 

@@ -5,6 +5,7 @@
 // utils
 #include <lang/utils/ast_utils.h>
 #include <lang/utils/syntax_utils.h>
+#include <common/memory/arena_aloc.h>
 
 #include <lang/pipeline/compiledriver.h>
 
@@ -20,10 +21,17 @@ namespace lang::pipeline {
        Program program;
        program.compile_options = compile_options;
 
-        {   // parsing all files (loading them as modules to semantic info)
-            ModulesLoader loader(&program);
-            loader.load();
-            if(compile_options.syntax_only) return;
+        { // syntax stage
+					
+					// alocating arena
+					program.syntax_arena = std::make_unique<common::memory::ArenaAloc>(
+						program.compile_options.arena_init_size
+					);
+
+					// parsing all files (loading them as units to untis mngr)
+					ModulesLoader loader(&program);
+					loader.load();
+					if(compile_options.syntax_only) return;
         }
         return;
         

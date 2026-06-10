@@ -141,7 +141,7 @@ namespace lang::syntax::parser
             auto node = process_import_stmt();
             if(!is_end()) pos.merge(peek().pos); // merging semicolon
             process_semicolon();
-            node->set_source_pos(pos);
+						node->source_pos = pos;
             add_to_imports_list(node.get());
             return node;
         }
@@ -154,7 +154,7 @@ namespace lang::syntax::parser
             auto node = process_import_stmt();
             if(!is_end()) import_pos.merge(peek().pos);
             process_semicolon();
-            node->set_source_pos(import_pos);
+            node->source_pos = import_pos;
             add_to_submodules(node.get());
             return node;
         }
@@ -242,7 +242,7 @@ namespace lang::syntax::parser
         if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
         else body = process_token();
 
-        if(body->get_source_pos() != common::SourceLocation()) loc.merge(body->get_source_pos());
+        if(body->source_pos != common::SourceLocation()) loc.merge(body->source_pos);
 
         return std::make_unique<ast::IfStmt>(
             std::move(cond), 
@@ -263,7 +263,7 @@ namespace lang::syntax::parser
         if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
         else body = process_token();
 
-        if(body->get_source_pos() != common::SourceLocation()) loc.merge(body->get_source_pos());
+        if(body->source_pos != common::SourceLocation()) loc.merge(body->source_pos);
 
         return std::make_unique<ast::ElseStmt>(
             std::move(body),
@@ -302,7 +302,7 @@ namespace lang::syntax::parser
         if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
         else body = process_token();
 
-        if(body->get_source_pos() != common::SourceLocation()) loc.merge(body->get_source_pos());
+        if(body->source_pos != common::SourceLocation()) loc.merge(body->source_pos);
 
         return std::make_unique<ast::ForStmt>(
             std::move(decl),
@@ -333,7 +333,7 @@ namespace lang::syntax::parser
         if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
         else body = process_token();
 
-        if(body->get_source_pos() != common::SourceLocation()) loc.merge(body->get_source_pos());
+        if(body->source_pos != common::SourceLocation()) loc.merge(body->source_pos);
         return std::make_unique<ast::WhileStmt>(
             std::move(cond),
             std::move(body),
@@ -355,7 +355,7 @@ namespace lang::syntax::parser
         if(!is_end() && !match(TokenType::RBRACE)) throw expected_rbrace();
         loc.merge(advance().pos); // '}'
 
-        block->set_source_pos(loc);
+        block->source_pos = loc;
         return block;
     }
 
@@ -570,7 +570,7 @@ namespace lang::syntax::parser
         // check for stack also, so <- will not used as =
         &&  match(TokenType::STACK, 1)))) {skip(); // skip = or <-
             auto init_expr = process_expr();
-            if(init_expr->get_source_pos() != common::SourceLocation()) loc.merge(init_expr->get_source_pos());
+            if(init_expr->source_pos != common::SourceLocation()) loc.merge(init_expr->source_pos);
             auto node = std::make_unique<ast::DeclVariable>(
                 name,
                 name_loc,
@@ -633,7 +633,7 @@ namespace lang::syntax::parser
         } 
         
         auto body = process_scope();
-        if(body->get_source_pos() != common::SourceLocation()) loc.merge(body->get_source_pos());
+        if(body->source_pos != common::SourceLocation()) loc.merge(body->source_pos);
         auto node = std::make_unique<ast::DeclFunction>(
             name,
             std::move(args),
@@ -792,7 +792,7 @@ namespace lang::syntax::parser
             auto node = process_expr();
             if(!is_end() && !match(TokenType::RPAREN)) throw expected_rparen();
             node_loc.merge(advance().pos); // skip ')'
-            node->set_source_pos(std::move(node_loc));
+            node->source_pos = std::move(node_loc);
             return node;
         }
         if(!is_end() && match(TokenType::IDENTIFIER)) return process_name();
