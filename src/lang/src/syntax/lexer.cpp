@@ -3,22 +3,24 @@
 #include <lang/syntax/lexer.h>
 #include <lang/utils/syntax_utils.h>
 
+#include <print>
+
 namespace lang::syntax::lexer
 {
-// api
+// public api
     bool Lexer::is_success() const noexcept {
         return success;
     }
-    std::vector<Token> Lexer::tokenize(common::streams::InputStream* _stream) {
-        stream = _stream;
-        return tokenize();
-    }
+//    std::vector<Token> Lexer::tokenize(common::streams::InputStream* _stream) {
+//        stream = _stream;
+//        return tokenize();
+//    }
     std::vector<Token> Lexer::tokenize() {
         breakpoint();
         tokens.clear();
 
-        if(stream->get_pos().path.empty()) logger.log("tokenizing new stream");
-        else logger.log("tokenizing file: {}", stream->get_pos().path);
+//        if(stream->get_pos().path.empty()) logger.log("tokenizing new stream");
+//        else logger.log("tokenizing file: {}", stream->get_pos().path);
         
         while(!is_eof()) try {
             // for ConsoleIStream:
@@ -50,12 +52,12 @@ namespace lang::syntax::lexer
             tokenize_punct();
         } catch(const diagnostic::LexerError& e) {
             success = false;
-            logger.error("{}", e.what());
+            logger->error("{}", e.what());
             if(!is_eof()) skip();
             else break;
         } catch(const std::exception& e) {
             success = false;
-            logger.error("lexer inter error: {}", e.what());
+            logger->error("lexer inter error: {}", e.what());
             if(!is_eof()) skip();
             else break;
         }
@@ -71,11 +73,11 @@ namespace lang::syntax::lexer
     // errors creation
 
     void Lexer::init_logger() noexcept {
-        logger.set_name("Lexer");
+        logger->set_name("Lexer");
         #ifdef LEXER_DEBUG            
             logger.set_level(common::utils::Logger::LogLevel::ALL);
         #else
-            logger.set_level(common::utils::Logger::LogLevel::INFO | common::utils::Logger::LogLevel::WARN | common::utils::Logger::LogLevel::ERROR);
+            logger->set_level(common::utils::Logger::LogLevel::INFO | common::utils::Logger::LogLevel::WARN | common::utils::Logger::LogLevel::ERROR);
         #endif 
         // logger.set_level(common::utils::Logger::LogLevel::ALL);s
     }
@@ -87,10 +89,10 @@ namespace lang::syntax::lexer
     }
 
     void Lexer::set_logger_infostream(std::unique_ptr<common::streams::OutputStream> stream) noexcept {
-        logger.set_infostream(std::move(stream));
+        logger->set_infostream(std::move(stream));
     }
     void Lexer::set_logger_errstream(std::unique_ptr<common::streams::OutputStream> stream) noexcept {
-        logger.set_errstream(std::move(stream));
+        logger->set_errstream(std::move(stream));
     }
 
     diagnostic::LexerError Lexer::stream_null() const {
@@ -124,41 +126,69 @@ namespace lang::syntax::lexer
         return diagnostic::LexerError("Unicode is not supported (yet)", pos);
     }
 
-    // stream work
+    // stream work // ai generated while refactoring; todo: refactor whole lexer, so it operate only on characters (accepts string -> return tokens)
+		void Lexer::check_stream() const {
+    if (source.empty()) throw stream_null();
+}
 
-    void Lexer::check_stream() const {
-        if(!stream) throw stream_null();
-        if(stream->bad()) throw stream_bad();
+// check_data() больше не нужен в базовых методах, удали его или оставь только для специфичных проверок
+
+bool Lexer::is_eof(size_t n) const {
+    if (n == 0) throw passed_zero_to_eof();
+    return cursor + n > source.size();
+}
+
+char Lexer::peek(size_t offset) const {
+    check_stream(); // Было check_data(), стало check_stream() как в InputStream
+    if (is_eof(offset + 1)) throw reached_eof();
+    return source[cursor + offset];
+}
+
+char Lexer::advance(size_t offset) {
+    check_stream(); // Было check_data(), стало check_stream()
+    if (is_eof(offset + 1)) throw reached_eof();
+    
+    for (size_t i = 0; i <= offset; ++i) {
+        current_pos = update_pos(current_pos, source[cursor + i]);
     }
-    void Lexer::check_data() const {
-        if(is_eof()) throw reached_eof();
+    char result = source[cursor + offset];
+    cursor += offset + 1;
+    return result;
+}
+
+void Lexer::skip(size_t n) {
+    if (n == 0) return;
+    // Безопасный skip: останавливается на EOF, не кидает исключение
+    size_t actual_skip = std::min(n, source.size() - cursor);
+    for (size_t i = 0; i < actual_skip; ++i) {
+        current_pos = update_pos(current_pos, source[cursor]);
+        cursor++;
     }
-    bool Lexer::is_eof(size_t n) const {
-        if(n == 0) throw passed_zero_to_eof();
-        check_stream();
-        return stream->is_eof(n);
+}
+
+std::string Lexer::read_word() {
+    check_stream(); // Было check_data(), стало check_stream()
+    std::string word;
+    while (!is_eof() && is_word()) {
+        word += advance();
     }
-    char Lexer::peek(size_t offset) const {
-        check_data();
-        return stream->peek(offset);
+    return word;
+}
+
+void Lexer::skip_whitespace() {
+    check_stream(); // Было check_data(), стало check_stream()
+    while (!is_eof() && isspace(peek())) {
+        skip(1);
     }
-    char Lexer::advance(size_t offset) {
-        check_data();
-        return stream->advance(offset);
-    }
-    void Lexer::skip(size_t n) {
-        check_data();
-        stream->skip(n);
-    }
-    std::string Lexer::read_word() {
-        check_data();
-        return stream->read_word();
-    }
-    void Lexer::skip_whitespace() {
-        check_data();
-        stream->skip_whitespace();
-    }
-    [[nodiscard("Lexer::update_pos() RETURN updated pos")]] common::SourceLocation Lexer::update_pos(common::SourceLocation pos, char c) noexcept {
+}
+
+common::SourceLocation Lexer::get_pos() const {
+    check_stream();
+    return current_pos;
+}
+
+    [[nodiscard("Lexer::update_pos() RETURN updated pos")]]
+		common::SourceLocation Lexer::update_pos(common::SourceLocation pos, char c) noexcept {
         ++pos.length;
         ++pos.end.index;
         if(c == '\n') {
@@ -167,15 +197,11 @@ namespace lang::syntax::lexer
         } else ++pos.end.column;
         return pos;
     }
-    common::SourceLocation Lexer::get_pos() const {
-        check_stream();
-        return stream->get_pos();
-    }
 
 // tokenizing
 
     void Lexer::add_token(Token tok) {
-        logger.debug("add_token() token: {{tt: {} str:\"{}\"}}", utils::stringify(tok.ty), tok.sym);
+        logger->debug("add_token() token: {{tt: {} str:\"{}\"}}", utils::stringify(tok.ty), tok.sym);
         tokens.emplace_back(tok);
     }
 
@@ -202,7 +228,7 @@ namespace lang::syntax::lexer
     }
 
     void Lexer::tokenize_word() {
-        breakpoint(); logger.debug("tokenize_word()");
+        breakpoint(); logger->debug("tokenize_word()");
         common::SourceLocation loc = get_pos();
         std::string buf = read_word();
         
@@ -226,7 +252,7 @@ namespace lang::syntax::lexer
     }
 
     void Lexer::tokenize_punct() {
-        breakpoint(); logger.debug("tokenize_punct()");
+        breakpoint(); logger->debug("tokenize_punct()");
         common::SourceLocation pos = get_pos();
         std::string buf;
 
@@ -255,7 +281,7 @@ namespace lang::syntax::lexer
     }
 
     void Lexer::tokenize_number() {
-        breakpoint(); logger.debug("tokenize_number()");
+        breakpoint(); logger->debug("tokenize_number()");
         common::SourceLocation loc = get_pos();
         std::string buf;
         bool has_dot{false};
@@ -280,7 +306,7 @@ namespace lang::syntax::lexer
     }
 
     void Lexer::tokenize_string() {
-        breakpoint(); logger.debug("tokenize_sring()");
+        breakpoint(); logger->debug("tokenize_sring()");
         common::SourceLocation pos = get_pos();
         std::string buf;
 
@@ -330,13 +356,13 @@ namespace lang::syntax::lexer
     }
 
     void Lexer::process_comment_line() {
-        breakpoint(); logger.debug("process_coment_line()");
+        breakpoint(); logger->debug("process_coment_line()");
         skip(2); // skip "//"
 
         while(!is_eof(1) && peek() != '\n') skip();
     }
     void Lexer::process_comment_block() {
-        breakpoint(); logger.debug("process_coment_block()");
+        breakpoint(); logger->debug("process_coment_block()");
         auto pos = get_pos();
         skip(2); // skip "/*"
         while(!is_eof()) {

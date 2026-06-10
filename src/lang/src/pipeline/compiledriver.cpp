@@ -17,15 +17,28 @@ namespace lang::pipeline {
 
     void CompileDriver::run()
     {
-       semantic::SemanticState semantic_state;
-       Program program;
        program.compile_options = compile_options;
+
+			 // initializing logger
+			init_logger(); 
 
         { // syntax stage
 					
-					// alocating arena
-					program.syntax_arena = std::make_unique<common::memory::ArenaAloc>(
-						program.compile_options.arena_init_size
+					program.logger.set_name("SYNTAX");
+					
+					// alocating arena for sources
+					program.sources_arena = std::make_unique<common::memory::ArenaAloc>(
+						program.compile_options.sources_arena_init_size
+					);
+
+					// creating storage for sources
+					program.sources_storage = std::make_unique<syntax::SourcesStorage>(
+							program.sources_arena->get_resource()
+					);
+
+					// alocating arena for ast
+					program.ast_arena = std::make_unique<common::memory::ArenaAloc>(
+						program.compile_options.ast_arena_init_size
 					);
 
 					// parsing all files (loading them as units to untis mngr)
@@ -36,6 +49,7 @@ namespace lang::pipeline {
         return;
         
         {   // semantic analyze
+       			semantic::SemanticState semantic_state;
             SemanticDriver analyzer(
                 &compile_options,
                 &semantic_state
@@ -47,4 +61,11 @@ namespace lang::pipeline {
 
         }
     }
+
+		void CompileDriver::init_logger() {
+			// todo
+//			if(program.compile_options.trace_lexer) {
+//					
+//			}
+		}
 }

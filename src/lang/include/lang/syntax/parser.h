@@ -28,7 +28,7 @@ namespace lang::syntax::parser
         bool had_errors() const noexcept;
 
     private: // vars
-        common::utils::Logger logger{common::utils::Logger::LogLevel::ALL};
+        common::utils::Logger logger{"PARSER"};
         SyntaxContainer syntax_container;
 				common::memory::ArenaAloc* arena;
 

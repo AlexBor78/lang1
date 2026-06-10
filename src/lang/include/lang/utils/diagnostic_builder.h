@@ -14,7 +14,7 @@ namespace lang::diagnostic
     class DiagnosticBuilder
     {
     private: // vars
-        common::utils::Logger logger{common::utils::Logger::LogLevel::ALL};
+        common::utils::Logger logger{"DIAGNOSTIC"};
         std::unique_ptr<common::streams::FileIStream> file;
         common::SourceLocation loc;
         std::string error_message;

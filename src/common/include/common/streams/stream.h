@@ -55,6 +55,7 @@ namespace common::streams
         virtual SourceLocation get_pos() const override;
 
         virtual std::string read_word();
+				virtual std::string read_all();
 
         /**
          * @brief see current+offset token

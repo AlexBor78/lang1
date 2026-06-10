@@ -1,6 +1,8 @@
 #include <common/diagnostic/diagnostic.h>
 #include <common/streams/stream.h>
 
+#include <print>
+
 namespace common::streams
 {
 // AbstractStream
@@ -104,6 +106,31 @@ namespace common::streams
             if(is_eof()) break;
         } return word;
     }
+
+		// AI GENERATED.
+		std::string InputStream::read_all() {
+	    check_stream();
+	    
+	    // 1. Забираем то, что уже успело накопиться в буфере предпросмотра (если были peek/advance)
+	    std::string result = std::move(lookahead_buffer);
+	    lookahead_buffer.clear();
+	    
+	    // 2. Читаем остаток потока чанками. 
+	    // Это стандартный и самый быстрый способ для std::istream (работает и для файлов, и для cin)
+	    constexpr size_t CHUNK_SIZE = 8192;
+	    char buffer[CHUNK_SIZE];
+	    
+	    while (istream->read(buffer, CHUNK_SIZE) || istream->gcount() > 0) {
+	        result.append(buffer, istream->gcount());
+	    }
+	    
+	    // 3. Поток полностью вычитан до EOF
+	    is_eof_reached = true; 
+
+			// std::println("result of stream: {}", result);
+	    
+	    return result;
+	}
     
     void InputStream::skip_whitespace() {
         check_stream();

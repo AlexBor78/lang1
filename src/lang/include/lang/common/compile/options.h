@@ -20,7 +20,7 @@ namespace lang
     struct CompileOptions {
         std::string output_name{"a.out"};
         std::vector<std::string> import_paths;
-        std::vector<std::string> inputs_files = {"main.lang"};
+        std::vector<std::string> inputs_files = {};// {"main.lang"};
         // int threads{1}; // todo: multi-threading
 
         // features
@@ -36,7 +36,8 @@ namespace lang
         std::vector<std::string> print_modules_tokens;
 
 				// other options
-				size_t arena_init_size{64 * 1024}; // by defalt arena starts from 64kb
+				size_t sources_arena_init_size{256 * 1024}; // by defalt arena starts from 256kb
+				size_t ast_arena_init_size{64 * 1024}; // by defalt arena starts from 64kb
 				std::string extension{".lang"};
     };
 }

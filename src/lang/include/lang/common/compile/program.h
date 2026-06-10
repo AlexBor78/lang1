@@ -5,13 +5,18 @@
 #include <unordered_set>
 #include <unordered_map>
 
+#include <common/utils/logger.h>
 #include <common/memory/arena_aloc.h>
 
 #include <lang/common/compile/unit.h>
 #include <lang/common/compile/state.h>
 #include <lang/common/compile/options.h>
+
+#include <lang/syntax/source_file.h>
+
 #include <lang/semantic/types/typesystem.h> // needs by PreSemanticContainer
 #include <lang/semantic/types/semantic_types.h>
+
 
 
 // temporary here util remove deprecated
@@ -56,12 +61,23 @@ namespace lang
 
         CompileState compile_state;
 
+				/**
+				 * @breif logger
+				 */
+				common::utils::Logger logger;
+
+				/**
+				 * @brief stores all source files till end of compilation
+				 */
+				std::unique_ptr<syntax::SourcesStorage> sources_storage; 
+				std::unique_ptr<common::memory::ArenaAloc> sources_arena;
+
 
 				/**
 				 * @brief 	arena to alocate ast
 				 * @note		initialized by CompileDriver
 				 */
-				std::unique_ptr<common::memory::ArenaAloc> syntax_arena;
+				std::unique_ptr<common::memory::ArenaAloc> ast_arena;
 
         /**
          * @brief   container with all CompileUnits

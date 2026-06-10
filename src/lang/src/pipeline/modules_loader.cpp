@@ -11,9 +11,15 @@
 
 // # define MODULESLOADER_DEBUG
 
+//constexpr const char FILE_SUFFIX[] = ".lang";
+// constexpr size_t FILE_SUFFIX_SIZE = (sizeof(FILE_SUFFIX) - 1);
+
 namespace lang::pipeline
 {
     void ModulesLoader::load() {
+				if(program->compile_options.inputs_files.size() == 0) {
+					throw common::diagnostic::InterError("no input files provided");
+				}
         for(const auto& file : program->compile_options.inputs_files) {
             load(file);
         }
@@ -49,7 +55,8 @@ namespace lang::pipeline
         auto dependencies = process_imports(syntax_container.imports_list);
         auto submodules = process_imports(syntax_container.submodules_list);
 
-        assert(file_path.size() >= id.path.normalized_path.size() + FILE_SUFFIX_SIZE);
+        assert(file_path.size() >= id.path.normalized_path.size() + program->compile_options.extension.size()
+);
         // current_id = id;
         // current_path = file_path.substr(0, file_path.size() - id.path.normalized_path.size() - FILE_SUFFIX_SIZE);
 
@@ -174,7 +181,10 @@ namespace lang::pipeline
     }
 
     SymbolPath ModulesLoader::gen_sympath(const std::string& file_name) {
-        assert(file_name.substr(file_name.size() - FILE_SUFFIX_SIZE, FILE_SUFFIX_SIZE) ==  FILE_SUFFIX);
+        assert(file_name.substr(file_name.size() - program->compile_options.extension.size()
+, program->compile_options.extension.size()
+) ==  program->compile_options.extension.size()
+);
 
         std::string module_name;
         if(file_name.contains('/')) module_name = file_name.substr(file_name.find_last_of("/") + 1, file_name.size() - ext_len);

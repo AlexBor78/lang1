@@ -1,7 +1,7 @@
 #pragma once
 
 #include <lang/common/compile/state.h>
-#include <lang/common/compile/options.h>
+#include <lang/common/compile/program.h>
 
 namespace lang::pipeline
 {
@@ -17,9 +17,10 @@ namespace lang::pipeline
         void run(CompileOptions);
 
     private: // var
-        CompileState   compile_state;
         CompileOptions compile_options;
+				Program program;
         
     private: // api
+				void init_logger();
     };
 }

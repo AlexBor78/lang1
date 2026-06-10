@@ -8,6 +8,7 @@
 #include <common/streams/stream.h>
 #include <lang/syntax/token.h> 
 #include <lang/syntax/keywords.h> 
+#include <lang/syntax/source_file.h>
 
 namespace lang::syntax::lexer
 {
@@ -15,24 +16,31 @@ namespace lang::syntax::lexer
     {
     public: // api
         std::vector<Token> tokenize();
-        std::vector<Token> tokenize(common::streams::InputStream*);
+//        std::vector<Token> tokenize(common::streams::InputStream*);
 
         bool is_success() const noexcept;
 
         void set_logger_infostream(std::unique_ptr<common::streams::OutputStream>) noexcept;
         void set_logger_errstream(std::unique_ptr<common::streams::OutputStream>) noexcept;
         
-        Lexer() {init_logger();}
-        explicit Lexer(common::streams::InputStream* _stream):
-            stream(_stream)
+        explicit Lexer(
+					std::string_view _source 
+				,	common::utils::Logger* _logger
+				):source(_source)
+				,	logger(_logger)
         {init_logger();}
 
     private: // vars
-        // not owned
+//        common::streams::InputStream* stream{nullptr};
+				std::string_view source;
+				size_t cursor{0};
+				common::SourceLocation current_pos = {};
+
+//				common::memory::ArenaAloc* arena;
+
         bool success{true};
         std::vector<Token> tokens;
-        common::streams::InputStream* stream{nullptr};
-        common::utils::Logger logger{common::utils::Logger::LogLevel::ALL};
+        common::utils::Logger* logger;
 
     private: // inside api
         void breakpoint() noexcept;
@@ -53,6 +61,7 @@ namespace lang::syntax::lexer
         void check_stream() const;
         void check_data() const;
 
+				void load_file();
         bool is_eof(size_t n = 1) const;
         char peek(size_t offset = 0) const;
         char advance(size_t offset = 0);

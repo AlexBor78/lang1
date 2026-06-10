@@ -4,6 +4,7 @@
 
 // syntax
 #include <common/streams/istream.h>
+#include <lang/syntax/source_file.h>
 #include <lang/syntax/lexer.h>
 #include <lang/syntax/parser.h>
 
@@ -26,11 +27,22 @@ namespace lang::pipeline {
         if(!file->is_open())
 					throw common::diagnostic::InterError(std::format("Can not open file: {}", file_path));
 
+				// creating SourceFile to store in SourcesStorage
+				syntax::SourceFile src(
+						file_path
+				,		program->sources_arena->get_resource()
+				);
+
+				src.load_from_stream(file.get());
+
         // syntax
-        syntax::lexer::Lexer lexer(file.get());
+        syntax::lexer::Lexer lexer(
+						src.content(),
+						&program->logger
+				);
         auto tokens = lexer.tokenize();
 
-        syntax::parser::Parser parser(program->syntax_arena.get());
+        syntax::parser::Parser parser(program->ast_arena.get());
         return parser.parse(tokens);
     }
 }

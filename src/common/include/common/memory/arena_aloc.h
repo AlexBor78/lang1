@@ -32,6 +32,10 @@ namespace common::memory
 			return std::construct_at(static_cast<Type*>(ptr), std::forward<Args>(args)...);
     }
 
+		inline std::pmr::memory_resource* get_resource() {
+			return &arena;
+		}
+
 		inline void free() {
 			arena.release();
 		}

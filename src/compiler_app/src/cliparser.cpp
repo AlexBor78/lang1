@@ -72,7 +72,9 @@ namespace compiler_app {
                     flag.value = args[i];
                 }
                 flags.emplace_back(std::move(flag));
-            } else throw std::runtime_error(std::format("unexpected value: {}, use --help", arg));
+            } else optoins.inputs_files.emplace_back(arg);
+
+							//throw std::runtime_error(std::format("unexpected value: {}, use --help", arg));
         }
     }
 

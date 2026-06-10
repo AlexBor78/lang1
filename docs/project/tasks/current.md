@@ -26,6 +26,7 @@ do not devide data and ast, but have diffrent asts.
     [ ] Parser part
       [ ] change all smart ptrs in ast to stuped ones
       [ ] allocate all ast in separated arena
+      [ ] 
 
 
 2. [ ] redesign AST 
@@ -35,5 +36,6 @@ do not devide data and ast, but have diffrent asts.
 3. [ ] HIR (Basicaly second AST with different data)
     [ ] redesign semantic types (scope, symbol)
     [ ] design HIR
+      [ ] introduce StringsPool to store strings and use string_views
 4. [ ] "translaor" for SyntaxAST -> SemanticAST
 

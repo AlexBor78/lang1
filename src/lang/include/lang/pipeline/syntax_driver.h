@@ -8,7 +8,8 @@ namespace lang::pipeline
     class SyntaxDriver
     {
     public:
-        explicit SyntaxDriver(Program* _program
+        explicit SyntaxDriver(
+						Program* _program
         ):  program(_program)
         {}
 

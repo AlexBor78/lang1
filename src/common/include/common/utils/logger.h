@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <common/streams/ostream.h>
 
 #define LOGLEVEL ::lang::utils::Logger::LogLevel::DEBUG
@@ -30,14 +31,28 @@ namespace common::utils
             ERROR = 1 << 3,  // errsteam
             ALL   = DEBUG | INFO | WARN | ERROR
         };
-    private:
-        LogLevel level{LogLevel::WARN};
-        std::string prefix;
-        std::string name;
+				struct LoggerProfile {
+        		LogLevel level;
+        		std::string prefix;
+		
+		        std::shared_ptr<streams::OutputStream> infostream{nullptr};
+		        std::shared_ptr<streams::OutputStream> errstream{nullptr};
 
-        std::shared_ptr<streams::OutputStream> infostream{nullptr};
-        std::shared_ptr<streams::OutputStream> errstream{nullptr};
-
+						static inline constexpr LoggerProfile default_() noexcept{
+							return LoggerProfile{
+								.level = LogLevel::WARN,
+								.prefix = "",
+								.infostream = std::make_shared<streams::ConsoleOStream>(),
+								.errstream = std::make_shared<streams::ConsoleErrOStream>()
+							};
+						}
+				};
+		private:
+		private:
+        std::string name{"LOGGER"};
+				LoggerProfile profile;
+				std::unordered_map<std::string, LoggerProfile> profiles;
+				
     private:
         diagnostic::InterError stream_null() const;
         diagnostic::InterError stream_bad() const;
@@ -52,7 +67,11 @@ namespace common::utils
 
         void set_name(std::string_view) noexcept;
         std::string_view get_name() const noexcept;
-        void remove_name() noexcept;
+
+				void add_profile(const std::string&, LoggerProfile) noexcept;
+				void set_profile(const std::string&, LoggerProfile) noexcept;
+				void set_profile(LoggerProfile) noexcept;
+				LoggerProfile get_profile() const noexcept;
 
         LogLevel get_level() const  noexcept;
         void set_level(LogLevel) noexcept;
@@ -66,13 +85,15 @@ namespace common::utils
          * @note print to console by default 
          * 
          */
-        Logger() = delete;
-        Logger(LogLevel _level
-        ,      std::shared_ptr<streams::OutputStream> _infostream = std::make_shared<streams::ConsoleOStream>()
-        ,      std::shared_ptr<streams::OutputStream> _errostream = std::make_shared<streams::ConsoleErrOStream>()
-        ):  level(_level)
-        ,   infostream(std::move(_infostream))
-        ,   errstream(std::move(_errostream))
+        Logger():
+						name("LOGGER"),
+						profile(LoggerProfile::default_())
+				{}
+        Logger(
+					std::string_view _name
+				,	LoggerProfile _profile = LoggerProfile::default_()
+        ):  name(_name)
+				,		profile(std::move(_profile))
         {}
 
         // debug lvl

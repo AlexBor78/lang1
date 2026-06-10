@@ -4,36 +4,60 @@
 namespace common::utils
 {
     void Logger::set_prefix(std::string_view _prefix) noexcept {
-        prefix = _prefix;
+        profile.prefix = _prefix;
     }
     std::string_view Logger::get_prefix() const noexcept {
-        return prefix;
+        return profile.prefix;
     }
     void Logger::remove_prefix() noexcept {
-        prefix = "";
+        profile.prefix = "";
     }
     void Logger::set_name(std::string_view _name) noexcept {
+				if(!name.empty()) {
+						profiles[name] = std::move(profile);
+				}
         name = _name;
+				if(profiles.contains(name))
+						profile = profiles.at(name);
+				else profile = LoggerProfile::default_();
     }
     std::string_view Logger::get_name() const noexcept {
         return name;
     }
-    void Logger::remove_name() noexcept {
-        name = "";
-    }
+
+		void Logger::add_profile(const std::string& _name, LoggerProfile _profile) noexcept {
+				if(!_name.empty()) {
+						profiles[_name] = _profile;
+				}
+		}
+
+		void Logger::set_profile(const std::string& _name, LoggerProfile _profile) noexcept {
+				if(!_name.empty()) profiles[_name] = _profile;
+				
+				name = _name;
+				profile = _profile;
+		}
+
+		void Logger::set_profile(LoggerProfile _profile) noexcept {
+				profile = _profile;
+		}
+
+		Logger::LoggerProfile Logger::get_profile() const noexcept {
+				return profile;
+		}
 
     Logger::LogLevel Logger::get_level() const  noexcept {
-        return level;
+        return profile.level;
     }
     void Logger::set_level(LogLevel lvl) noexcept {
-        level = lvl;
+        profile.level = lvl;
     }
     void Logger::add_level(LogLevel lvl) noexcept {
-        level |= lvl;
+        profile.level |= lvl;
     }
     void Logger::sub_level(LogLevel lvl) noexcept {
-        level = static_cast<LogLevel>(
-            static_cast<uint8_t>(level) & ~static_cast<uint8_t>(lvl));
+        profile.level = static_cast<LogLevel>(
+            static_cast<uint8_t>(profile.level) & ~static_cast<uint8_t>(lvl));
     }
 
     diagnostic::InterError Logger::stream_null() const {
@@ -44,44 +68,45 @@ namespace common::utils
     }
 
     void Logger::set_infostream(std::unique_ptr<streams::OutputStream> stream) noexcept {
-        infostream = std::move(stream);
+        profile.infostream = std::move(stream);
     }
     void Logger::set_errstream(std::unique_ptr<streams::OutputStream> stream) noexcept {
-        errstream = std::move(stream);
+        profile.errstream = std::move(stream);
     }
 
     void Logger::check_infostream() const {
-        if(!infostream) throw stream_null();
-        if(infostream->bad()) throw stream_bad();
+        if(!profile.infostream) throw stream_null();
+        if(profile.infostream->bad()) throw stream_bad();
     }
     bool Logger::check_errstream() const {
-        return  errstream && !errstream->bad();
+        return  profile.errstream && !profile.errstream->bad();
     }
     
     void Logger::debug(const std::string& line) {
-        if(!(level & Logger::LogLevel::DEBUG)) return;
+        if(!(profile.level & Logger::LogLevel::DEBUG)) return;
         check_infostream();
-        infostream->write_line("{}{}[{}{}DEBUG] {}", prefix, std::string(prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
+        profile.infostream->write_line("{}{}[{}{}DEBUG] {}", 
+						profile.prefix, std::string(profile.prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
     }
     void Logger::log(const std::string& line) {
-        if(!(level & Logger::LogLevel::INFO)) return;
+        if(!(profile.level & Logger::LogLevel::INFO)) return;
         check_infostream();
-        infostream->write_line("{}{}[{}{}INFO] {}", prefix, std::string(prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
+        profile.infostream->write_line("{}{}[{}{}INFO] {}", profile.prefix, std::string(profile.prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
     }
     void Logger::warn(const std::string& line) {
-        if(!(level & Logger::LogLevel::WARN)) return;
-        if(check_errstream()) errstream->write_line("{}{}[{}{}WARN] {}", prefix, std::string(prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
+        if(!(profile.level & Logger::LogLevel::WARN)) return;
+        if(check_errstream()) profile.errstream->write_line("{}{}[{}{}WARN] {}", profile.prefix, std::string(profile.prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
         else {  
             check_infostream();
-            infostream->write_line("{}{}[{}{}WARN] {}", prefix, std::string(prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
+            profile.infostream->write_line("{}{}[{}{}WARN] {}", profile.prefix, std::string(profile.prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
         } 
     }
     void Logger::error(const std::string& line) {
-        if(!(level & Logger::LogLevel::ERROR)) return;
-        if(check_errstream()) errstream->write_line("{}{}[{}{}ERROR] {}", prefix, std::string(prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
+        if(!(profile.level & Logger::LogLevel::ERROR)) return;
+        if(check_errstream()) profile.errstream->write_line("{}{}[{}{}ERROR] {}", profile.prefix, std::string(profile.prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
         else {  
             check_infostream();
-            infostream->write_line("{}{}[{}{}ERROR] {}", prefix, std::string(prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
+            profile.infostream->write_line("{}{}[{}{}ERROR] {}", profile.prefix, std::string(profile.prefix.length() > 0,' '), name, std::string(name.length() > 0,' '), line);
         } 
     }
 }
