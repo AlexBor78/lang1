@@ -16,6 +16,18 @@ do not devide data and ast, but have diffrent asts.
 
 ## Current stage - redesign architecture
 
+1. [ ] redesign memory usage
+    [X] introduce ArenaAloc
+    [ ] Lexer part
+      [ ] introduce SourceFile (structure that store WHOLE file)
+      [ ] store all files in one arena (till end of compilation)
+      [ ] do not store strings in tokens, only string views
+      [ ] adapt lexer to use SourceFile
+    [ ] Parser part
+      [ ] change all smart ptrs in ast to stuped ones
+      [ ] allocate all ast in separated arena
+
+
 2. [ ] redesign AST 
     [ ] add whole bunch off shit that been moved to contexts
     [ ] move to ArenaAloc for AST

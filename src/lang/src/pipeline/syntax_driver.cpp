@@ -16,17 +16,21 @@
 namespace lang::pipeline {
     syntax::SyntaxContainer SyntaxDriver::process_file(const std::string& file_path) {
         // check if module already processed
-        if(program->compile_state.processed_files.contains(file_path)) throw common::diagnostic::InterError(std::format("file {} overloading", file_path));
+        if(program->compile_state.processed_files.contains(file_path)) 
+					throw common::diagnostic::InterError(std::format("file {} overloading", file_path));
 
         // tring to open file
-        std::unique_ptr<common::streams::FileIStream> file = std::make_unique<common::streams::FileIStream>(file_path);
-        if(!file->is_open()) throw common::diagnostic::InterError(std::format("Can not open file: {}", file_path));
+        std::unique_ptr<common::streams::FileIStream>
+				file = std::make_unique<common::streams::FileIStream>(file_path);
+
+        if(!file->is_open())
+					throw common::diagnostic::InterError(std::format("Can not open file: {}", file_path));
 
         // syntax
         syntax::lexer::Lexer lexer(file.get());
         auto tokens = lexer.tokenize();
 
-        syntax::parser::Parser parser;
+        syntax::parser::Parser parser(program->syntax_arena.get());
         return parser.parse(tokens);
     }
 }

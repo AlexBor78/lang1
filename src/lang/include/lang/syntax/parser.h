@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <memory>
 
+#include <common/memory/arena_aloc.h>
+
 #include <lang/ast/ast.h>
 #include <lang/ast/stmt.h>
 #include <lang/ast/expr.h>
@@ -16,7 +18,9 @@ namespace lang::syntax::parser
 {
     class Parser {
     public: // api
-        Parser() {
+        Parser(common::memory::ArenaAloc* _arena):
+					arena(_arena)
+				{
             init();
         }
 
@@ -26,6 +30,7 @@ namespace lang::syntax::parser
     private: // vars
         common::utils::Logger logger{common::utils::Logger::LogLevel::ALL};
         SyntaxContainer syntax_container;
+				common::memory::ArenaAloc* arena;
 
         const std::vector<Token>* tokens{nullptr};    
         bool success{true};
