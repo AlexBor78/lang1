@@ -12,6 +12,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(sources
     # common
     src/common/units_manager.cpp
+		src/common/import_resolver.cpp
 
     # syntax
     src/syntax/lexer.cpp

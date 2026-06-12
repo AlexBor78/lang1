@@ -4,10 +4,11 @@
 #include <vector>
 #include <unordered_set>
 
-#include <lang/pipeline/syntax_driver.h>
 #include <lang/common/compile/state.h>
 #include <lang/common/compile/options.h>
 #include <lang/semantic/types/semantic_types.h>
+#include <lang/common/compile/import_resolver.h>
+#include <lang/pipeline/syntax_driver.h>
 
 // constexpr const char FILE_SUFFIX[] = ".lang";
 // constexpr size_t FILE_SUFFIX_SIZE = (sizeof(FILE_SUFFIX) - 1);
@@ -23,8 +24,12 @@ namespace lang::pipeline
         
         explicit ModulesLoader(Program* _program
         ):  program(_program)
-        ,   syntax_driver(_program)
 				,		ext_len(program->compile_options.extension.size())
+        ,   syntax_driver(_program)
+				,		import_resolver(
+								program->compile_options.extension
+						,		&program->compile_options.import_paths
+						)
         {}
 
         void load();
@@ -35,23 +40,10 @@ namespace lang::pipeline
          * 
          */
         Program* program;
-
-        /**
-         * @brief   path to pwd
-         */
-        std::string working_dir;
-
-        /**
-         * @brief   sympath to module we are working on
-         */
-        SymbolPath  working_sympath;
-        
-        SyntaxDriver syntax_driver;
-
-				/**
-				 * @brief lenth of file extension
-				 */
 				size_t ext_len{0};
+        SyntaxDriver syntax_driver;
+				ImportResolver import_resolver;
+
     private: // api
         /**
          * @brief   load files, accept only root files e.g. main file or main-inner of library
@@ -62,7 +54,8 @@ namespace lang::pipeline
         void load(syntax::UnitID);
         void load(const std::vector<syntax::UnitID>&);
 
-        std::vector<syntax::UnitID> process_imports(const std::unordered_set<syntax::ImportStmt*>&);
+        std::vector<syntax::UnitID> process_imports(
+						const std::unordered_set<syntax::ImportStmt*>&);
 
         /**
          * @brief   generating module id by file path (file must be root file e.g. main file or inner of library)
@@ -72,12 +65,12 @@ namespace lang::pipeline
          * @todo    rename to show that it'is only for root files
          */
         SymbolPath gen_sympath(const std::string&);
-
-        /**
-         * @brief   generating file path from SymbolPath
-         * @return  std::string 
-         */
-        std::string gen_path(const SymbolPath&);
+//
+//        /**
+//         * @brief   generating file path from SymbolPath
+//         * @return  std::string 
+//         */
+//        std::string gen_path(const SymbolPath&);
 
         void debug_break();
     };

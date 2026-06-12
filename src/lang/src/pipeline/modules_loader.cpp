@@ -11,15 +11,12 @@
 
 // # define MODULESLOADER_DEBUG
 
-//constexpr const char FILE_SUFFIX[] = ".lang";
-// constexpr size_t FILE_SUFFIX_SIZE = (sizeof(FILE_SUFFIX) - 1);
-
 namespace lang::pipeline
 {
     void ModulesLoader::load() {
-				if(program->compile_options.inputs_files.size() == 0) {
+				if(program->compile_options.inputs_files.size() == 0)
 					throw common::diagnostic::InterError("no input files provided");
-				}
+				
         for(const auto& file : program->compile_options.inputs_files) {
             load(file);
         }
@@ -35,7 +32,6 @@ namespace lang::pipeline
         debug_break();
 
         // check if file already processed
-        // if(program->compile_units_manager.contains(syntax::UnitID{.filepath = file_path})) // wtf is that error?
         if(program->compile_state.processed_files.contains(file_path)) return;
         
         // process file
@@ -49,21 +45,25 @@ namespace lang::pipeline
         program->units_storage.update_contexts(id);
 
         auto unit = program->units_storage.get(id);
-        if(!unit) throw common::diagnostic::InterError("ModulesLoader: load_file error: UnitsManager return nullptr ");
+        if(!unit) throw common::diagnostic::InterError(
+						"ModulesLoader: load_file(file_path) error: UnitsManager returned nullptr");
         
         // prepare info to save
         auto dependencies = process_imports(syntax_container.imports_list);
         auto submodules = process_imports(syntax_container.submodules_list);
 
-        assert(file_path.size() >= id.path.normalized_path.size() + program->compile_options.extension.size()
-);
+        assert(
+						file_path.size() >= id.path.normalized_path.size() + program->compile_options.extension.size()
+				);
         // current_id = id;
         // current_path = file_path.substr(0, file_path.size() - id.path.normalized_path.size() - FILE_SUFFIX_SIZE);
 
         // updating data for relative paths solving
-        working_sympath = id.symbolpath;        
-        working_dir = file_path.substr(0, file_path.size() - id.symbolpath.absolute_path.normalized_path.size() - ext_len);
-        
+        import_resolver.set_workdir(file_path.substr(0, 
+							file_path.size() - id.symbolpath.absolute_path.normalized_path.size() - ext_len
+				));
+				import_resolver.set_worksympath(id.symbolpath);
+
         // save semantic info
         program->pre_semantic_data.extern_list.insert(
             syntax_container.extern_list.begin(),
@@ -87,7 +87,7 @@ namespace lang::pipeline
         // if(program->compile_units_manager.contains(id)) return;
 
         // generating file paths
-        std::string file_path = gen_path(id.symbolpath);
+        std::string file_path = import_resolver.gen_path(id.symbolpath);
 
         // also save file path of compile unit
         id.filepath = file_path;
@@ -95,7 +95,8 @@ namespace lang::pipeline
 
         // updating info for relative paths solving
         // current_id = id;
-        working_sympath = id.symbolpath;
+        //working_sympath = id.symbolpath;
+				import_resolver.set_worksympath(id.symbolpath);
 
         // check just in case if file was already processed
         if(program->compile_state.processed_files.contains(file_path)) return;
@@ -131,29 +132,8 @@ namespace lang::pipeline
         }
     }
 
-    // old one
-    // std::vector<syntax::UnitID> ModulesLoader::process_imports(const std::unordered_set<syntax::ImportStmt*>& imports) {
-    //     std::vector<semantic::ModuleID> output;
-    //     for(const auto* node : imports) {
-    //         semantic::ModuleID depend_id;
-    //         if(node->is_relative()) {
-    //             depend_id.is_relative = true;process_imports
-    //             depend_id.relative_path = node->get_path();
-
-    //             depend_id.path = current_id.path;
-    //             depend_id.path.path.insert(
-    //                 depend_id.path.path.end(),
-    //                 node->get_path().path.begin(),
-    //                 node->get_path().path.end()
-    //             );
-    //         } else depend_id.path = node->get_path();
-
-    //         depend_id.path.normalize();
-    //         output.emplace_back(depend_id);
-    //     } return std::move(output);
-    // }
-
-    std::vector<syntax::UnitID> ModulesLoader::process_imports(const std::unordered_set<syntax::ImportStmt*>& imports) {
+    std::vector<syntax::UnitID> ModulesLoader::process_imports(
+				const std::unordered_set<syntax::ImportStmt*>& imports) {
         std::vector<syntax::UnitID> output;
         for(const auto* node : imports) {
             // creating new unit
@@ -164,7 +144,8 @@ namespace lang::pipeline
                 auto sympath = node->get_path();
                 
                 // inserting root of absolute path (current module)
-                sympath.absolute_path = working_sympath.absolute_path;
+                sympath.absolute_path = import_resolver.get_worksympath().absolute_path;
+                //sympath.absolute_path = working_sympath.absolute_path;
                 sympath.absolute_path.path.insert(
                     sympath.absolute_path.path.end(),
                     sympath.relative_path.path.begin(),
@@ -182,12 +163,13 @@ namespace lang::pipeline
 
     SymbolPath ModulesLoader::gen_sympath(const std::string& file_name) {
         assert(file_name.substr(file_name.size() - program->compile_options.extension.size()
-, program->compile_options.extension.size()
-) ==  program->compile_options.extension.size()
-);
+				, program->compile_options.extension.size()
+				) ==  program->compile_options.extension.size()
+				);
 
         std::string module_name;
-        if(file_name.contains('/')) module_name = file_name.substr(file_name.find_last_of("/") + 1, file_name.size() - ext_len);
+        if(file_name.contains('/')) 
+					module_name = file_name.substr(file_name.find_last_of("/") + 1, file_name.size() - ext_len);
         else module_name = file_name.substr(0, file_name.size() - ext_len);
         
         SymbolPath path{
@@ -202,67 +184,4 @@ namespace lang::pipeline
         return path;
     }
 
-    /**
-     * @brief generating path to file by symbolpath and given path start
-     * 
-     * @param sympath - absolute symbolpath of module 
-     * @param start_path start of path
-     * @return std::string 
-     */
-    static std::string gen_path_(
-			const SymbolPath& sympath
-		, std::string extension
-		, std::string start_path = "./"
-		) {
-
-        if(sympath.absolute_path.empty()) {
-            throw common::diagnostic::InterError("gen_path_(): needs absolute sympath to module to generate");
-        }
-
-        // creating base path
-        std::string file_path = start_path;
-        for(size_t i = 0; i + 1 < sympath.absolute_path.path.size(); ++i) file_path += sympath.absolute_path.path[i] + "/";
-        file_path += sympath.absolute_path.path.back();
-
-        // if it's library
-        if(std::filesystem::is_directory(file_path)) {
-            file_path += "/" + sympath.absolute_path.path.back() + extension;
-            if(!std::filesystem::exists(file_path)) throw common::diagnostic::InterError(std::format("file {} doesn't exists", file_path));
-            return file_path;
-        }
-        
-        // just module, without submodule
-        file_path += extension;
-        if(!std::filesystem::exists(file_path)) throw common::diagnostic::InterError(std::format("file {} doesn't exists", file_path));
-        return file_path;
-    }
-
-    std::string ModulesLoader::gen_path(const SymbolPath& sympath) {
-        assert(!id.path.path.empty());
-
-        if(sympath.is_relative) {
-            return gen_path_(
-							sympath
-						,	program->compile_options.extension
-						, working_dir
-						);
-        }
-
-        for(const auto& path : program->compile_options.import_paths) {
-            try {
-                std::string buf = gen_path_(sympath, program->compile_options.extension, path);
-                return buf;
-            } catch(const common::diagnostic::InterError& e) {
-                continue;
-            }
-            // lets better fall in case of unexpected error
-            // catch(...) {
-            //     break;
-            // }
-        } 
-        
-        // // not sure should i try relative path, if absolute don't work
-        return gen_path_(sympath, program->compile_options.extension, working_dir);
-        throw common::diagnostic::InterError(std::format("Cannot open file of {} module", sympath.absolute_path.normalize()));
-    }
 }
