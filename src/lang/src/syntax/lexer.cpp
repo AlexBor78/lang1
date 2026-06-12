@@ -15,6 +15,7 @@ namespace lang::syntax::lexer
     std::vector<Token> Lexer::tokenize() {
         breakpoint();
         tokens.clear();
+				current_pos.path = path;
 
         while(!is_eof()) try {
 //             // for ConsoleIStream:
@@ -45,12 +46,12 @@ namespace lang::syntax::lexer
             
             tokenize_punct();
         } catch(const diagnostic::LexerError& e) {
-            had_errors = false;
+            had_errors = true;
             logger->error("{}", e.what());
             if(!is_eof()) skip();
             else break;
         } catch(const std::exception& e) {
-            had_errors = false;
+            had_errors = true;
             logger->error("lexer inter error: {}", e.what());
             if(!is_eof()) skip();
             else break;
@@ -67,13 +68,6 @@ namespace lang::syntax::lexer
         #ifdef LEXER_DEBUG
             debug_break();
         #endif
-    }
-
-    void Lexer::set_logger_infostream(std::unique_ptr<common::streams::OutputStream> stream) noexcept {
-        logger->set_infostream(std::move(stream));
-    }
-    void Lexer::set_logger_errstream(std::unique_ptr<common::streams::OutputStream> stream) noexcept {
-        logger->set_errstream(std::move(stream));
     }
 
     diagnostic::LexerError Lexer::stream_null() const {
@@ -149,6 +143,10 @@ void Lexer::skip(size_t n) {
     }
 }
 
+std::string_view Lexer::mk_substr(size_t start, size_t lenth) {
+	return source.substr(start, lenth);
+}
+
 std::string Lexer::read_word() {
     check_stream(); // Было check_data(), стало check_stream()
     std::string word;
@@ -170,6 +168,12 @@ common::SourceLocation Lexer::get_pos() const {
     return current_pos;
 }
 
+common::SourceLocation Lexer::get_loc() const {
+		auto loc = get_pos();
+		loc.path = path;
+		return loc;
+}
+
     [[nodiscard("Lexer::update_pos() RETURN updated pos")]]
 		common::SourceLocation Lexer::update_pos(common::SourceLocation pos, char c) noexcept {
         ++pos.length;
@@ -184,7 +188,11 @@ common::SourceLocation Lexer::get_pos() const {
 // tokenizing
 
     void Lexer::add_token(Token tok) {
-        logger->debug("add_token() token: {{tt: {} str:\"{}\"}}", utils::stringify(tok.ty), tok.sym);
+        logger->debug(
+						"add_token() token: {{tt: {} str:\"{}\"}}"
+				, 	utils::stringify(tok.ty)
+				, 	tok.sym
+				);
         tokens.emplace_back(tok);
     }
 
@@ -211,66 +219,67 @@ common::SourceLocation Lexer::get_pos() const {
     }
 
     void Lexer::tokenize_word() {
-        breakpoint(); logger->debug("tokenize_word()");
-        common::SourceLocation loc = get_pos();
-        std::string buf = read_word();
+        breakpoint(); logger->debug("tokenize_word() called");
+
+				auto start_loc = get_loc();
+				size_t start = cursor;
+				read_word();
+				size_t end = cursor;
+				auto word = mk_substr(start, end - start);
+				auto end_loc = get_loc();
+
+				start_loc.merge(end_loc);
+				auto loc = start_loc;
         
-        // todo: use merge, update api, 
-        loc.length = get_pos().start.index - loc.start.index;
-        loc.end = get_pos().start;
-        
-        if(auto it = keywords.find(buf); it != keywords.end()) {
+        if(auto it = keywords.find(word); it != keywords.end()) {
             add_token({
                 .ty = it->second,
                 .pos = loc,
-                .sym = std::move(buf)
+                .sym = word
+                // .sym = word
             }); return;
         }
 
         add_token({
             .ty = TokenType::IDENTIFIER,
             .pos = loc,
-            .sym = std::move(buf)
+            .sym = word
+            // .sym = word
         });
     }
 
     void Lexer::tokenize_punct() {
-        breakpoint(); logger->debug("tokenize_punct()");
-        common::SourceLocation pos = get_pos();
-        std::string buf;
+        breakpoint(); logger->debug("tokenize_punct() called");
+        common::SourceLocation start_loc = get_loc();
+				size_t start = cursor;
+        std::string_view punct;
 
         for(int length = 3; length > 0; --length) {
             if(is_eof(length)) continue;
 
-            pos.length = length;
-            pos.end.line = pos.start.line;
-            pos.end.index = pos.start.index + length;
-            pos.end.column = pos.start.column + length;
-
-            buf.clear();
-
-            for(int i = 0; i < length; ++i)
-                buf += peek(i);
-
-            if(auto it = keywords.find(buf); it != keywords.end()) {
+						punct = mk_substr(start, length);
+            if(auto it = keywords.find(punct); it != keywords.end()) {
                 skip(length);
+								start_loc.merge(get_loc());
                 add_token({ 
                     .ty = it->second,
-                    .pos = pos,
-                    .sym = std::move(buf)
+                    .pos = start_loc,
+                    .sym = punct
                 }); return;
             }
-        } throw unexpected_token(pos);
+        } throw unexpected_token(start_loc);
     }
-
+		
+		// .34234 number format instead of 0.34234 unsupported for now
     void Lexer::tokenize_number() {
-        breakpoint(); logger->debug("tokenize_number()");
+        breakpoint(); logger->debug("tokenize_number() called");
         common::SourceLocation loc = get_pos();
-        std::string buf;
+				size_t start = cursor, length = 0;
+//				std::string buf; 
         bool has_dot{false};
-        if(peek() == '.') {
-            buf += '0';
-        }
+//        if(peek() == '.') {
+//					buf += "0";
+//				}
 
         while(!is_eof() && is_number()) {
             if(peek() == '.') {
@@ -278,59 +287,57 @@ common::SourceLocation Lexer::get_pos() const {
 
                 if(has_dot) throw wrong_number_format(loc);
                 has_dot = true;
-            } buf += advance();
+            } ++length; skip();
         }
 
         add_token({
             .ty = TokenType::NUMBER,
             .pos = loc,
-            .sym = std::move(buf)
+            .sym = mk_substr(start, length)
         });
     }
 
     void Lexer::tokenize_string() {
-        breakpoint(); logger->debug("tokenize_sring()");
-        common::SourceLocation pos = get_pos();
-        std::string buf;
+        breakpoint(); logger->debug("tokenize_sring() called");
+        common::SourceLocation start_loc = get_loc();
+				size_t start = cursor, length = 0;
 
         skip(); // skip '"'
         while(!is_eof() && peek() != '"') {
-            pos = update_pos(pos, peek());
-            if(peek() == '\\') {
-                buf += tokenize_escape();
-                continue;
-            } buf += advance();
+						++length; skip();
+            if(peek() == '\\' && peek(1) == '"') {
+								++length; skip(); continue;
+            }
         }
-        if(is_eof()) throw not_closed_string(pos);
+        if(is_eof()) throw not_closed_string(start_loc);
         skip(); // skip '"'
-        
 
         add_token({
             .ty = TokenType::STRING,
-            .pos = pos,
-            .sym = std::move(buf)
+            .pos = start_loc,
+            .sym = std::string(mk_substr(start, length))
         });
     }
 
-    char Lexer::tokenize_escape() {
-        breakpoint();
-        auto pos = get_pos();
-        ++pos.end.column;
-        ++pos.end.index;
-        ++pos.end.line;
-        ++pos.length;
-
-        skip(); // skip '\'
-        switch (peek()) {
-            case ('\\'):    skip(); return '\\';
-            case ('\"'):    skip(); return '\"';
-            case ('n'):     skip(); return '\n';
-            case ('t'):     skip(); return '\t';
-            case ('u'):     throw unicode_not_suported(pos);
-            case ('U'):     throw unicode_not_suported(pos);
-            default:        return advance(); // skip char
-        }
-    }
+//    char Lexer::tokenize_escape() {
+//        breakpoint();
+//        auto pos = get_pos();
+//        ++pos.end.column;
+//        ++pos.end.index;
+//        ++pos.end.line;
+//        ++pos.length;
+//
+//        skip(); // skip '\'
+//        switch (peek()) {
+//            case ('\\'):    skip(); return '\\';
+//            case ('\"'):    skip(); return '\"';
+//            case ('n'):     skip(); return '\n';
+//            case ('t'):     skip(); return '\t';
+//            case ('u'):     throw unicode_not_suported(pos);
+//            case ('U'):     throw unicode_not_suported(pos);
+//            default:        return advance(); // skip char
+//        }
+//    }
 
     void Lexer::process_comment(){
         if(peek(0) != '/') return;

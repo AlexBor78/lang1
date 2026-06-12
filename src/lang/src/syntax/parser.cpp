@@ -665,7 +665,12 @@ namespace lang::syntax::parser
         while(!is_end() && match(TokenType::LBRACKET)) { 
             auto loc = advance().pos; // skip [
             if(!is_end() && !match(TokenType::NUMBER)) throw expected_number();
-            dimensions.emplace_back(std::stoull(advance().sym));
+
+						unsigned long long val;
+						auto sym = advance().sym;
+						std::from_chars(sym.data(), sym.data() + sym.size(), val);
+						dimensions.emplace_back(val);
+
             if(!is_end() && !match(TokenType::RBRACKET)) throw expected_rbracket();
             loc.merge(advance().pos); // skip ]
             locs.emplace_back(loc);
@@ -815,7 +820,7 @@ namespace lang::syntax::parser
         breakpoint(); logger.debug("process_namespace_expr()");
 
         auto name_loc = peek().pos;
-        std::string name = advance().sym;
+        std::string_view name = advance().sym;
         
         // useless - already checked by process_name() to call this
         // if(!is_end() && !match(TokenType::DOUBLECOLON)) throw expected_doublecolon();
@@ -834,7 +839,7 @@ namespace lang::syntax::parser
 
         auto name_loc = peek().pos;
         auto node_loc = name_loc;
-        std::string name = advance().sym;
+        std::string_view name = advance().sym;
 
         // useless - already checked by process_name() to call this
         if(!is_end() && !match(TokenType::LPAREN)) throw expected_lparen();
@@ -861,7 +866,7 @@ namespace lang::syntax::parser
         breakpoint(); logger.debug("process_variable_expr()");
         if(!is_end(1) && !match(TokenType::IDENTIFIER)) throw expected_variable_name();
         auto name_loc = peek().pos;
-        std::string name = advance().sym;
+        std::string_view name = advance().sym;
         return std::make_unique<ast::VariableExpr>(
             name,
             std::move(name_loc)

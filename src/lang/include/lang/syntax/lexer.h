@@ -15,13 +15,6 @@ namespace lang::syntax::lexer
     class Lexer
     {
     public: // api
-        std::vector<Token> tokenize();
-
-        bool had_erros() const noexcept;
-
-        void set_logger_infostream(std::unique_ptr<common::streams::OutputStream>) noexcept;
-        void set_logger_errstream(std::unique_ptr<common::streams::OutputStream>) noexcept;
-        
         explicit Lexer(
 					std::string_view _path
 				,	std::string_view _source 
@@ -31,10 +24,13 @@ namespace lang::syntax::lexer
 				,		logger(_logger)
         {}
 
+        std::vector<Token> tokenize();
+        bool had_erros() const noexcept;
+
     private: // vars
 				size_t cursor{0};
         bool had_errors{true};
-				std::string_view path;
+				std::string  path;
 				std::string_view source;
         common::utils::Logger* logger;
 
@@ -59,18 +55,20 @@ namespace lang::syntax::lexer
         void check_stream() const;
         void check_data() const;
 
-				void load_file();
         bool is_eof(size_t n = 1) const;
         char peek(size_t offset = 0) const;
         char advance(size_t offset = 0);
         void skip(size_t n = 1);
+				std::string_view mk_substr(size_t start, size_t len);
 
         static common::SourceLocation update_pos(common::SourceLocation, char) noexcept;
         common::SourceLocation get_pos() const;
+				common::SourceLocation get_loc() const;
         std::string read_word();
         void skip_whitespace();
 
     private: // tokenizing
+        void add_token(Token);
 
         bool is_word() const noexcept;
         bool is_number() const noexcept;
@@ -81,12 +79,9 @@ namespace lang::syntax::lexer
         void tokenize_punct();
         void tokenize_number();
         void tokenize_string();
-        char tokenize_escape();
         
         void process_comment();
         void process_comment_line();
         void process_comment_block();
-
-        void add_token(Token);
     };
 }

@@ -117,6 +117,6 @@ namespace lang::syntax
     struct Token {
         TokenType ty{TokenType::ILLEGAL};
         common::SourceLocation pos;
-        std::string sym;
+        std::string_view sym;
     };
 }
