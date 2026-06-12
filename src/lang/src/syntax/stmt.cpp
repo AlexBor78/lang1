@@ -1,11 +1,10 @@
-#include "lang/common/symbol_path.h"
-#include <lang/ast/visitor.h>
-#include <lang/ast/stmt.h>
+#include <lang/syntax/visitor.h>
+#include <lang/syntax/stmt.h>
 #include <iostream>
 #include <print>
 
 
-namespace lang::ast
+namespace lang::syntax
 {
 // BlockStmt
 

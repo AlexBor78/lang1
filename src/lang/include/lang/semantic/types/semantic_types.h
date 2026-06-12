@@ -3,7 +3,7 @@
 
 #include <unordered_set>
 
-#include <lang/ast/ast.h>
+#include <lang/syntax/ast.h>
 #include <lang/semantic/types/scope.h>
 #include <lang/semantic/types/typesystem.h>
 
@@ -14,7 +14,7 @@ namespace lang::semantic
          * @brief one list of all external stuff is a lot more convenient then every in every module, will be used in codegen
          * 
          */
-        std::unordered_set<ast::BaseNode*> extern_list;
+        std::unordered_set<syntax::BaseNode*> extern_list;
     };
 
     class SemanticState {

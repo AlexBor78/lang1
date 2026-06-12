@@ -5,9 +5,9 @@
 
 #include <common/memory/arena_aloc.h>
 
-#include <lang/ast/ast.h>
-#include <lang/ast/stmt.h>
-#include <lang/ast/expr.h>
+#include <lang/syntax/ast.h>
+#include <lang/syntax/stmt.h>
+#include <lang/syntax/expr.h>
 #include <lang/utils/diagnostic.h>
 #include <common/utils/logger.h>
 #include <lang/syntax/token.h>
@@ -42,11 +42,11 @@ namespace lang::syntax::parser
         void reset_state();
         void breakpoint();
 
-        void save_type_to_context(ast::DeclStmt*, std::unique_ptr<AbstractType>);
-        void add_to_extern_list(ast::DeclStmt*);
-        void add_to_export_list(ast::DeclStmt*);
-        void add_to_imports_list(ast::ImportStmt*);
-        void add_to_submodules(ast::ImportStmt*);
+        void save_type_to_context(DeclStmt*, std::unique_ptr<AbstractType>);
+        void add_to_extern_list(DeclStmt*);
+        void add_to_export_list(DeclStmt*);
+        void add_to_imports_list(ImportStmt*);
+        void add_to_submodules(ImportStmt*);
 
         bool         is_end(size_t n = 1) const;
         bool         match(TokenType, size_t offset = 0) const;
@@ -67,58 +67,58 @@ namespace lang::syntax::parser
         
     // stmts
         void process_semicolon();
-        ast::StmtPtr process_token();
-        std::unique_ptr<ast::StmtNode>          process_stmt();
+        StmtPtr process_token();
+        std::unique_ptr<StmtNode>          process_stmt();
         
         // moduless
-        std::unique_ptr<ast::ImportStmt>        process_import_stmt();
+        std::unique_ptr<ImportStmt>        process_import_stmt();
 
         // control flow
-        std::unique_ptr<ast::IfStmt>            process_if_stmt();
-        std::unique_ptr<ast::ElseStmt>          process_else_stmt();
-        std::unique_ptr<ast::ForStmt>           process_for_stmt();
-        std::unique_ptr<ast::WhileStmt>         process_while_stmt();
+        std::unique_ptr<IfStmt>            process_if_stmt();
+        std::unique_ptr<ElseStmt>          process_else_stmt();
+        std::unique_ptr<ForStmt>           process_for_stmt();
+        std::unique_ptr<WhileStmt>         process_while_stmt();
 
         // other stmt's
-        std::unique_ptr<ast::BlockStmt>         process_scope();
-        std::unique_ptr<ast::BreakStmt>         process_break_stmt();
-        std::unique_ptr<ast::ContinueStmt>      process_continue_stmt();
-        std::unique_ptr<ast::ReturnStmt>        process_return_stmt();
+        std::unique_ptr<BlockStmt>         process_scope();
+        std::unique_ptr<BreakStmt>         process_break_stmt();
+        std::unique_ptr<ContinueStmt>      process_continue_stmt();
+        std::unique_ptr<ReturnStmt>        process_return_stmt();
 
         // declare
         std::unique_ptr<AbstractType>           process_type();
-        std::unique_ptr<ast::DeclStmt>          process_declare();
-        std::unique_ptr<ast::DeclVariable>      process_variable_decl();
-        std::unique_ptr<ast::StackAllocExpr>    process_stackalloc_expr();
-        std::unique_ptr<ast::DeclFunction>      process_function_decl();
+        std::unique_ptr<DeclStmt>          process_declare();
+        std::unique_ptr<DeclVariable>      process_variable_decl();
+        std::unique_ptr<StackAllocExpr>    process_stackalloc_expr();
+        std::unique_ptr<DeclFunction>      process_function_decl();
 
     // exprs
-        std::unique_ptr<ast::ExprNode>          process_expr();
+        std::unique_ptr<ExprNode>          process_expr();
         
         // operators
-        std::unique_ptr<ast::ExprNode>          process_operator();
-        std::unique_ptr<ast::ExprNode>          process_assign_expr();
-        std::unique_ptr<ast::ExprNode>          process_logical_expr();
-        std::unique_ptr<ast::ExprNode>          process_compare_expr();
-        std::unique_ptr<ast::ExprNode>          process_additive_expr();
+        std::unique_ptr<ExprNode>          process_operator();
+        std::unique_ptr<ExprNode>          process_assign_expr();
+        std::unique_ptr<ExprNode>          process_logical_expr();
+        std::unique_ptr<ExprNode>          process_compare_expr();
+        std::unique_ptr<ExprNode>          process_additive_expr();
         /**
          * @todo rename to process_multiply_expr()
          */
-        std::unique_ptr<ast::ExprNode>          process_multiple_expr();
-        std::unique_ptr<ast::ExprNode>          process_unary_expr();
-        std::unique_ptr<ast::ExprNode>          process_primary_expr();
+        std::unique_ptr<ExprNode>          process_multiple_expr();
+        std::unique_ptr<ExprNode>          process_unary_expr();
+        std::unique_ptr<ExprNode>          process_primary_expr();
         
         // names
-        std::unique_ptr<ast::ExprNode>          process_name();
-        std::unique_ptr<ast::FunctionExpr>      process_function_expr();
-        std::unique_ptr<ast::VariableExpr>      process_variable_expr();
-        std::unique_ptr<ast::SymbolPathExpr>    process_symbol_path();
+        std::unique_ptr<ExprNode>          process_name();
+        std::unique_ptr<FunctionExpr>      process_function_expr();
+        std::unique_ptr<VariableExpr>      process_variable_expr();
+        std::unique_ptr<SymbolPathExpr>    process_symbol_path();
 
         // literals
-        std::unique_ptr<ast::LiteralExpr>       process_literal();
-        std::unique_ptr<ast::NumberLiteral>     process_number_literal();
-        std::unique_ptr<ast::StringLiteral>     process_string_literal();
-        std::unique_ptr<ast::BoolLiteral>       process_bool_literal();
+        std::unique_ptr<LiteralExpr>       process_literal();
+        std::unique_ptr<NumberLiteral>     process_number_literal();
+        std::unique_ptr<StringLiteral>     process_string_literal();
+        std::unique_ptr<BoolLiteral>       process_bool_literal();
 
     private: // diagnostic creating
 

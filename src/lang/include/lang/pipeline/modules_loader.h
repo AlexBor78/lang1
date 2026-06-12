@@ -62,7 +62,7 @@ namespace lang::pipeline
         void load(UnitID);
         void load(const std::vector<UnitID>&);
 
-        std::vector<UnitID> process_imports(const std::unordered_set<ast::ImportStmt*>&);
+        std::vector<UnitID> process_imports(const std::unordered_set<syntax::ImportStmt*>&);
 
         /**
          * @brief   generating module id by file path (file must be root file e.g. main file or inner of library)

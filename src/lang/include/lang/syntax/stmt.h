@@ -3,14 +3,14 @@
 #include <memory>
 #include <vector>
 #include <string_view>
-#include <lang/ast/ast.h>
+#include <lang/syntax/ast.h>
 #include <lang/common/symbol_path.h>
 #include <lang/semantic/types/typesystem.h>
 
 /**
  * @todo rename _pos to _full_range_loc, all pos like to loc like.
  */
-namespace lang::ast
+namespace lang::syntax
 {   
     class BlockStmt : public StmtNode {
     private:

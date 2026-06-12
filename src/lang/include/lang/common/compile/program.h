@@ -34,17 +34,17 @@ namespace lang
         /**
          * @brief   DeclNode of something -> It's type
          */
-        std::unordered_map<ast::BaseNode*, std::unique_ptr<AbstractType>> types_context;
+        std::unordered_map<syntax::BaseNode*, std::unique_ptr<AbstractType>> types_context;
 
         /**
          * @brief   list of all external symbols (vars and functoin)
          */
-        std::unordered_set<ast::BaseNode*> extern_list;
+        std::unordered_set<syntax::BaseNode*> extern_list;
 
         /**
          * @brief   UnitID -> list of Module export (temporary by UnitID)
          */
-        std::unordered_map<UnitID, std::unordered_set<ast::BaseNode*>> export_lists;
+        std::unordered_map<UnitID, std::unordered_set<syntax::BaseNode*>> export_lists;
     };
 
     /**

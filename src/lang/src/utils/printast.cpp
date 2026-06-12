@@ -39,14 +39,14 @@ namespace lang::utils
         need_prefix = true;
     }
 
-    void PrintAST::print(const ast::BaseNode* node) noexcept
+    void PrintAST::print(const syntax::BaseNode* node) noexcept
     {
         if(!node) return;
         clean_prefix();
         node->accept(*this);
     }
 
-    void PrintAST::visit_block_stmt(const ast::BlockStmt& node) noexcept
+    void PrintAST::visit_block_stmt(const syntax::BlockStmt& node) noexcept
     {
         println("BlockStmt:");
         
@@ -56,7 +56,7 @@ namespace lang::utils
         remove_from_prefix();
     }
 
-    void PrintAST::visit_if_stmt(const ast::IfStmt& node) noexcept
+    void PrintAST::visit_if_stmt(const syntax::IfStmt& node) noexcept
     {
         println("IfStmt:");
         add_to_prefix();
@@ -73,7 +73,7 @@ namespace lang::utils
         else println("null");
         remove_from_prefix(4);
     }
-    void PrintAST::visit_else_stmt(const ast::ElseStmt& node) noexcept
+    void PrintAST::visit_else_stmt(const syntax::ElseStmt& node) noexcept
     {
         println("ElseStmt:");
         add_to_prefix();
@@ -84,7 +84,7 @@ namespace lang::utils
         else println("null");
         remove_from_prefix(4);
     }
-    void PrintAST::visit_for_stmt(const ast::ForStmt& node) noexcept
+    void PrintAST::visit_for_stmt(const syntax::ForStmt& node) noexcept
     {
         println("ForStmt:");
         add_to_prefix();
@@ -113,7 +113,7 @@ namespace lang::utils
         else println("null");
         remove_from_prefix(4);
     }
-    void PrintAST::visit_while_stmt(const ast::WhileStmt& node) noexcept
+    void PrintAST::visit_while_stmt(const syntax::WhileStmt& node) noexcept
     {
         println("WhileStmt:");
         add_to_prefix();
@@ -130,7 +130,7 @@ namespace lang::utils
         else println("null");
         remove_from_prefix(4);
     }
-    void PrintAST::visit_decl_var(const ast::DeclVariable& node) noexcept
+    void PrintAST::visit_decl_var(const syntax::DeclVariable& node) noexcept
     {
         println("DeclVar:");
         add_to_prefix();
@@ -143,7 +143,7 @@ namespace lang::utils
         else println("null");
         remove_from_prefix(4);
     }
-    void PrintAST::visit_decl_func(const ast::DeclFunction& node) noexcept
+    void PrintAST::visit_decl_func(const syntax::DeclFunction& node) noexcept
     {
         println("DeclFunc:");
         add_to_prefix();
@@ -166,14 +166,14 @@ namespace lang::utils
         remove_from_prefix(4);
     }
 
-    void PrintAST::visit_import_stmt(const ast::ImportStmt& node) noexcept
+    void PrintAST::visit_import_stmt(const syntax::ImportStmt& node) noexcept
     {
         println("ImportStmt:");
         add_to_prefix();
         println("name: {}", node.get_imported());
         remove_from_prefix();
     }
-    void PrintAST::visit_return_stmt(const ast::ReturnStmt& node) noexcept
+    void PrintAST::visit_return_stmt(const syntax::ReturnStmt& node) noexcept
     {
         println("ReturnStmt:");
         add_to_prefix();
@@ -183,41 +183,41 @@ namespace lang::utils
         else println("null");
         remove_from_prefix(4);
     }
-    void PrintAST::visit_break_stmt(const ast::BreakStmt&) noexcept {
+    void PrintAST::visit_break_stmt(const syntax::BreakStmt&) noexcept {
         println("BreakStmt:");
     }
-    void PrintAST::visit_continue_stmt(const ast::ContinueStmt&) noexcept {
+    void PrintAST::visit_continue_stmt(const syntax::ContinueStmt&) noexcept {
         println("ContinueStmt:");
     }
-    void PrintAST::visit_number_literal(const ast::NumberLiteral& node) noexcept
+    void PrintAST::visit_number_literal(const syntax::NumberLiteral& node) noexcept
     {
         println("NumberLiteral:");
         add_to_prefix();
         println("literal: {}", node.get_literal());
         remove_from_prefix();
     }
-    void PrintAST::visit_string_literal(const ast::StringLiteral& node) noexcept
+    void PrintAST::visit_string_literal(const syntax::StringLiteral& node) noexcept
     {
         println("StringLiteral:");
         add_to_prefix();
         println("literal: \"{}\"", node.get_literal());
         remove_from_prefix();
     }
-    void PrintAST::visit_bool_literal(const ast::BoolLiteral& node) noexcept
+    void PrintAST::visit_bool_literal(const syntax::BoolLiteral& node) noexcept
     {
         println("BoolLiteral:");
         add_to_prefix();
         println("literal: {}", node.get_literal());
         remove_from_prefix();
     }
-    void PrintAST::visit_variable_expr(const ast::VariableExpr& node) noexcept
+    void PrintAST::visit_variable_expr(const syntax::VariableExpr& node) noexcept
     {
         println("VariableExpr:");
         add_to_prefix();
         println("name: {}", node.get_name());
         remove_from_prefix();
     }
-    void PrintAST::visit_stackalloc_expr(const ast::StackAllocExpr& node) noexcept {
+    void PrintAST::visit_stackalloc_expr(const syntax::StackAllocExpr& node) noexcept {
         println("StackAllocExpr:");
         add_to_prefix();
         print("dimensions: ");
@@ -226,7 +226,7 @@ namespace lang::utils
         }
         remove_from_prefix();
     }
-    void PrintAST::visit_symbol_path(const ast::SymbolPathExpr& node) noexcept
+    void PrintAST::visit_symbol_path(const syntax::SymbolPathExpr& node) noexcept
     {
         println("NamespaceExpr:");
         add_to_prefix();
@@ -238,7 +238,7 @@ namespace lang::utils
         else println("null");
         remove_from_prefix(4);
     }
-    void PrintAST::visit_call_expr(const ast::FunctionExpr& node) noexcept
+    void PrintAST::visit_call_expr(const syntax::FunctionExpr& node) noexcept
     {
         println("CallExpr:");
         add_to_prefix();
@@ -252,7 +252,7 @@ namespace lang::utils
         } else println("null");
         remove_from_prefix(4);
     }
-    void PrintAST::visit_binop_expr(const ast::BinOpExpr& node) noexcept
+    void PrintAST::visit_binop_expr(const syntax::BinOpExpr& node) noexcept
     {
         println("BinOpExpr:");
         add_to_prefix();
@@ -269,7 +269,7 @@ namespace lang::utils
         else println("null");
         remove_from_prefix(4);
     }
-    void PrintAST::visit_prefix_unary_op_expr(const ast::PrefixUnaryOpExpr& node) noexcept
+    void PrintAST::visit_prefix_unary_op_expr(const syntax::PrefixUnaryOpExpr& node) noexcept
     {
         println("PrefixUnaryOpExpr:");
         add_to_prefix();
@@ -281,7 +281,7 @@ namespace lang::utils
         else println("null");
         remove_from_prefix(4);
     }
-    void PrintAST::visit_postfix_unary_op_expr(const ast::PostfixUnaryOpExpr& node) noexcept
+    void PrintAST::visit_postfix_unary_op_expr(const syntax::PostfixUnaryOpExpr& node) noexcept
     {
         println("PostfixUnaryOpExpr:");
         add_to_prefix();

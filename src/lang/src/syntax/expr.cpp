@@ -1,7 +1,7 @@
-#include <lang/ast/visitor.h>
-#include <lang/ast/expr.h>
+#include <lang/syntax/visitor.h>
+#include <lang/syntax/expr.h>
 
-namespace lang::ast
+namespace lang::syntax
 {
 // LiteralExpr
 

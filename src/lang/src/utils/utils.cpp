@@ -18,12 +18,12 @@ namespace lang::utils
         }
     }
 
-    void print(const ast::BaseNode* ast) noexcept {
+    void print(const syntax::BaseNode* ast) noexcept {
         PrintAST printer;
         printer.print(ast);
     }
 
-    void print(const std::vector<std::unique_ptr<ast::BaseNode>>& asts) noexcept {
+    void print(const std::vector<std::unique_ptr<syntax::BaseNode>>& asts) noexcept {
         PrintAST printer;
         for(const auto& ast : asts) {
             printer.print(ast.get());

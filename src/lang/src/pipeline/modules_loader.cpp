@@ -132,7 +132,7 @@ namespace lang::pipeline
     }
 
     // old one
-    // std::vector<UnitID> ModulesLoader::process_imports(const std::unordered_set<ast::ImportStmt*>& imports) {
+    // std::vector<UnitID> ModulesLoader::process_imports(const std::unordered_set<syntax::ImportStmt*>& imports) {
     //     std::vector<semantic::ModuleID> output;
     //     for(const auto* node : imports) {
     //         semantic::ModuleID depend_id;
@@ -153,7 +153,7 @@ namespace lang::pipeline
     //     } return std::move(output);
     // }
 
-    std::vector<UnitID> ModulesLoader::process_imports(const std::unordered_set<ast::ImportStmt*>& imports) {
+    std::vector<UnitID> ModulesLoader::process_imports(const std::unordered_set<syntax::ImportStmt*>& imports) {
         std::vector<UnitID> output;
         for(const auto* node : imports) {
             // creating new unit

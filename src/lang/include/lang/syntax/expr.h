@@ -2,9 +2,9 @@
 
 #include <vector>
 #include <string_view>
-#include <lang/ast/ast.h>
+#include <lang/syntax/ast.h>
 
-namespace lang::ast
+namespace lang::syntax
 {
     class LiteralExpr : public ExprNode
     {

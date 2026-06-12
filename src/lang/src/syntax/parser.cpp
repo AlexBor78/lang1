@@ -70,19 +70,19 @@ namespace lang::syntax::parser
         return pos + (n - 1) >= tokens->size();
     }
 
-    void Parser::save_type_to_context(ast::DeclStmt* node, std::unique_ptr<AbstractType> type) {
+    void Parser::save_type_to_context(DeclStmt* node, std::unique_ptr<AbstractType> type) {
         syntax_container.types_context[node] = std::move(type);
     }
-    void Parser::add_to_extern_list(ast::DeclStmt* node) {
+    void Parser::add_to_extern_list(DeclStmt* node) {
         syntax_container.extern_list.emplace(node);
     }
-    void Parser::add_to_export_list(ast::DeclStmt* node) {
+    void Parser::add_to_export_list(DeclStmt* node) {
         syntax_container.export_list.emplace(node);
     }
-    void Parser::add_to_imports_list(ast::ImportStmt* node) {
+    void Parser::add_to_imports_list(ImportStmt* node) {
         syntax_container.imports_list.emplace(node);
     }
-    void Parser::add_to_submodules(ast::ImportStmt* node) {
+    void Parser::add_to_submodules(ImportStmt* node) {
         syntax_container.submodules_list.emplace(node);
     }
 
@@ -116,7 +116,7 @@ namespace lang::syntax::parser
 
 // process_ functions
 
-    ast::StmtPtr Parser::process_token() {
+    StmtPtr Parser::process_token() {
         breakpoint(); logger.debug("proccess_token()");
         if(is_end()) throw end_reached();
         if(!is_end() && match(TokenType::END)) throw end_reached();
@@ -132,7 +132,7 @@ namespace lang::syntax::parser
 
     // stmt's
 
-    std::unique_ptr<ast::StmtNode> Parser::process_stmt() {
+    std::unique_ptr<StmtNode> Parser::process_stmt() {
         breakpoint(); logger.debug("proccess_stmt()");
         // modules
         // import
@@ -192,7 +192,7 @@ namespace lang::syntax::parser
     }
 
     // modules stmts
-    std::unique_ptr<ast::ImportStmt> Parser::process_import_stmt() {
+    std::unique_ptr<ImportStmt> Parser::process_import_stmt() {
         breakpoint(); logger.debug("proccess_import_stmt()");
         skip(); // skip IMPORT TOK
 
@@ -216,14 +216,14 @@ namespace lang::syntax::parser
         else sympath.absolute_path = rawpath;
         sympath.normalize();
 
-        return std::make_unique<ast::ImportStmt>(sympath, path_loc);
+        return std::make_unique<ImportStmt>(sympath, path_loc);
     }
 
     // types stmts - unsupported for now
 
     // control flow stmts
 
-    std::unique_ptr<ast::IfStmt> Parser::process_if_stmt() {
+    std::unique_ptr<IfStmt> Parser::process_if_stmt() {
         breakpoint(); logger.debug("proccess_if_stmt()");
         auto loc = peek().pos;
         auto word_loc = peek().pos;
@@ -238,13 +238,13 @@ namespace lang::syntax::parser
         skip(); // skip ')'
 
         // body
-        ast::StmtPtr body{nullptr};
+        StmtPtr body{nullptr};
         if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
         else body = process_token();
 
         if(body->source_pos != common::SourceLocation()) loc.merge(body->source_pos);
 
-        return std::make_unique<ast::IfStmt>(
+        return std::make_unique<IfStmt>(
             std::move(cond), 
             std::move(body), 
             std::move(word_loc),
@@ -252,27 +252,27 @@ namespace lang::syntax::parser
         );
     }
 
-    std::unique_ptr<ast::ElseStmt> Parser::process_else_stmt() {
+    std::unique_ptr<ElseStmt> Parser::process_else_stmt() {
         breakpoint(); logger.debug("proccess_else_stmt()");
         auto loc = peek().pos;
         auto word_loc = peek().pos;
         skip(); // skip ELSE tok
 
         // body
-        ast::StmtPtr body{nullptr};
+        StmtPtr body{nullptr};
         if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
         else body = process_token();
 
         if(body->source_pos != common::SourceLocation()) loc.merge(body->source_pos);
 
-        return std::make_unique<ast::ElseStmt>(
+        return std::make_unique<ElseStmt>(
             std::move(body),
             std::move(word_loc),
             std::move(loc)
         );
     }
 
-    std::unique_ptr<ast::ForStmt> Parser::process_for_stmt() {
+    std::unique_ptr<ForStmt> Parser::process_for_stmt() {
         breakpoint(); logger.debug("proccess_for_stmt()");
         auto loc = peek().pos;
         auto word_loc = peek().pos;
@@ -282,29 +282,29 @@ namespace lang::syntax::parser
         skip(); // skip '('
 
         // decl
-        ast::StmtPtr decl{nullptr};
+        StmtPtr decl{nullptr};
         if(!is_end() && !match(TokenType::SEMICOLON)) decl = process_variable_decl();
         process_semicolon();
 
         // condition
-        ast::ExprPtr cond{nullptr};
+        ExprPtr cond{nullptr};
         if(!is_end() && !match(TokenType::SEMICOLON)) cond = process_expr();
         process_semicolon();
 
         // incr/decr
-        ast::StmtPtr incr = process_expr();
+        StmtPtr incr = process_expr();
 
         if(!(!is_end() && match(TokenType::RPAREN))) throw expected_rparen();
         skip(); // skip ')'
 
         // body
-        ast::StmtPtr body{nullptr};
+        StmtPtr body{nullptr};
         if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
         else body = process_token();
 
         if(body->source_pos != common::SourceLocation()) loc.merge(body->source_pos);
 
-        return std::make_unique<ast::ForStmt>(
+        return std::make_unique<ForStmt>(
             std::move(decl),
             std::move(cond),
             std::move(incr),
@@ -314,7 +314,7 @@ namespace lang::syntax::parser
         );
     }
 
-    std::unique_ptr<ast::WhileStmt> Parser::process_while_stmt() {
+    std::unique_ptr<WhileStmt> Parser::process_while_stmt() {
         breakpoint(); logger.debug("proccess_while_stmt()");
         auto loc = peek().pos;
         auto word_loc = peek().pos;
@@ -329,12 +329,12 @@ namespace lang::syntax::parser
         skip(); // skip ')'
 
         // body
-        ast::StmtPtr body;
+        StmtPtr body;
         if(!is_end() && match(TokenType::LBRACE)) body = process_scope();
         else body = process_token();
 
         if(body->source_pos != common::SourceLocation()) loc.merge(body->source_pos);
-        return std::make_unique<ast::WhileStmt>(
+        return std::make_unique<WhileStmt>(
             std::move(cond),
             std::move(body),
             std::move(word_loc),
@@ -344,11 +344,11 @@ namespace lang::syntax::parser
 
     // other stmts
 
-    std::unique_ptr<ast::BlockStmt> Parser::process_scope() {
+    std::unique_ptr<BlockStmt> Parser::process_scope() {
         breakpoint(); logger.debug("process_scope()");
         if(!is_end() && !match(TokenType::LBRACE)) throw expected_lbrace();
         
-        auto block = std::make_unique<ast::BlockStmt>();
+        auto block = std::make_unique<BlockStmt>();
 
         auto loc = advance().pos;  // skip '{'
         while(!is_end() && !match(TokenType::RBRACE)) block->add_tobody(process_token());
@@ -359,24 +359,24 @@ namespace lang::syntax::parser
         return block;
     }
 
-    std::unique_ptr<ast::ReturnStmt> Parser::process_return_stmt() {
+    std::unique_ptr<ReturnStmt> Parser::process_return_stmt() {
         breakpoint(); logger.debug("proccess_return_stmt()");
         skip(); // skip RETURN tok
 
-        if(!is_end() && match(TokenType::SEMICOLON)) return std::make_unique<ast::ReturnStmt>();
-        return std::make_unique<ast::ReturnStmt>(process_expr());
+        if(!is_end() && match(TokenType::SEMICOLON)) return std::make_unique<ReturnStmt>();
+        return std::make_unique<ReturnStmt>(process_expr());
     }
 
-    std::unique_ptr<ast::BreakStmt> Parser::process_break_stmt() {
+    std::unique_ptr<BreakStmt> Parser::process_break_stmt() {
         breakpoint(); logger.debug("proccess_break_stmt()");
         skip(); // skip BREAK tok
-        return std::make_unique<ast::BreakStmt>();
+        return std::make_unique<BreakStmt>();
     }
 
-    std::unique_ptr<ast::ContinueStmt> Parser::process_continue_stmt() {
+    std::unique_ptr<ContinueStmt> Parser::process_continue_stmt() {
         breakpoint(); logger.debug("proccess_continue_stmt()");
         skip(); // skip BREAK tok
-        return std::make_unique<ast::ContinueStmt>();
+        return std::make_unique<ContinueStmt>();
     }
 
     // declare stmts
@@ -429,7 +429,7 @@ namespace lang::syntax::parser
         } return false;
     }
 
-    std::unique_ptr<ast::DeclStmt> Parser::process_declare() {        
+    std::unique_ptr<DeclStmt> Parser::process_declare() {        
         breakpoint(); logger.debug("process_declare()");
 
         bool is_export{false};
@@ -551,7 +551,7 @@ namespace lang::syntax::parser
         } throw unexpected_token();
     }
 
-    std::unique_ptr<ast::DeclVariable> Parser::process_variable_decl() {
+    std::unique_ptr<DeclVariable> Parser::process_variable_decl() {
         breakpoint(); logger.debug("process_variable_decl()");
         auto loc = peek().pos;
 
@@ -571,7 +571,7 @@ namespace lang::syntax::parser
         &&  match(TokenType::STACK, 1)))) {skip(); // skip = or <-
             auto init_expr = process_expr();
             if(init_expr->source_pos != common::SourceLocation()) loc.merge(init_expr->source_pos);
-            auto node = std::make_unique<ast::DeclVariable>(
+            auto node = std::make_unique<DeclVariable>(
                 name,
                 name_loc,
                 std::move(init_expr),
@@ -583,7 +583,7 @@ namespace lang::syntax::parser
 
         // can merge just to name loc, here no init expr 
         loc.merge(name_loc);
-        auto node = std::make_unique<ast::DeclVariable>(
+        auto node = std::make_unique<DeclVariable>(
             name,
             name_loc,
             nullptr,
@@ -593,7 +593,7 @@ namespace lang::syntax::parser
         return node;
     }
 
-    std::unique_ptr<ast::DeclFunction> Parser::process_function_decl() {
+    std::unique_ptr<DeclFunction> Parser::process_function_decl() {
         breakpoint(); logger.debug("process_function_decl()");
         auto loc = peek().pos;
         
@@ -609,7 +609,7 @@ namespace lang::syntax::parser
         // if(!is_end() && !match(TokenType::LPAREN)) throw expected_lparen();
         skip(); // skip '('
 
-        std::vector<std::unique_ptr<ast::DeclVariable>> args;
+        std::vector<std::unique_ptr<DeclVariable>> args;
         while(! is_end() && !match(TokenType::RPAREN)) {
             args.emplace_back(process_variable_decl());
             if(!is_end() && match(TokenType::RPAREN)) break;
@@ -621,7 +621,7 @@ namespace lang::syntax::parser
         // if forward declaration
         if(!is_end() && match(TokenType::SEMICOLON)) { 
             loc.merge(advance().pos); // skip ';'
-            auto node = std::make_unique<ast::DeclFunction>(
+            auto node = std::make_unique<DeclFunction>(
                 name, 
                 std::move(args), 
                 std::move(name_loc),
@@ -634,7 +634,7 @@ namespace lang::syntax::parser
         
         auto body = process_scope();
         if(body->source_pos != common::SourceLocation()) loc.merge(body->source_pos);
-        auto node = std::make_unique<ast::DeclFunction>(
+        auto node = std::make_unique<DeclFunction>(
             name,
             std::move(args),
             std::move(name_loc),
@@ -649,13 +649,13 @@ namespace lang::syntax::parser
 
     // TODO:
     // can process location for ALL expr just here 
-    std::unique_ptr<ast::ExprNode> Parser::process_expr() {
+    std::unique_ptr<ExprNode> Parser::process_expr() {
         breakpoint(); logger.debug("process_expr");
         if(!is_end() && match(TokenType::STACK)) return process_stackalloc_expr();
         return process_operator();
     }
 
-    std::unique_ptr<ast::StackAllocExpr> Parser::process_stackalloc_expr() {
+    std::unique_ptr<StackAllocExpr> Parser::process_stackalloc_expr() {
         breakpoint(); logger.debug("process_stackalloc_expr()");
         skip(); // skip stack keyword
         if(!is_end() && !match(TokenType::LBRACKET)) throw expected_lbracket();
@@ -679,23 +679,23 @@ namespace lang::syntax::parser
         // check for initialization
         if(!is_end() && match(TokenType::ASSIGN)) throw stack_initialization_not_supported();
 
-        return std::make_unique<ast::StackAllocExpr>(
+        return std::make_unique<StackAllocExpr>(
             std::move(dimensions),
             std::move(locs)
         );
     }
     
     // TODO: add is_-_op funcs for TokenType not only for Operator
-    std::unique_ptr<ast::ExprNode> Parser::process_operator() {
+    std::unique_ptr<ExprNode> Parser::process_operator() {
         return process_assign_expr();
     }
-    std::unique_ptr<ast::ExprNode> Parser::process_assign_expr() {
+    std::unique_ptr<ExprNode> Parser::process_assign_expr() {
         breakpoint(); logger.debug("process_assign_expr()");
         auto left = process_logical_expr();
         if(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_assign_op(op)) { auto op_loc = advance().pos; // skip op
-                return std::make_unique<ast::BinOpExpr>(
+                return std::make_unique<BinOpExpr>(
                     op,
                     std::move(left),
                     process_assign_expr(),
@@ -704,13 +704,13 @@ namespace lang::syntax::parser
             }   
         } return left;
     }
-    std::unique_ptr<ast::ExprNode> Parser::process_logical_expr() {
+    std::unique_ptr<ExprNode> Parser::process_logical_expr() {
         breakpoint(); logger.debug("process_logical_expr()");
         auto left = process_compare_expr();
         while(!is_end(1) &&  utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_logical_op(op)) { auto op_loc = advance().pos; // skip op
-                left = std::make_unique<ast::BinOpExpr>(
+                left = std::make_unique<BinOpExpr>(
                     op,
                     std::move(left),
                     process_compare_expr(),
@@ -719,13 +719,13 @@ namespace lang::syntax::parser
             } else break;
         } return left;
     }
-    std::unique_ptr<ast::ExprNode> Parser::process_compare_expr() {
+    std::unique_ptr<ExprNode> Parser::process_compare_expr() {
         breakpoint(); logger.debug("process_compare_expr()");
         auto left = process_additive_expr();
         while(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_compare_op(op)) { auto op_loc = advance().pos; // skip op
-                left = std::make_unique<ast::BinOpExpr>(op,
+                left = std::make_unique<BinOpExpr>(op,
                     std::move(left),
                     process_additive_expr(),
                     std::move(op_loc)
@@ -733,13 +733,13 @@ namespace lang::syntax::parser
             } else break;
         } return left;
     }
-    std::unique_ptr<ast::ExprNode> Parser::process_additive_expr() {
+    std::unique_ptr<ExprNode> Parser::process_additive_expr() {
         breakpoint(); logger.debug("process_additive_expr()");
         auto left = process_multiple_expr();
         while(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_add_op(op)) { auto op_loc = advance().pos; // skip op
-                left = std::make_unique<ast::BinOpExpr>(
+                left = std::make_unique<BinOpExpr>(
                     op,
                     std::move(left),
                     process_multiple_expr(),
@@ -748,13 +748,13 @@ namespace lang::syntax::parser
             } else break;
         } return left;
     }
-    std::unique_ptr<ast::ExprNode> Parser::process_multiple_expr() {
+    std::unique_ptr<ExprNode> Parser::process_multiple_expr() {
         breakpoint(); logger.debug("process_multiple_expr()");
         auto left = process_unary_expr();
         while(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_mul_op(op)) { auto op_loc = advance().pos; // skip op
-                return std::make_unique<ast::BinOpExpr>(op,
+                return std::make_unique<BinOpExpr>(op,
                     std::move(left),
                     process_unary_expr(),
                     std::move(op_loc)
@@ -762,14 +762,14 @@ namespace lang::syntax::parser
             } else break;
         } return left;
     }
-    std::unique_ptr<ast::ExprNode> Parser::process_unary_expr() {
+    std::unique_ptr<ExprNode> Parser::process_unary_expr() {
         breakpoint(); logger.debug("process_unary_expr()");
         
         // PREfix op
         if(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_prefix_op(op)) { auto op_loc = advance().pos; // skip op
-                return std::make_unique<ast::PrefixUnaryOpExpr>(
+                return std::make_unique<PrefixUnaryOpExpr>(
                     op,
                     process_primary_expr(),
                     std::move(op_loc)
@@ -783,14 +783,14 @@ namespace lang::syntax::parser
         if(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op_loc = peek().pos;
             auto op = utils::token_to_op(peek().ty);
-            if(utils::is_postfix_op(op)) return std::make_unique<ast::PostfixUnaryOpExpr>(
+            if(utils::is_postfix_op(op)) return std::make_unique<PostfixUnaryOpExpr>(
                 utils::token_to_op(advance().ty),
                 std::move(node),
                 std::move(op_loc)
             ); // throw expected_postfix_op(); conflict with binary operators
         } return node;
     }
-    std::unique_ptr<ast::ExprNode> Parser::process_primary_expr() {
+    std::unique_ptr<ExprNode> Parser::process_primary_expr() {
         breakpoint(); logger.debug("process_primary_expr()");
         if(!is_end() && match(TokenType::LPAREN)) {
             auto node_loc = advance().pos; // skip '('
@@ -808,7 +808,7 @@ namespace lang::syntax::parser
 
     // names
 
-    std::unique_ptr<ast::ExprNode> Parser::process_name() {
+    std::unique_ptr<ExprNode> Parser::process_name() {
         breakpoint(); logger.debug("process_name()");
         if(!is_end(1) && !match(TokenType::IDENTIFIER)) throw expected_identifier();
         if(!is_end(2) && match(TokenType::DOUBLECOLON, 1)) return process_symbol_path();
@@ -816,7 +816,7 @@ namespace lang::syntax::parser
         return process_variable_expr();
     }
 
-    std::unique_ptr<ast::SymbolPathExpr> Parser::process_symbol_path() {
+    std::unique_ptr<SymbolPathExpr> Parser::process_symbol_path() {
         breakpoint(); logger.debug("process_namespace_expr()");
 
         auto name_loc = peek().pos;
@@ -826,14 +826,14 @@ namespace lang::syntax::parser
         // if(!is_end() && !match(TokenType::DOUBLECOLON)) throw expected_doublecolon();
         skip(); // skip '::'
 
-        return std::make_unique<ast::SymbolPathExpr>(
+        return std::make_unique<SymbolPathExpr>(
             name,
             process_name(),
             std::move(name_loc)
         );
     }
 
-    std::unique_ptr<ast::FunctionExpr> Parser::process_function_expr() {
+    std::unique_ptr<FunctionExpr> Parser::process_function_expr() {
         breakpoint(); logger.debug("process_function_expr()");
         if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_function_name();
 
@@ -846,7 +846,7 @@ namespace lang::syntax::parser
         skip(); // skip '('
 
         // todo: file end check
-        std::vector<ast::ExprPtr> args;
+        std::vector<ExprPtr> args;
         while(!is_end() && !match(TokenType::RPAREN)) {
             args.emplace_back(process_expr());
             if(!is_end() && match(TokenType::RPAREN)) break;
@@ -854,7 +854,7 @@ namespace lang::syntax::parser
             skip(); // skip comma
         } if(is_end()) throw expected_rparen();
         node_loc.merge(advance().pos); // skip ')'
-        return std::make_unique<ast::FunctionExpr>(
+        return std::make_unique<FunctionExpr>(
             std::string_view(name),
             std::move(args),
             std::move(name_loc),
@@ -862,12 +862,12 @@ namespace lang::syntax::parser
         );
     }
 
-    std::unique_ptr<ast::VariableExpr> Parser::process_variable_expr() {
+    std::unique_ptr<VariableExpr> Parser::process_variable_expr() {
         breakpoint(); logger.debug("process_variable_expr()");
         if(!is_end(1) && !match(TokenType::IDENTIFIER)) throw expected_variable_name();
         auto name_loc = peek().pos;
         std::string_view name = advance().sym;
-        return std::make_unique<ast::VariableExpr>(
+        return std::make_unique<VariableExpr>(
             name,
             std::move(name_loc)
         );
@@ -875,7 +875,7 @@ namespace lang::syntax::parser
 
     // literals
 
-    std::unique_ptr<ast::LiteralExpr> Parser::process_literal() {
+    std::unique_ptr<LiteralExpr> Parser::process_literal() {
         breakpoint(); logger.debug("process_literal()");
         switch (peek().ty) {
             case(TokenType::NUMBER): return process_number_literal();
@@ -888,31 +888,31 @@ namespace lang::syntax::parser
         }
     }
 
-    std::unique_ptr<ast::NumberLiteral> Parser::process_number_literal() {
+    std::unique_ptr<NumberLiteral> Parser::process_number_literal() {
         breakpoint(); logger.debug("process_number_literal()");
         // useless - already checked by process_literal() to call this
         // if(!is_end() && !match(TokenType::NUMBER)) throw expected_number();
-        return std::make_unique<ast::NumberLiteral>(
+        return std::make_unique<NumberLiteral>(
             peek().sym,
             advance().pos
         );
     }
 
-    std::unique_ptr<ast::StringLiteral> Parser::process_string_literal() {
+    std::unique_ptr<StringLiteral> Parser::process_string_literal() {
         breakpoint(); logger.debug("process_string_literal()");
         // useless - already checked by process_literal() to call this
         // if(!is_end() && !match(TokenType::STRING)) throw expected_string();
-        return std::make_unique<ast::StringLiteral>(
+        return std::make_unique<StringLiteral>(
             peek().sym,
             advance().pos
         );
     }
 
-    std::unique_ptr<ast::BoolLiteral> Parser::process_bool_literal() {
+    std::unique_ptr<BoolLiteral> Parser::process_bool_literal() {
         breakpoint(); logger.debug("process_bool_literal()");
         // useless - already checked by process_literal() to call this
         // if(!is_end() && !match(TokenType::TRUE) || !match(TokenType::FALSE)) throw expected_bool();
-        return std::make_unique<ast::BoolLiteral>(
+        return std::make_unique<BoolLiteral>(
             peek().sym,
             advance().pos
         );

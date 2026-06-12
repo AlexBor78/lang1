@@ -4,7 +4,7 @@
 #include <vector>
 #include <common/common.h>
 
-namespace lang::ast
+namespace lang::syntax
 {
     class ConstASTVisitor;
     class ASTVisitor;

@@ -8,7 +8,7 @@
 #include <string>
 #include <unordered_map>
 
-#include <lang/ast/ast.h>
+#include <lang/syntax/ast.h>
 #include <lang/common/symbol_path.h>
 
 namespace lang
@@ -82,7 +82,7 @@ namespace lang
         /**
          * @brief   Abstract Syntax tree
          */
-        ast::AST ast;
+        syntax::AST ast;
 
         /**
          * @brief   list of dependencies
@@ -98,7 +98,7 @@ namespace lang
 
         CompileUnit() = default;
         CompileUnit(UnitID _id
-        ,           ast::AST _ast
+        ,           syntax::AST _ast
         ,           std::vector<UnitID> _dependencies = {}
         ,           std::vector<UnitID> _submodules = {}
         ): id(std::move(_id))

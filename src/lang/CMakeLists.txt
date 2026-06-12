@@ -14,13 +14,11 @@ set(sources
     src/common/units_manager.cpp
 
     # syntax
-    src/syntax/parser.cpp
     src/syntax/lexer.cpp
-
-    # ast
-    src/ast/stmt.cpp
-    src/ast/expr.cpp
-    src/ast/ast.cpp
+    src/syntax/stmt.cpp
+    src/syntax/expr.cpp
+    src/syntax/ast.cpp
+    src/syntax/parser.cpp
 
     # semantic types
     src/semantic/types/semantic_types.cpp

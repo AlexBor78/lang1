@@ -1,10 +1,10 @@
 #pragma once
 
-#include <lang/ast/ast.h>
-#include <lang/ast/stmt.h>
-#include <lang/ast/expr.h>
+#include <lang/syntax/ast.h>
+#include <lang/syntax/stmt.h>
+#include <lang/syntax/expr.h>
 
-namespace lang::ast
+namespace lang::syntax
 {
     class ConstASTVisitor
     {
