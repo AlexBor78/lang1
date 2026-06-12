@@ -4,7 +4,7 @@
 
 // syntax
 #include <common/streams/istream.h>
-#include <lang/syntax/source_file.h>
+#include <lang/common/compile/source_file.h>
 #include <lang/syntax/lexer.h>
 #include <lang/syntax/parser.h>
 
@@ -13,35 +13,40 @@
 
 #include <lang/pipeline/syntax_driver.h>
 
-
 namespace lang::pipeline {
     syntax::SyntaxContainer SyntaxDriver::process_file(const std::string& file_path) {
         // check if module already processed
         if(program->compile_state.processed_files.contains(file_path)) 
 					throw common::diagnostic::InterError(std::format("file {} overloading", file_path));
 
+				program->logger.set_name("SYNTAX");
+				program->logger.log("processing file: {}", file_path);
+
         // tring to open file
         std::unique_ptr<common::streams::FileIStream>
-				file = std::make_unique<common::streams::FileIStream>(file_path);
+				file_stream = std::make_unique<common::streams::FileIStream>(file_path);
 
-        if(!file->is_open())
+        if(!file_stream->is_open())
 					throw common::diagnostic::InterError(std::format("Can not open file: {}", file_path));
 
 				// creating SourceFile to store in SourcesStorage
-				syntax::SourceFile src(
+				syntax::SourceFile* file = program->sources_storage.add(
 						file_path
-				,		program->sources_arena->get_resource()
+				,		program->compile_options.memory_page_size
 				);
 
-				src.load_from_stream(file.get());
+				file->load_from_stream(file_stream.get());
 
+				program->logger.set_name("LEXER");
         // syntax
         syntax::lexer::Lexer lexer(
-						src.content(),
-						&program->logger
+						file_path
+				,		file->content()
+				,		&program->logger
 				);
         auto tokens = lexer.tokenize();
 
+				program->logger.set_name("PARSER");
         syntax::parser::Parser parser(program->ast_arena.get());
         return parser.parse(tokens);
     }

@@ -16,6 +16,11 @@ namespace common::streams
         return file && file->is_open();
     }
 
+
+		std::string_view FileIStream::get_path() const noexcept {
+				return path;
+		}
+
 // StringStream
 
     void StringIStream::set_string(const std::string& _str) {

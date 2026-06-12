@@ -25,7 +25,7 @@ namespace compiler_app {
 
             // features 
             if(flag.flag == "-h" || flag.flag == "--help") {
-                optoins.help = true;
+//                optoins.help = true;
                 continue;
             }
             if(flag.flag == "--syntax-only") {

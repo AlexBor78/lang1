@@ -17,6 +17,7 @@ namespace common::streams
     public:
         void open(std::string_view);
         bool is_open() const noexcept;
+				std::string_view get_path() const noexcept;
 
         explicit FileIStream(std::string_view _path):
             path(_path)

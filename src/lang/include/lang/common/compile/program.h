@@ -12,7 +12,7 @@
 #include <lang/common/compile/state.h>
 #include <lang/common/compile/options.h>
 
-#include <lang/syntax/source_file.h>
+#include <lang/common/compile/source_file.h>
 
 #include <lang/semantic/types/typesystem.h> // needs by PreSemanticContainer
 #include <lang/semantic/types/semantic_types.h>
@@ -69,9 +69,7 @@ namespace lang
 				/**
 				 * @brief stores all source files till end of compilation
 				 */
-				std::unique_ptr<syntax::SourcesStorage> sources_storage; 
-				std::unique_ptr<common::memory::ArenaAloc> sources_arena;
-
+				syntax::SourcesStorage sources_storage; 
 
 				/**
 				 * @brief 	arena to alocate ast

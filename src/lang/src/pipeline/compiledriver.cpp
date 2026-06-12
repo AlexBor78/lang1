@@ -26,16 +26,6 @@ namespace lang::pipeline {
 					
 					program.logger.set_name("SYNTAX");
 					
-					// alocating arena for sources
-					program.sources_arena = std::make_unique<common::memory::ArenaAloc>(
-						program.compile_options.sources_arena_init_size
-					);
-
-					// creating storage for sources
-					program.sources_storage = std::make_unique<syntax::SourcesStorage>(
-							program.sources_arena->get_resource()
-					);
-
 					// alocating arena for ast
 					program.ast_arena = std::make_unique<common::memory::ArenaAloc>(
 						program.compile_options.ast_arena_init_size

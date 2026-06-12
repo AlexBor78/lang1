@@ -24,19 +24,26 @@ namespace lang
         // int threads{1}; // todo: multi-threading
 
         // features
-        bool help{false};
+				bool dry_run{false};
         bool syntax_only{false};
         bool semantic_only{false};
-				bool dry_run{false};
 
         // debug flags
-        bool trace_lexer{false}; // todo: SyntaxDriver, Lexer support
-        bool trace_parser{false}; // todo: SyntaxDriver, Parser support
-        std::vector<std::string> print_modules_ast;
-        std::vector<std::string> print_modules_tokens;
+        std::vector<std::string> print_modules_ast; // print ast of that modules
+        std::vector<std::string> print_modules_tokens; // print tokens of that modules
+
+				// verbose
+				bool verbose_all{false};
+				bool verbose_syntax{false};
+				bool verbose_lexer{false};
+				bool verbose_parser{false};
+
+				// trace
+        bool trace_lexer{false};
+        bool trace_parser{false};
 
 				// other options
-				size_t sources_arena_init_size{256 * 1024}; // by defalt arena starts from 256kb
+				size_t memory_page_size{4096}; // needs for padding
 				size_t ast_arena_init_size{64 * 1024}; // by defalt arena starts from 64kb
 				std::string extension{".lang"};
     };

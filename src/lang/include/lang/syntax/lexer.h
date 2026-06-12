@@ -8,7 +8,7 @@
 #include <common/streams/stream.h>
 #include <lang/syntax/token.h> 
 #include <lang/syntax/keywords.h> 
-#include <lang/syntax/source_file.h>
+#include <lang/common/compile/source_file.h>
 
 namespace lang::syntax::lexer
 {
@@ -16,35 +16,33 @@ namespace lang::syntax::lexer
     {
     public: // api
         std::vector<Token> tokenize();
-//        std::vector<Token> tokenize(common::streams::InputStream*);
 
-        bool is_success() const noexcept;
+        bool had_erros() const noexcept;
 
         void set_logger_infostream(std::unique_ptr<common::streams::OutputStream>) noexcept;
         void set_logger_errstream(std::unique_ptr<common::streams::OutputStream>) noexcept;
         
         explicit Lexer(
-					std::string_view _source 
+					std::string_view _path
+				,	std::string_view _source 
 				,	common::utils::Logger* _logger
-				):source(_source)
-				,	logger(_logger)
-        {init_logger();}
+				):	path(_path)
+				,		source(_source)
+				,		logger(_logger)
+        {}
 
     private: // vars
-//        common::streams::InputStream* stream{nullptr};
-				std::string_view source;
 				size_t cursor{0};
-				common::SourceLocation current_pos = {};
-
-//				common::memory::ArenaAloc* arena;
-
-        bool success{true};
-        std::vector<Token> tokens;
+        bool had_errors{true};
+				std::string_view path;
+				std::string_view source;
         common::utils::Logger* logger;
+
+				common::SourceLocation current_pos = {};
+        std::vector<Token> tokens;
 
     private: // inside api
         void breakpoint() noexcept;
-        void init_logger() noexcept;
 
         diagnostic::LexerError stream_null() const;
         diagnostic::LexerError stream_bad() const;

@@ -24,13 +24,18 @@ namespace common::utils
     public:
         enum class LogLevel : uint8_t
         {
-            NONE  = 0,      // infostream
-            DEBUG = 1 << 0, // infostream
-            INFO  = 1 << 1, // infostream 
-            WARN  = 1 << 2, // errsteam
-            ERROR = 1 << 3,  // errsteam
-            ALL   = DEBUG | INFO | WARN | ERROR
-        };
+            NONE 		= 0,      // infostream
+            DEBUG		= 1 << 0, // infostream
+            INFO 		= 1 << 1, // infostream 
+            WARN 		= 1 << 2, // errsteam
+            ERROR		= 1 << 3, // errsteam
+
+            TRACE		= DEBUG | INFO | WARN | ERROR,
+						ALL  		= TRACE,
+						VERBOSE = ERROR | WARN | INFO,
+						REGULAR = ERROR | WARN,
+						QUITE 	= NONE
+				};
 				struct LoggerProfile {
         		LogLevel level;
         		std::string prefix;

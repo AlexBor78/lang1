@@ -8,26 +8,20 @@
 namespace lang::syntax::lexer
 {
 // public api
-    bool Lexer::is_success() const noexcept {
-        return success;
+    bool Lexer::had_erros() const noexcept {
+        return had_errors;
     }
-//    std::vector<Token> Lexer::tokenize(common::streams::InputStream* _stream) {
-//        stream = _stream;
-//        return tokenize();
-//    }
+
     std::vector<Token> Lexer::tokenize() {
         breakpoint();
         tokens.clear();
 
-//        if(stream->get_pos().path.empty()) logger.log("tokenizing new stream");
-//        else logger.log("tokenizing file: {}", stream->get_pos().path);
-        
         while(!is_eof()) try {
-            // for ConsoleIStream:
-            // stop if got ctrl^D on POSIX or ctr+Z on shitdows
-            if (peek() == '\x04' || peek() == '\x1A') {
-                break;
-            }
+//             // for ConsoleIStream:
+//             // stop if got ctrl^D on POSIX or ctr+Z on shitdows
+//             if (peek() == '\x04' || peek() == '\x1A') {
+//                 break;
+//             }
             if(isspace(peek())) {
                 skip_whitespace();
                 continue;
@@ -51,19 +45,16 @@ namespace lang::syntax::lexer
             
             tokenize_punct();
         } catch(const diagnostic::LexerError& e) {
-            success = false;
+            had_errors = false;
             logger->error("{}", e.what());
             if(!is_eof()) skip();
             else break;
         } catch(const std::exception& e) {
-            success = false;
+            had_errors = false;
             logger->error("lexer inter error: {}", e.what());
             if(!is_eof()) skip();
             else break;
         }
-        // tokens.emplace_back(Token{
-        //     .ty = TokenType::END
-        // });
         tokens.shrink_to_fit();
         return tokens;
     }
@@ -71,16 +62,6 @@ namespace lang::syntax::lexer
 // inside api
 
     // errors creation
-
-    void Lexer::init_logger() noexcept {
-        logger->set_name("Lexer");
-        #ifdef LEXER_DEBUG            
-            logger.set_level(common::utils::Logger::LogLevel::ALL);
-        #else
-            logger->set_level(common::utils::Logger::LogLevel::INFO | common::utils::Logger::LogLevel::WARN | common::utils::Logger::LogLevel::ERROR);
-        #endif 
-        // logger.set_level(common::utils::Logger::LogLevel::ALL);s
-    }
 
     void Lexer::breakpoint() noexcept {
         #ifdef LEXER_DEBUG
@@ -126,7 +107,9 @@ namespace lang::syntax::lexer
         return diagnostic::LexerError("Unicode is not supported (yet)", pos);
     }
 
-    // stream work // ai generated while refactoring; todo: refactor whole lexer, so it operate only on characters (accepts string -> return tokens)
+    // stream work
+		// ai generated while refactoring; todo: refactor whole lexer,
+		// so it operate only on characters (accepts string -> return tokens)
 		void Lexer::check_stream() const {
     if (source.empty()) throw stream_null();
 }
