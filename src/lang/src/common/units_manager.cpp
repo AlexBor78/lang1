@@ -1,14 +1,14 @@
 #include <common/diagnostic/diagnostic.h>
-#include <lang/common/compile/unit.h>
+#include <lang/syntax/translation_unit.h>
 #include <string_view>
 
-namespace lang
+namespace lang::syntax
 {
-    UnitID CompileUnitsManager::gen_new_id() {
+    UnitID UnitsStorage::gen_new_id() {
         UnitID id;
         id.id = counter++;
 
-        auto unit = std::make_unique<CompileUnit>();
+        auto unit = std::make_unique<TranslationUnit>();
         unit->id = id;
 
         units.emplace_back(std::move(unit));
@@ -18,7 +18,7 @@ namespace lang
         return id;
     }
 
-    void CompileUnitsManager::update_contexts(UnitID id) {
+    void UnitsStorage::update_contexts(UnitID id) {
         if(!id.is_valid) throw common::diagnostic::InterError("UnitsManager: update_contexts(): got non valid id");
         
         // if id not specified, try to find
@@ -31,17 +31,17 @@ namespace lang
         if(!id.filepath.empty()) filepaths_context[id.filepath] = id.id;
     }
 
-    CompileUnit* CompileUnitsManager::get(UnitID id) {
+    TranslationUnit* UnitsStorage::get(UnitID id) {
         if(id.id == ULLONG_MAX) id = try_complete(id);
         return units.at(indexes_context.at(id.id)).get();
     }
 
-    const CompileUnit* CompileUnitsManager::get(UnitID id) const {
+    const TranslationUnit* UnitsStorage::get(UnitID id) const {
         if(id.id == ULLONG_MAX) id = try_complete(id);
         return units.at(indexes_context.at(id.id)).get();
     }
 
-    UnitID CompileUnitsManager::try_complete(UnitID id) const {
+    UnitID UnitsStorage::try_complete(UnitID id) const {
         // id
         if(id.id == ULLONG_MAX) {
             if(!id.symbolpath.empty()
@@ -62,17 +62,17 @@ namespace lang
         return id;
     }
 
-    bool CompileUnitsManager::contains(UnitID id) const noexcept {
+    bool UnitsStorage::contains(UnitID id) const noexcept {
         if(id.id == ULLONG_MAX) id = try_complete(id);
         if(id.id != ULLONG_MAX) return true;
         return false;
     }
 
-    bool CompileUnitsManager::contains(SymbolPath sympath) const noexcept {
+    bool UnitsStorage::contains(SymbolPath sympath) const noexcept {
         return sympaths_context.contains(sympath);
     }
 
-    bool CompileUnitsManager::contains(const std::string& filepath) const noexcept {
+    bool UnitsStorage::contains(const std::string& filepath) const noexcept {
         return filepaths_context.contains(filepath);
     }
 }

@@ -8,7 +8,7 @@
 #include <common/utils/logger.h>
 #include <common/memory/arena_aloc.h>
 
-#include <lang/common/compile/unit.h>
+#include <lang/syntax/translation_unit.h>
 #include <lang/common/compile/state.h>
 #include <lang/common/compile/options.h>
 
@@ -44,7 +44,7 @@ namespace lang
         /**
          * @brief   UnitID -> list of Module export (temporary by UnitID)
          */
-        std::unordered_map<UnitID, std::unordered_set<syntax::BaseNode*>> export_lists;
+//        std::unordered_map<UnitID, std::unordered_set<syntax::BaseNode*>> export_lists;
     };
 
     /**
@@ -67,24 +67,21 @@ namespace lang
 				 * @brief stores all source files till end of compilation
 				 */
 				syntax::SourcesStorage sources_storage; 
-
-				/**
-				 * @brief 	arena to alocate ast
-				 * @note		initialized by CompileDriver
-				 */
+				
 				std::unique_ptr<common::memory::ArenaAloc> ast_arena;
 
         /**
-         * @brief   container with all CompileUnits
-         * @note    will replace `modules` field
-				 * @notw 		all data after syntax here
+         * @brief   container with all TranslationUnit (ast basicaly)
+				 * @note 		all data after syntax stage here
          */
-        CompileUnitsManager compile_units_manager;
+				syntax::UnitsStorage units_storage;
+				// syntax::UnitsStorage units_storage;
 
-        /**
-         * @brief   temporary store semantic data until it will be processed by semantic
-         */
-        PreSemanticContainer pre_semantic_data;
+
+       /**
+        * @brief   temporary store semantic data until it will be processed by semantic
+        */
+       PreSemanticContainer pre_semantic_data;
 
         /**
          * @brief   semantic stat

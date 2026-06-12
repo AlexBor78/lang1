@@ -86,7 +86,7 @@ namespace lang::syntax::parser
         std::unique_ptr<ReturnStmt>        process_return_stmt();
 
         // declare
-        std::unique_ptr<AbstractType>           process_type();
+        std::unique_ptr<AbstractType>      process_type();
         std::unique_ptr<DeclStmt>          process_declare();
         std::unique_ptr<DeclVariable>      process_variable_decl();
         std::unique_ptr<StackAllocExpr>    process_stackalloc_expr();

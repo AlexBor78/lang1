@@ -35,7 +35,7 @@ namespace lang::pipeline
         debug_break();
 
         // check if file already processed
-        // if(program->compile_units_manager.contains(UnitID{.filepath = file_path})) // wtf is that error?
+        // if(program->compile_units_manager.contains(syntax::UnitID{.filepath = file_path})) // wtf is that error?
         if(program->compile_state.processed_files.contains(file_path)) return;
         
         // process file
@@ -43,12 +43,12 @@ namespace lang::pipeline
         program->compile_state.processed_files.emplace(file_path);
 
         // creating new unit
-        auto id = program->compile_units_manager.gen_new_id();
+        auto id = program->units_storage.gen_new_id();
         id.filepath = file_path;
         id.symbolpath = gen_sympath(file_path);
-        program->compile_units_manager.update_contexts(id);
+        program->units_storage.update_contexts(id);
 
-        auto unit = program->compile_units_manager.get(id);
+        auto unit = program->units_storage.get(id);
         if(!unit) throw common::diagnostic::InterError("ModulesLoader: load_file error: UnitsManager return nullptr ");
         
         // prepare info to save
@@ -80,7 +80,7 @@ namespace lang::pipeline
         load(unit->submodules);
     }
 
-    void ModulesLoader::load(UnitID id) {
+    void ModulesLoader::load(syntax::UnitID id) {
         debug_break();
         
         // if module already loaded
@@ -91,7 +91,7 @@ namespace lang::pipeline
 
         // also save file path of compile unit
         id.filepath = file_path;
-        program->compile_units_manager.update_contexts(id);
+        program->units_storage.update_contexts(id);
 
         // updating info for relative paths solving
         // current_id = id;
@@ -115,7 +115,7 @@ namespace lang::pipeline
         );
 
         // save compile unit's data
-        auto* unit = program->compile_units_manager.get(id);
+        auto* unit = program->units_storage.get(id);
         unit->ast = std::move(syntax_container.ast);
         unit->dependencies = std::move(dependencies);
         unit->submodules = std::move(submodules);
@@ -125,14 +125,14 @@ namespace lang::pipeline
         load(unit->submodules);
     }
 
-    void ModulesLoader::load(const std::vector<UnitID>& units) {
+    void ModulesLoader::load(const std::vector<syntax::UnitID>& units) {
         for(const auto& unit : units) {
             load(unit);
         }
     }
 
     // old one
-    // std::vector<UnitID> ModulesLoader::process_imports(const std::unordered_set<syntax::ImportStmt*>& imports) {
+    // std::vector<syntax::UnitID> ModulesLoader::process_imports(const std::unordered_set<syntax::ImportStmt*>& imports) {
     //     std::vector<semantic::ModuleID> output;
     //     for(const auto* node : imports) {
     //         semantic::ModuleID depend_id;
@@ -153,11 +153,11 @@ namespace lang::pipeline
     //     } return std::move(output);
     // }
 
-    std::vector<UnitID> ModulesLoader::process_imports(const std::unordered_set<syntax::ImportStmt*>& imports) {
-        std::vector<UnitID> output;
+    std::vector<syntax::UnitID> ModulesLoader::process_imports(const std::unordered_set<syntax::ImportStmt*>& imports) {
+        std::vector<syntax::UnitID> output;
         for(const auto* node : imports) {
             // creating new unit
-            UnitID id; // = program->compile_units_manager.add_new_id();
+            syntax::UnitID id; // = program->compile_units_manager.add_new_id();
 
             // if it's relative path, we now can generate absolute
             if(node->get_path().is_relative) {
@@ -173,8 +173,8 @@ namespace lang::pipeline
             } else id.symbolpath = node->get_path();
             id.symbolpath.normalize();
 
-            if(!program->compile_units_manager.contains(id.symbolpath)) id.id = program->compile_units_manager.gen_new_id().id;
-            program->compile_units_manager.update_contexts(id);
+            if(!program->units_storage.contains(id.symbolpath)) id.id = program->units_storage.gen_new_id().id;
+            program->units_storage.update_contexts(id);
 
             output.emplace_back(std::move(id));
         } return output;

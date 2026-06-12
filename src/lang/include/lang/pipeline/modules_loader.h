@@ -59,10 +59,10 @@ namespace lang::pipeline
          * @warning file must be root file e.g. main file or inner of library
          */
         void load(const std::string&);
-        void load(UnitID);
-        void load(const std::vector<UnitID>&);
+        void load(syntax::UnitID);
+        void load(const std::vector<syntax::UnitID>&);
 
-        std::vector<UnitID> process_imports(const std::unordered_set<syntax::ImportStmt*>&);
+        std::vector<syntax::UnitID> process_imports(const std::unordered_set<syntax::ImportStmt*>&);
 
         /**
          * @brief   generating module id by file path (file must be root file e.g. main file or inner of library)

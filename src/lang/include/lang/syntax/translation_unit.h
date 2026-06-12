@@ -11,7 +11,7 @@
 #include <lang/syntax/ast.h>
 #include <lang/common/symbol_path.h>
 
-namespace lang
+namespace lang::syntax
 {
     struct UnitID
     {
@@ -72,7 +72,7 @@ namespace lang
         {}
     };
 
-    struct CompileUnit
+    struct TranslationUnit
     {
         /**
          * @brief   ID of itself
@@ -96,8 +96,8 @@ namespace lang
          */
         std::vector<UnitID> submodules;
 
-        CompileUnit() = default;
-        CompileUnit(UnitID _id
+        TranslationUnit() = default;
+        TranslationUnit(UnitID _id
         ,           syntax::AST _ast
         ,           std::vector<UnitID> _dependencies = {}
         ,           std::vector<UnitID> _submodules = {}
@@ -111,7 +111,7 @@ namespace lang
     /**
      * @brief   store and manage CompieUnits and their's IDs
      */
-    class CompileUnitsManager
+    class UnitsStorage
     {
     private:
 
@@ -139,7 +139,7 @@ namespace lang
         /**
          * @brief   array of all units, 
          */
-        std::vector<std::unique_ptr<CompileUnit>> units;
+        std::vector<std::unique_ptr<TranslationUnit>> units;
 
         /**
          * @brief   tries to complete id from contexts
@@ -169,14 +169,14 @@ namespace lang
          * @note    will try to use sympath and filepath after id.id
          * @return  const CompileUnit* 
          */
-        CompileUnit* get(UnitID);
+        TranslationUnit* get(UnitID);
 
         /**
          * @brief   const getter by id
          * @note    will try to use sympath and filepath after id.id
          * @return  const CompileUnit* 
          */
-        const CompileUnit* get(UnitID) const;
+        const TranslationUnit* get(UnitID) const;
 
         /**
          * @brief   check if contains unit with given id
@@ -209,8 +209,8 @@ namespace std {
      * @todo: optimize by cache of hash
      */
     template<>
-    struct hash<lang::UnitID> {
-        size_t operator()(const lang::UnitID& id) const {
+    struct hash<lang::syntax::UnitID> {
+        size_t operator()(const lang::syntax::UnitID& id) const {
             return hash<std::string>{}(id.filepath);
         }
     };
