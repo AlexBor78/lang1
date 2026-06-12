@@ -54,8 +54,39 @@ namespace lang::pipeline {
 
 		void CompileDriver::init_logger() {
 			// todo
-//			if(program.compile_options.trace_lexer) {
-//					
-//			}
+			if(program.compile_options.verbose_all
+			|| program.compile_options.verbose_syntax
+			) program.logger.add_profile("SYNTAX", {
+					.level 	= common::utils::Logger::LogLevel::VERBOSE
+			});
+
+			if(program.compile_options.verbose_all
+			|| program.compile_options.verbose_syntax
+			|| program.compile_options.verbose_lexer
+			) program.logger.add_profile("LEXER", {
+					.level 	= common::utils::Logger::LogLevel::VERBOSE
+				,	.prefix = "SYNTAX"
+			});
+
+			if(program.compile_options.verbose_all
+			|| program.compile_options.verbose_syntax
+			|| program.compile_options.verbose_parser
+			) program.logger.add_profile("PARSER", {
+					.level 	= common::utils::Logger::LogLevel::VERBOSE
+				,	.prefix = "SYNTAX"
+			});
+
+			if(program.compile_options.trace_lexer)
+				program.logger.add_profile("LEXER", {
+					.level 	= common::utils::Logger::LogLevel::TRACE
+				,	.prefix = "SYNTAX"
+			});
+
+			if(program.compile_options.trace_parser)
+				program.logger.add_profile("PARSER", {
+					.level 	= common::utils::Logger::LogLevel::TRACE
+				,	.prefix = "SYNTAX"
+			});
+			
 		}
 }

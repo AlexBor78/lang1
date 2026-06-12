@@ -15,49 +15,84 @@ namespace compiler_app {
         // processing flags
         for(const auto& flag : flags) {
             if(flag.flag == "-o" || flag.flag == "--output") {
-                optoins.output_name = flag.value;
+                options.output_name = flag.value;
                 continue;
             }
             if(flag.flag == "-I" || flag.flag == "--import-path") {
-                optoins.import_paths.emplace_back(flag.value);
+                options.import_paths.emplace_back(flag.value);
                 continue;
             }
 
             // features 
+						// TODO: --help
             if(flag.flag == "-h" || flag.flag == "--help") {
-//                optoins.help = true;
                 continue;
             }
+						if(flag.flag == "--dry-run") {
+							options.dry_run = true;
+							continue;
+						}
             if(flag.flag == "--syntax-only") {
-                optoins.syntax_only = true;
+                options.syntax_only = true;
                 continue;
             }
             if(flag.flag == "--semantic-only") {
-                optoins.semantic_only = true;
+                options.semantic_only = true;
                 continue;
             }
 
             // debug
+            if(flag.flag == "--print-tokens") {
+                options.print_modules_tokens.emplace_back(flag.value);
+                continue;
+            }
+            if(flag.flag == "--print-ast") {
+                options.print_modules_ast.emplace_back(flag.value);
+                continue;
+            }
+
+						// verbose
+						if(flag.flag == "-v" || flag.flag == "--verbose") {
+								options.verbose_all = true;							
+								continue;
+						}
+						if(flag.flag == "--verbose-syntax") {
+								options.verbose_syntax = true;							
+								continue;
+						}
+						if(flag.flag == "--verbose-lexer") {
+								options.verbose_lexer = true;
+								continue;
+						}
+						if(flag.flag == "--verbose-parser") {
+								options.verbose_parser = true;
+								continue;
+						}
+
+						// trace
             if(flag.flag == "--trace-lexer") {
-                optoins.trace_lexer = true;
+                options.trace_lexer = true;
                 continue;
             }
             if(flag.flag == "--trace-parser") {
-                optoins.trace_parser = true;
+                options.trace_parser = true;
                 continue;
             }
-            // if(flag.flag == "--print-tokens") {
-            //     optoins.print_tokens = true;
-            //     continue;
-            // }
-            // if(flag.flag == "--print-ast") {
-            //     optoins.print_ast = true;
-            //     continue;
-            // }
+
+
+						// other options
+						if(flag.flag == "--memory-page-size") {
+								options.memory_page_size = std::stoull(flag.value);
+								continue;
+						}
+						if(flag.flag == "--ast--arena-init-size") {
+								options.ast_arena_init_size = std::stoull(flag.value);
+								continue;
+						}
 
             throw std::runtime_error(std::format("unknown flag: {}, use --help", flag.flag));
         }
-        return std::move(optoins);
+        return std::move(options);
     }
 
     void CLIParser::parse(const std::vector<std::string>& args) {
@@ -68,18 +103,21 @@ namespace compiler_app {
                 if(arg.size() == 1) throw std::runtime_error("unexpected -, use --help");
                 flag.flag = arg;
                 if(flag_requires_value(arg)) {
-                    if(args.size() < i++) throw std::runtime_error(std::format("after flag {} expected value, use --help", arg));
-                    flag.value = args[i];
-                }
-                flags.emplace_back(std::move(flag));
-            } else optoins.inputs_files.emplace_back(arg);
-
-							//throw std::runtime_error(std::format("unexpected value: {}, use --help", arg));
+                    if(args.size() < i++) throw std::runtime_error(
+												std::format("after flag {} expected value, use --help", arg)
+										); flag.value = args[i];
+                } flags.emplace_back(std::move(flag));
+            } else options.inputs_files.emplace_back(arg);
         }
     }
 
     bool CLIParser::flag_requires_value(std::string_view flag) {
-        return flag == "-o" || flag == "--output"
-        ||     flag == "-I" || flag == "--import-path";
+        return flag == "--output" 		 || flag == "-o"
+        ||     flag == "--import-path" || flag == "-I"
+				||		 flag == "--print-tokens"
+				|| 		 flag == "--print-ast"
+				||		 flag == "--memory-page-size"
+				||		 flag == "--ast-arena-init-size"
+				;
     }
 }

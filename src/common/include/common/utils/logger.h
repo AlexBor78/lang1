@@ -31,17 +31,19 @@ namespace common::utils
             ERROR		= 1 << 3, // errsteam
 
             TRACE		= DEBUG | INFO | WARN | ERROR,
-						ALL  		= TRACE,
 						VERBOSE = ERROR | WARN | INFO,
 						REGULAR = ERROR | WARN,
-						QUITE 	= NONE
+						QUITE 	= NONE,
+						ALL  		= TRACE
 				};
 				struct LoggerProfile {
-        		LogLevel level;
-        		std::string prefix;
+        		LogLevel level{LogLevel::REGULAR};
+        		std::string prefix{""};
 		
-		        std::shared_ptr<streams::OutputStream> infostream{nullptr};
-		        std::shared_ptr<streams::OutputStream> errstream{nullptr};
+		        std::shared_ptr<streams::OutputStream>
+							infostream{std::make_shared<streams::ConsoleOStream>()};
+		        std::shared_ptr<streams::OutputStream> 
+							errstream{std::make_shared<streams::ConsoleErrOStream>()};
 
 						static inline constexpr LoggerProfile default_() noexcept{
 							return LoggerProfile{

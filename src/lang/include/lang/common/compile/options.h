@@ -3,8 +3,6 @@
  * @file compile_options.h
  * @author alex (borproyoutob@gmail.com)
  * @brief file contains `struct CompileOptions`
- * 
- * @todo rename file to compile_type and combine with compile_state.h
  */
 
 #include <string>
@@ -19,8 +17,8 @@ namespace lang
      */
     struct CompileOptions {
         std::string output_name{"a.out"};
-        std::vector<std::string> import_paths;
         std::vector<std::string> inputs_files = {};// {"main.lang"};
+        std::vector<std::string> import_paths;
         // int threads{1}; // todo: multi-threading
 
         // features
@@ -29,8 +27,8 @@ namespace lang
         bool semantic_only{false};
 
         // debug flags
-        std::vector<std::string> print_modules_ast; // print ast of that modules
         std::vector<std::string> print_modules_tokens; // print tokens of that modules
+        std::vector<std::string> print_modules_ast; // print ast of that modules
 
 				// verbose
 				bool verbose_all{false};

@@ -61,9 +61,6 @@ namespace lang
 
         CompileState compile_state;
 
-				/**
-				 * @breif logger
-				 */
 				common::utils::Logger logger;
 
 				/**

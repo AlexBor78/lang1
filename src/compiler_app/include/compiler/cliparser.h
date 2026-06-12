@@ -21,7 +21,7 @@ namespace compiler_app
         lang::CompileOptions process(const std::vector<std::string>&);
     
     private: // var
-        lang::CompileOptions optoins;
+        lang::CompileOptions options;
         std::vector<ParsedFlag> flags;
         
     private: // api

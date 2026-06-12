@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <memory>
 #include <format>
 #include <string>
@@ -32,6 +33,7 @@ namespace lang::pipeline {
 				// creating SourceFile to store in SourcesStorage
 				syntax::SourceFile* file = program->sources_storage.add(
 						file_path
+				,		std::filesystem::file_size(file_path)
 				,		program->compile_options.memory_page_size
 				);
 
