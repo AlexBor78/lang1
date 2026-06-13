@@ -15,10 +15,9 @@
 #include <lang/pipeline/syntax_driver.h>
 
 namespace lang::pipeline {
-    syntax::SyntaxContainer SyntaxDriver::process_file(const std::string& file_path) {
-        // check if module already processed
-//        if(program->compile_state.processed_files.contains(file_path)) 
-//					throw common::diagnostic::InterError(std::format("file {} overloading", file_path));
+    //syntax::SyntaxContainer SyntaxDriver::process_file(const std::string& file_path) {
+    std::unordered_set<syntax::ImportStmt*> SyntaxDriver::process_file(
+				const std::string& file_path) {
 
         // tring to open file
         std::unique_ptr<common::streams::FileIStream>
@@ -27,25 +26,44 @@ namespace lang::pipeline {
         if(!file_stream->is_open())
 					throw common::diagnostic::InterError(std::format("Can not open file: {}", file_path));
 
-				// creating SourceFile to store in SourcesStorage
+				const size_t page_size = program->compile_options.memory_page_size;
+				const size_t file_size = std::filesystem::file_size(file_path);
+				const size_t arena_size = std::max(page_size, ((file_size * 2 + page_size - 1) / page_size) * page_size);
+
+				// creating and loading SourceFile to SourcesStorage
 				syntax::SourceFile* file = program->sources_storage.add(
 						file_path
-				,		std::filesystem::file_size(file_path)
+				,		file_size
 				,		program->compile_options.memory_page_size
-				);
+				); file->load_from_stream(file_stream.get());
 
-				file->load_from_stream(file_stream.get());
-
+				// tokenizing
 				program->logger.set_name("LEXER");
-        // syntax
         syntax::lexer::Lexer lexer(
 						file_path // need for right SourceLocation generation
 				,		file->content()
 				,		&program->logger
 				); auto tokens = lexer.tokenize();
 
+				// parsing
+				// allocating arena for ast
+				auto arena = std::make_unique<common::memory::ArenaAloc>(arena_size);
+        syntax::parser::Parser parser(
+				//	&program->logger
+						arena.get()
+				); auto result = parser.parse(tokens);
+
+				// storing data in UnitsStorage
+				auto unit = program->units_storage.add();
+				unit->file_id = file->get_id();
+				unit->ast_arena = std::move(arena);
+				unit->ast = std::move(result.ast);
 				program->logger.set_name("PARSER");
-        syntax::parser::Parser parser(program->ast_arena.get());
-        return parser.parse(tokens);
+
+				auto imports = result.imports_list;
+				imports.insert(
+						result.submodules_list.begin()
+				,		result.submodules_list.end()
+				); return imports;
     }
 }

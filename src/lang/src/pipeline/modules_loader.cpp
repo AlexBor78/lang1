@@ -20,14 +20,22 @@ namespace lang::pipeline
         }
     }
 
+    void ModulesLoader::load(const std::vector<SymbolPath>& paths) {
+        for(const auto& path : paths) {
+            load(path);
+        }
+    }
+
     void ModulesLoader::debug_break() {
         #ifdef MODULESLOADER_DEBUG
             common::debug_break();
         #endif
     }
 
-    void ModulesLoader::load(const std::string& file_path) {
+    void ModulesLoader::load(std::string_view _file_path) {
         debug_break();
+
+				const std::string file_path = std::filesystem::canonical(_file_path).string();
 
         // check if file already processed
         if(program->sources_storage.contains(file_path)) return;
@@ -35,37 +43,27 @@ namespace lang::pipeline
         // process file
 				program->logger.set_name("SYNTAX");
 				program->logger.log("processing file: {}", file_path);
-        auto syntax_container = syntax_driver.process_file(file_path);
-
-        // creating new unit
-        auto id = program->units_storage.gen_new_id();
-        auto unit = program->units_storage.get(id);
-        if(!unit) throw common::diagnostic::InterError(
-						"ModulesLoader: load_file(file_path) error: UnitsManager returned nullptr"
-				);
-
-        // save compile unit's data
-        unit->ast = std::move(syntax_container.ast);
+        auto unresolved_imports = syntax_driver.process_file(file_path);
+        const auto resolved_imports = import_resolver.process_imports(unresolved_imports);
 
         // updating data for relative paths solving
 				const auto sympath = import_resolver.gen_sympath(file_path);
+//				const auto workdir = file_path.substr(0, file_path.size() - sympath.absolute_path.normalized_path.size() - ext_len);
+				const auto workdir = std::filesystem::path(file_path).parent_path().string();
+
 				import_resolver.set_worksympath(sympath);
-        import_resolver.set_workdir(file_path.substr(0, 
-					file_path.size() - sympath.absolute_path.normalized_path.size() - ext_len
-				));
+        import_resolver.set_workdir(workdir);
 
         // recursively load all other files
-        const auto dependencies = import_resolver.process_imports(syntax_container.imports_list);
-        const auto submodules = import_resolver.process_imports(syntax_container.submodules_list);
-        load(dependencies);
-        load(submodules);
+        load(resolved_imports);
     }
 
     void ModulesLoader::load(SymbolPath sympath) {
         debug_break();
         
         // generating file paths
-        const std::string file_path = import_resolver.gen_path(sympath);
+        const std::string _file_path = import_resolver.gen_path(sympath);
+				const std::string file_path = std::filesystem::canonical(_file_path).string();
 
 // TODO: add load_root(file_ath) func, and move main load(file_path) logic
 //				load(file_path);
@@ -73,6 +71,9 @@ namespace lang::pipeline
 				
         // updating info for relative paths solving
 				import_resolver.set_worksympath(sympath);
+//         import_resolver.set_workdir(file_path.substr(0, 
+// 					file_path.size() - sympath.absolute_path.normalized_path.size() - ext_len
+// 				));
 
         // check just in case if file was already processed
         if(program->sources_storage.contains(file_path)) return;
@@ -80,30 +81,10 @@ namespace lang::pipeline
         // process files
 				program->logger.set_name("SYNTAX");
 				program->logger.log("processing file: {}", file_path);
-        auto syntax_container = syntax_driver.process_file(file_path);
-
-        // creating new unit
-        auto id = program->units_storage.gen_new_id();
-        auto* unit = program->units_storage.get(id);
-        if(!unit) throw common::diagnostic::InterError(
-						"ModulesLoader: load_file(file_path) error: UnitsManager returned nullptr"
-				);
-				
-        // save compile unit's data
-        unit->ast = std::move(syntax_container.ast);
+        auto unresolved_imports = syntax_driver.process_file(file_path);
 
         // recursively load all other files
-        const auto dependencies = import_resolver.process_imports(syntax_container.imports_list);
-        const auto submodules = import_resolver.process_imports(syntax_container.submodules_list);
-        load(dependencies);
-        load(submodules);
+        const auto resolved_imports = import_resolver.process_imports(unresolved_imports);
+        load(resolved_imports);
     }
-
-    void ModulesLoader::load(const std::vector<SymbolPath>& paths) {
-        for(const auto& path : paths) {
-            load(path);
-        }
-    }
-
-
 }

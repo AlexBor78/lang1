@@ -11,34 +11,37 @@ namespace lang {
      * @param start_path start of path
      * @return std::string 
      */
-    static std::string gen_path_(
-			const SymbolPath& sympath
-		, std::string extension
-		, std::string start_path = "./"
-		) {
-
-        if(sympath.absolute_path.empty()) {
-            throw common::diagnostic::InterError("gen_path_(): needs absolute sympath to module to generate");
-        }
-
-        // creating base path
-        std::string file_path = start_path;
-        for(size_t i = 0; i + 1 < sympath.absolute_path.path.size(); ++i) file_path += sympath.absolute_path.path[i] + "/";
-        file_path += sympath.absolute_path.path.back();
-
-        // if it's library
-        if(std::filesystem::is_directory(file_path)) {
-            file_path += "/" + sympath.absolute_path.path.back() + extension;
-            if(!std::filesystem::exists(file_path)) throw common::diagnostic::InterError(std::format("file {} doesn't exists", file_path));
-            return file_path;
-        }
-        
-        // just module, without submodule
-        file_path += extension;
-        if(!std::filesystem::exists(file_path)) throw common::diagnostic::InterError(std::format("file {} doesn't exists", file_path));
-        return file_path;
+	// ai generated
+	static std::string gen_path_(
+    const SymbolPath& sympath,
+    std::string extension,
+    std::string start_path = "./"
+) {
+    if(sympath.absolute_path.empty()) {
+        throw common::diagnostic::InterError("gen_path_(): needs absolute sympath");
     }
 
+    // std::filesystem::path сам добавит недостающие '/'
+    std::filesystem::path file_path = start_path;
+    for (const auto& part : sympath.absolute_path.path) {
+        file_path /= part; 
+    }
+
+    // if it's library (directory)
+    if(std::filesystem::is_directory(file_path)) {
+        file_path /= (sympath.absolute_path.path.back() + extension);
+        if(!std::filesystem::exists(file_path)) 
+            throw common::diagnostic::InterError(std::format("file {} doesn't exists", file_path.string()));
+        return file_path.string();
+    }
+    
+    // just module file
+    file_path += extension;
+    if(!std::filesystem::exists(file_path)) 
+        throw common::diagnostic::InterError(std::format("file {} doesn't exists", file_path.string()));
+    
+    return file_path.string();
+}
 
     std::string ImportResolver::gen_path(const SymbolPath& sympath) {
 //        assert(!id.path.path.empty());

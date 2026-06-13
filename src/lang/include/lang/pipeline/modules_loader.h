@@ -30,6 +30,7 @@ namespace lang::pipeline
 				,		import_resolver(
 								program->compile_options.extension
 						,		&program->compile_options.import_paths
+						,		&program->logger
 						)
         {}
 
@@ -49,7 +50,7 @@ namespace lang::pipeline
          * @param   file_path
          * @warning file must be root file e.g. main file or inner of library
          */
-        void load(const std::string&);
+        void load(std::string_view);
         void load(
 						SymbolPath
 			//	,		syntax::UnitID

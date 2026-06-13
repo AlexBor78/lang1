@@ -1,7 +1,9 @@
 #pragma once
 
+#include <unordered_set>
+
 #include <lang/common/compile/program.h>
-#include <lang/syntax/syntax_container.h>
+#include <lang/syntax/stmt.h>
 
 namespace lang::pipeline
 {
@@ -19,7 +21,9 @@ namespace lang::pipeline
          * @param file file path
          * @return semantic::ModuleID 
          */
-        syntax::SyntaxContainer process_file(const std::string&);
+//        syntax::SyntaxContainer process_file(const std::string&);
+				std::unordered_set<syntax::ImportStmt*> process_file(const std::string&);
+
 
     private: // var
         Program* program;

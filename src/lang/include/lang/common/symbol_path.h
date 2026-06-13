@@ -57,6 +57,11 @@ namespace lang {
          */
         bool is_relative{false};
 
+				std::string to_string() const noexcept {
+					if(is_relative) return relative_path.normalized_path;
+					return absolute_path.normalized_path;
+				}
+
         /**
          * @brief relative path to same symbol as absolute
          * @note without initialized absolute path can make problems

@@ -43,6 +43,9 @@ namespace lang::syntax {
 		,		file("", arena->get_resource())
 		{}
 
+		inline FileID get_id() const noexcept {
+				return id;
+		}
 
 		void load_from_stream(common::streams::InputStream* stream) {
 			std::string raw = stream->read_all();
