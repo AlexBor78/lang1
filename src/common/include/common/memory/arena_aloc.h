@@ -27,7 +27,7 @@ namespace common::memory
     ArenaAloc& operator=(const ArenaAloc&) = delete;
 
 		template <typename Type, typename... Args>
-    Type* alloc(Args&&... args) {
+    Type* make(Args&&... args) {
 			void* ptr = arena.allocate(sizeof(Type), alignof(Type));
 			return std::construct_at(static_cast<Type*>(ptr), std::forward<Args>(args)...);
     }
