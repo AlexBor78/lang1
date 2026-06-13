@@ -20,9 +20,7 @@ namespace lang::syntax::parser
     public: // api
         Parser(common::memory::ArenaAloc* _arena):
 					arena(_arena)
-				{
-            init();
-        }
+				{}
 
         SyntaxContainer parse(const std::vector<Token>&);
         bool had_errors() const noexcept;
@@ -37,13 +35,11 @@ namespace lang::syntax::parser
         size_t pos{0};
     
     private: // api
-        void init();
-        void init_logger();
         void reset_state();
         void breakpoint();
 
-        void save_type_to_context(DeclStmt*, std::unique_ptr<AbstractType>);
-        void add_to_extern_list(DeclStmt*);
+        void save_type_to_context(DeclName*, std::unique_ptr<AbstractType>);
+        void add_to_extern_list(DeclName*);
         void add_to_export_list(DeclStmt*);
         void add_to_imports_list(ImportStmt*);
         void add_to_submodules(ImportStmt*);

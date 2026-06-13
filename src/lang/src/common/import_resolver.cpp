@@ -79,8 +79,8 @@ namespace lang {
 						SymbolPath sympath;
 
             // if it's relative path, we now can generate absolute
-            if(node->get_path().is_relative) {
-                sympath = node->get_path();
+            if(node->path.is_relative) {
+                sympath = node->path;
                 
                 // inserting root of absolute path (current module)
                 sympath.absolute_path = working_sympath.absolute_path;
@@ -90,7 +90,7 @@ namespace lang {
                     sympath.relative_path.path.begin(),
                     sympath.relative_path.path.end()
                 );
-            } else sympath = node->get_path();
+            } else sympath = node->path;
             sympath.normalize();
             output.emplace_back(std::move(sympath));
         } return output;

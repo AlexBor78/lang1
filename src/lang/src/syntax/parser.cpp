@@ -31,28 +31,14 @@ namespace lang::syntax::parser
 
 // private api
 
-    void Parser::init() {
-        init_logger();
-    }
-
-    void Parser::init_logger() {
-        logger.set_name("Parser");
-        #ifdef PARSER_DEBUG
-            logger.set_level(common::utils::Logger::LogLevel::ALL);
-        #else
-            logger.set_level(common::utils::Logger::LogLevel::INFO | common::utils::Logger::LogLevel::WARN | common::utils::Logger::LogLevel::ERROR);
-        #endif
-        // logger.set_level(common::utils::Logger::LogLevel::ALL); // just for now
-    }
-    
     void Parser::reset_state() {
         tokens = nullptr;
         success = true;
         pos = 0;
 
-        syntax_container.types_context.clear();
-        syntax_container.export_list.clear();
-        syntax_container.extern_list.clear();
+//        syntax_container.types_context.clear();
+//        syntax_container.export_list.clear();
+//        syntax_container.extern_list.clear();
         syntax_container.imports_list.clear();
         syntax_container.submodules_list.clear();
     }
@@ -70,14 +56,14 @@ namespace lang::syntax::parser
         return pos + (n - 1) >= tokens->size();
     }
 
-    void Parser::save_type_to_context(DeclStmt* node, std::unique_ptr<AbstractType> type) {
-        syntax_container.types_context[node] = std::move(type);
+    void Parser::save_type_to_context(DeclName* node, std::unique_ptr<AbstractType> type) {
+				node->type = std::move(type);
     }
-    void Parser::add_to_extern_list(DeclStmt* node) {
-        syntax_container.extern_list.emplace(node);
+    void Parser::add_to_extern_list(DeclName* node) {
+				node->is_extern = true;
     }
     void Parser::add_to_export_list(DeclStmt* node) {
-        syntax_container.export_list.emplace(node);
+				node->is_export = true;
     }
     void Parser::add_to_imports_list(ImportStmt* node) {
         syntax_container.imports_list.emplace(node);
@@ -351,7 +337,7 @@ namespace lang::syntax::parser
         auto block = std::make_unique<BlockStmt>();
 
         auto loc = advance().pos;  // skip '{'
-        while(!is_end() && !match(TokenType::RBRACE)) block->add_tobody(process_token());
+        while(!is_end() && !match(TokenType::RBRACE)) block->body.emplace_back(process_token());
         if(!is_end() && !match(TokenType::RBRACE)) throw expected_rbrace();
         loc.merge(advance().pos); // '}'
 

@@ -3,17 +3,6 @@
 
 namespace lang::syntax
 {
-// LiteralExpr
-
-    std::string_view LiteralExpr::get_literal() const noexcept
-    {
-        return literal;
-    }
-    const char* LiteralExpr::get_c_literal() const noexcept
-    {
-        return literal.c_str();
-    }
-
 // NumberLiteral
     
     void NumberLiteral::accept(ConstASTVisitor& visitor) const noexcept
@@ -47,13 +36,6 @@ namespace lang::syntax
         visitor.visit_bool_literal(*this);
     }
 
-// IdentifierExpr
-
-    std::string_view IdentifierExpr::get_name() const noexcept
-    {
-        return name;
-    }
-
 // VariableExpr
 
     void VariableExpr::accept(ConstASTVisitor& visitor) const noexcept
@@ -76,15 +58,6 @@ namespace lang::syntax
         visitor.visit_symbol_path(*this);
     }
 
-    const ExprNode* SymbolPathExpr::get_identifier() const noexcept
-    {
-        return identifier.get();
-    }
-    ExprNode* SymbolPathExpr::get_identifier() noexcept
-    {
-        return identifier.get();
-    }
-
 // CallExpr
 
     void FunctionExpr::accept(ConstASTVisitor& visitor) const noexcept
@@ -96,26 +69,6 @@ namespace lang::syntax
         visitor.visit_call_expr(*this);
     }
 
-    std::string_view FunctionExpr::get_callee() const noexcept
-    {
-        return callee;
-    }
-    const std::vector<ExprPtr>& FunctionExpr::get_args() const noexcept
-    {
-        return args;
-    }
-    std::vector<ExprPtr>& FunctionExpr::get_args() noexcept
-    {
-        return args;
-    }
-
-// OperatorExpr
-
-    OperatorExpr::OperatorKind OperatorExpr::get_op() const noexcept
-    {
-        return op;
-    }
-
 // BinOpExpr
 
     void BinOpExpr::accept(ConstASTVisitor& visitor) const noexcept
@@ -125,34 +78,6 @@ namespace lang::syntax
     void BinOpExpr::accept(ASTVisitor& visitor) noexcept
     {
         visitor.visit_binop_expr(*this);
-    }
-
-    const ExprNode* BinOpExpr::get_left() const noexcept
-    {
-        return left.get();
-    }
-    ExprNode* BinOpExpr::get_left() noexcept
-    {
-        return left.get();
-    }
-    const ExprNode* BinOpExpr::get_right() const noexcept
-    {
-        return right.get();
-    }
-    ExprNode* BinOpExpr::get_right() noexcept
-    {
-        return right.get();
-    }
-
-// UnaryOpExpr
-
-    const ExprNode* UnaryOpExpr::get_operand() const noexcept
-    {
-        return operand.get();
-    }
-    ExprNode* UnaryOpExpr::get_operand() noexcept
-    {
-        return operand.get();
     }
 
 // PrefixUnaryOpExpr
@@ -178,10 +103,6 @@ namespace lang::syntax
     }
 
 // StackAllocExpr
-
-    const std::vector<size_t> StackAllocExpr::get_dimensions() const noexcept {
-        return dimensions;
-    }
 
     void StackAllocExpr::accept(ConstASTVisitor& visitor) const noexcept
     {

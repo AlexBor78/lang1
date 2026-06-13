@@ -51,7 +51,7 @@ namespace lang::utils
         println("BlockStmt:");
         
         add_to_prefix();
-        for(const auto& stmt : node.get_body())
+        for(const auto& stmt : node.body)
             if(stmt) stmt->accept(*this);
         remove_from_prefix();
     }
@@ -63,13 +63,13 @@ namespace lang::utils
         
         print("Condition:");
         add_to_prefix();
-        if(node.get_cond()) node.get_cond()->accept(*this);
+        if(node.cond) node.cond->accept(*this);
         else println("null");
         remove_from_prefix();
 
         print("Body:");
         add_to_prefix();
-        if(node.get_body()) node.get_body()->accept(*this);
+        if(node.body) node.body->accept(*this);
         else println("null");
         remove_from_prefix(4);
     }
@@ -80,7 +80,7 @@ namespace lang::utils
         
         print("Body:");
         add_to_prefix();
-        if(node.get_body()) node.get_body()->accept(*this);
+        if(node.body) node.body->accept(*this);
         else println("null");
         remove_from_prefix(4);
     }
@@ -91,25 +91,25 @@ namespace lang::utils
         
         print("Declaration:");
         add_to_prefix();
-        if(node.get_decl()) node.get_decl()->accept(*this);
+        if(node.decl) node.decl->accept(*this);
         else println("null");
         remove_from_prefix();
 
         print("Condition:");
         add_to_prefix();
-        if(node.get_cond()) node.get_cond()->accept(*this);
+        if(node.cond) node.cond->accept(*this);
         else println("null");
         remove_from_prefix();
 
         print("Increment:");
         add_to_prefix();
-        if(node.get_incr()) node.get_incr()->accept(*this);
+        if(node.incr) node.incr->accept(*this);
         else println("null");
         remove_from_prefix();
 
         print("Body:");
         add_to_prefix();
-        if(node.get_body()) node.get_body()->accept(*this);
+        if(node.body) node.body->accept(*this);
         else println("null");
         remove_from_prefix(4);
     }
@@ -120,13 +120,13 @@ namespace lang::utils
         
         print("Condition:");
         add_to_prefix();
-        if(node.get_cond()) node.get_cond()->accept(*this);
+        if(node.cond) node.cond->accept(*this);
         else println("null");
         remove_from_prefix();
 
         print("Body:");
         add_to_prefix();
-        if(node.get_body()) node.get_body()->accept(*this);
+        if(node.body) node.body->accept(*this);
         else println("null");
         remove_from_prefix(4);
     }
@@ -135,11 +135,11 @@ namespace lang::utils
         println("DeclVar:");
         add_to_prefix();
 
-        println("name: {}", node.get_name());
+        println("name: {}", node.name);
         
         print("init: ");
         add_to_prefix();
-        if(node.get_init_expr()) node.get_init_expr()->accept((*this));
+        if(node.init_expr) node.init_expr->accept((*this));
         else println("null");
         remove_from_prefix(4);
     }
@@ -147,12 +147,12 @@ namespace lang::utils
     {
         println("DeclFunc:");
         add_to_prefix();
-        println("name: {}", node.get_name());
+        println("name: {}", node.name);
         
         print("args: ");
         add_to_prefix();
-        if(!node.get_args().empty()) {
-            for(const auto& arg : node.get_args())
+        if(!node.args.empty()) {
+            for(const auto& arg : node.args)
                 if(arg) arg->accept(*this);
         }
         else println("null");
@@ -160,7 +160,7 @@ namespace lang::utils
         
         print("body: ");
         add_to_prefix();
-        if(node.get_body()) node.get_body()->accept(*this);
+        if(node.body) node.body->accept(*this);
         else println("null");
 
         remove_from_prefix(4);
@@ -170,7 +170,7 @@ namespace lang::utils
     {
         println("ImportStmt:");
         add_to_prefix();
-        println("name: {}", node.get_imported());
+        println("name: {}", node.path.to_string());
         remove_from_prefix();
     }
     void PrintAST::visit_return_stmt(const syntax::ReturnStmt& node) noexcept
@@ -179,7 +179,7 @@ namespace lang::utils
         add_to_prefix();
         print("return expr: ");
         add_to_prefix();
-        if(node.get_ret_expr()) node.get_ret_expr()->accept(*this);
+        if(node.ret_expr) node.ret_expr->accept(*this);
         else println("null");
         remove_from_prefix(4);
     }
@@ -193,35 +193,35 @@ namespace lang::utils
     {
         println("NumberLiteral:");
         add_to_prefix();
-        println("literal: {}", node.get_literal());
+        println("literal: {}", node.literal);
         remove_from_prefix();
     }
     void PrintAST::visit_string_literal(const syntax::StringLiteral& node) noexcept
     {
         println("StringLiteral:");
         add_to_prefix();
-        println("literal: \"{}\"", node.get_literal());
+        println("literal: \"{}\"", node.literal);
         remove_from_prefix();
     }
     void PrintAST::visit_bool_literal(const syntax::BoolLiteral& node) noexcept
     {
         println("BoolLiteral:");
         add_to_prefix();
-        println("literal: {}", node.get_literal());
+        println("literal: {}", node.literal);
         remove_from_prefix();
     }
     void PrintAST::visit_variable_expr(const syntax::VariableExpr& node) noexcept
     {
         println("VariableExpr:");
         add_to_prefix();
-        println("name: {}", node.get_name());
+        println("name: {}", node.name);
         remove_from_prefix();
     }
     void PrintAST::visit_stackalloc_expr(const syntax::StackAllocExpr& node) noexcept {
         println("StackAllocExpr:");
         add_to_prefix();
         print("dimensions: ");
-        for(const auto size : node.get_dimensions()) {
+        for(const auto size : node.dimensions) {
             print("[{}]", size);
         }
         remove_from_prefix();
@@ -230,11 +230,11 @@ namespace lang::utils
     {
         println("NamespaceExpr:");
         add_to_prefix();
-        println("name: {}", node.get_name());
+        println("name: {}", node.name);
         
         print("identifier: ");
         add_to_prefix();
-        if(node.get_identifier()) node.get_identifier()->accept((*this));
+        if(node.identifier) node.identifier->accept((*this));
         else println("null");
         remove_from_prefix(4);
     }
@@ -242,12 +242,12 @@ namespace lang::utils
     {
         println("CallExpr:");
         add_to_prefix();
-        println("name: {}", node.get_callee());
+        println("name: {}", node.callee);
 
         print("args: ");
         add_to_prefix();
-        if(!node.get_args().empty()) {
-            for(const auto& arg : node.get_args())
+        if(!node.args.empty()) {
+            for(const auto& arg : node.args)
                 if(arg) arg->accept(*this);
         } else println("null");
         remove_from_prefix(4);
@@ -256,16 +256,16 @@ namespace lang::utils
     {
         println("BinOpExpr:");
         add_to_prefix();
-        println("operator: {}", stringify(node.get_op()));
+        println("operator: {}", stringify(node.op));
         print("left expr: ");
         add_to_prefix();
-        if(node.get_left()) node.get_left()->accept(*this);
+        if(node.left) node.left->accept(*this);
         else println("null");
         remove_from_prefix();
 
         print("right expr: ");
         add_to_prefix();
-        if(node.get_right()) node.get_right()->accept(*this);
+        if(node.right) node.right->accept(*this);
         else println("null");
         remove_from_prefix(4);
     }
@@ -273,11 +273,11 @@ namespace lang::utils
     {
         println("PrefixUnaryOpExpr:");
         add_to_prefix();
-        println("operator: {}", stringify(node.get_op()));
+        println("operator: {}", stringify(node.op));
 
         print("operand expr: ");
         add_to_prefix();
-        if(node.get_operand()) node.get_operand()->accept(*this);
+        if(node.operand) node.operand->accept(*this);
         else println("null");
         remove_from_prefix(4);
     }
@@ -285,11 +285,11 @@ namespace lang::utils
     {
         println("PostfixUnaryOpExpr:");
         add_to_prefix();
-        println("operator: {}", stringify(node.get_op()));
+        println("operator: {}", stringify(node.op));
 
         print("operand expr: ");
         add_to_prefix();
-        if(node.get_operand()) node.get_operand()->accept(*this);
+        if(node.operand) node.operand->accept(*this);
         else println("null");
         remove_from_prefix(4);
     }

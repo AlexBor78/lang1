@@ -22,8 +22,9 @@ namespace lang::syntax
         static constexpr inline common::SourceLocation default_pos() noexcept {
             return common::SourceLocation{};
         }
-        explicit BaseNode(common::SourceLocation _full_range_loc = default_pos()): 
-            source_pos(std::move(_full_range_loc))
+        explicit BaseNode(
+					common::SourceLocation _full_range_loc = default_pos()
+				):	source_pos(std::move(_full_range_loc))
         {}
 
     public:
