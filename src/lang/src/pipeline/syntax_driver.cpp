@@ -17,11 +17,8 @@
 namespace lang::pipeline {
     syntax::SyntaxContainer SyntaxDriver::process_file(const std::string& file_path) {
         // check if module already processed
-        if(program->compile_state.processed_files.contains(file_path)) 
-					throw common::diagnostic::InterError(std::format("file {} overloading", file_path));
-
-				program->logger.set_name("SYNTAX");
-				program->logger.log("processing file: {}", file_path);
+//        if(program->compile_state.processed_files.contains(file_path)) 
+//					throw common::diagnostic::InterError(std::format("file {} overloading", file_path));
 
         // tring to open file
         std::unique_ptr<common::streams::FileIStream>
@@ -42,11 +39,10 @@ namespace lang::pipeline {
 				program->logger.set_name("LEXER");
         // syntax
         syntax::lexer::Lexer lexer(
-						file_path
+						file_path // need for right SourceLocation generation
 				,		file->content()
 				,		&program->logger
-				);
-        auto tokens = lexer.tokenize();
+				); auto tokens = lexer.tokenize();
 
 				program->logger.set_name("PARSER");
         syntax::parser::Parser parser(program->ast_arena.get());

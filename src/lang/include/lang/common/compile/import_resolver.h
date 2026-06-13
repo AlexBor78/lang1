@@ -1,7 +1,9 @@
 #pragma once
 
 #include <string>
+#include <unordered_set>
 #include <lang/common/symbol_path.h>
+#include <lang/syntax/stmt.h>
 
 namespace lang {
 
@@ -26,6 +28,9 @@ namespace lang {
 		{}
 
 		std::string gen_path(const SymbolPath&);
+		std::vector<SymbolPath> process_imports(
+				const std::unordered_set<syntax::ImportStmt*>&
+		);
 
 		inline const SymbolPath& get_worksympath() const noexcept {
 			return working_sympath;
@@ -39,6 +44,14 @@ namespace lang {
 			working_sympath = path;
 		}
 
+        /**
+         * @brief   generating module id by file path (file must be root file e.g. main file or inner of library)
+         * @param   file_path
+         * @return  semantic::ModuleID moduleID of that file
+         * @warning file must be root file e.g. main file or inner of library, bcs it's just ignore's full path, and use only file_name
+         * @todo    rename to show that it'is only for root files
+         */
+        SymbolPath gen_sympath(const std::string&);
 
 	};
 }

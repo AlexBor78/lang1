@@ -93,8 +93,7 @@ namespace lang::syntax {
 						,	page_size
 						)
 					)
-				);				
-
+				);
 				return storage.at(id).get();
 		}
 
@@ -102,8 +101,12 @@ namespace lang::syntax {
 			return storage.at(id).get();
 		}
 
-		SourceFile* get(const std::string path) {
+		SourceFile* get(const std::string& path) {
 			return storage.at(paths.at(path)).get();
+		}
+
+		inline bool contains(const std::string& path) const noexcept{
+			return paths.contains(path);
 		}
 		
 	};
