@@ -38,7 +38,7 @@ namespace lang::syntax::parser
         void reset_state();
         void breakpoint();
 
-        void save_type_to_context(DeclName*, std::unique_ptr<AbstractType>);
+        void save_type_to_context(DeclName*, AbstractType*);
         void add_to_extern_list(DeclName*);
         void add_to_export_list(DeclStmt*);
         void add_to_imports_list(ImportStmt*);
@@ -64,57 +64,57 @@ namespace lang::syntax::parser
     // stmts
         void process_semicolon();
         StmtPtr process_token();
-        std::unique_ptr<StmtNode>          process_stmt();
+        StmtNode*          process_stmt();
         
         // moduless
-        std::unique_ptr<ImportStmt>        process_import_stmt();
+        ImportStmt*        process_import_stmt();
 
         // control flow
-        std::unique_ptr<IfStmt>            process_if_stmt();
-        std::unique_ptr<ElseStmt>          process_else_stmt();
-        std::unique_ptr<ForStmt>           process_for_stmt();
-        std::unique_ptr<WhileStmt>         process_while_stmt();
+        IfStmt*            process_if_stmt();
+        ElseStmt*          process_else_stmt();
+        ForStmt*           process_for_stmt();
+        WhileStmt*         process_while_stmt();
 
         // other stmt's
-        std::unique_ptr<BlockStmt>         process_scope();
-        std::unique_ptr<BreakStmt>         process_break_stmt();
-        std::unique_ptr<ContinueStmt>      process_continue_stmt();
-        std::unique_ptr<ReturnStmt>        process_return_stmt();
+        BlockStmt*         process_scope();
+        BreakStmt*         process_break_stmt();
+        ContinueStmt*      process_continue_stmt();
+        ReturnStmt*        process_return_stmt();
 
         // declare
-        std::unique_ptr<AbstractType>      process_type();
-        std::unique_ptr<DeclStmt>          process_declare();
-        std::unique_ptr<DeclVariable>      process_variable_decl();
-        std::unique_ptr<StackAllocExpr>    process_stackalloc_expr();
-        std::unique_ptr<DeclFunction>      process_function_decl();
+        AbstractType*      process_type();
+        DeclStmt*          process_declare();
+        DeclVariable*      process_variable_decl();
+        StackAllocExpr*    process_stackalloc_expr();
+        DeclFunction*      process_function_decl();
 
     // exprs
-        std::unique_ptr<ExprNode>          process_expr();
+        ExprNode*          process_expr();
         
         // operators
-        std::unique_ptr<ExprNode>          process_operator();
-        std::unique_ptr<ExprNode>          process_assign_expr();
-        std::unique_ptr<ExprNode>          process_logical_expr();
-        std::unique_ptr<ExprNode>          process_compare_expr();
-        std::unique_ptr<ExprNode>          process_additive_expr();
+        ExprNode*          process_operator();
+        ExprNode*          process_assign_expr();
+        ExprNode*          process_logical_expr();
+        ExprNode*          process_compare_expr();
+        ExprNode*          process_additive_expr();
         /**
          * @todo rename to process_multiply_expr()
          */
-        std::unique_ptr<ExprNode>          process_multiple_expr();
-        std::unique_ptr<ExprNode>          process_unary_expr();
-        std::unique_ptr<ExprNode>          process_primary_expr();
+        ExprNode*          process_multiple_expr();
+        ExprNode*          process_unary_expr();
+        ExprNode*          process_primary_expr();
         
         // names
-        std::unique_ptr<ExprNode>          process_name();
-        std::unique_ptr<FunctionExpr>      process_function_expr();
-        std::unique_ptr<VariableExpr>      process_variable_expr();
-        std::unique_ptr<SymbolPathExpr>    process_symbol_path();
+        ExprNode*          process_name();
+        FunctionExpr*      process_function_expr();
+        VariableExpr*      process_variable_expr();
+        SymbolPathExpr*    process_symbol_path();
 
         // literals
-        std::unique_ptr<LiteralExpr>       process_literal();
-        std::unique_ptr<NumberLiteral>     process_number_literal();
-        std::unique_ptr<StringLiteral>     process_string_literal();
-        std::unique_ptr<BoolLiteral>       process_bool_literal();
+        LiteralExpr*       process_literal();
+        NumberLiteral*     process_number_literal();
+        StringLiteral*     process_string_literal();
+        BoolLiteral*       process_bool_literal();
 
     private: // diagnostic creating
 

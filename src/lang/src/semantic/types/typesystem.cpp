@@ -9,27 +9,26 @@ namespace lang
         return kind;
     }
 
-
 // TypeTable
 
     const BaseType* TypeTable::add_builtin_type(std::string_view name) {
         if(contains(name)) common::diagnostic::InterError("Re-addition of type to typetable");
         
-        auto type = std::make_unique<BuiltInType>(name);
+        auto type = arena->make<BuiltInType>(name);
         table[type->get_name()] = std::move(type);
-        return  table[name].get();
+        return  table[name];
     }
 
     const BaseType* TypeTable::add_builtin_type(std::string_view name, TypeInfo info) {
         if(contains(name)) throw common::diagnostic::InterError("Re-addition of type to typetable");
 
-        auto type = std::make_unique<BuiltInType>(name, info);
+        auto type = arena->make<BuiltInType>(name, info);
         table[type->get_name()] = std::move(type);
-        return  table[name].get();
+        return  table[name];
     }
 
     const BaseType* TypeTable::get_type(std::string_view name) const noexcept {
-        if(table.contains(name)) return table.at(name).get();
+        if(table.contains(name)) return table.at(name);
         else return nullptr;
     }
 

@@ -13,9 +13,9 @@ namespace lang::syntax
     class DeclStmt;
     class BaseNode;
 
-    using StmtPtr = std::unique_ptr<StmtNode>;
-    using ExprPtr = std::unique_ptr<ExprNode>;
-    using AST = std::vector<std::unique_ptr<BaseNode>>;
+    using StmtPtr = StmtNode*;
+    using ExprPtr = ExprNode*;
+    using AST = std::vector<BaseNode*>;
 
     class BaseNode {
     protected:

@@ -8,6 +8,25 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Generate compile_commands.json for clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+find_program(CLANG_TIDY_EXE 
+    NAMES 
+        "clang-tidy" 
+        "clang-tidy-16" "clang-tidy-17" "clang-tidy-18" "clang-tidy-19"
+    HINTS 
+        $ENV{CLANG_TIDY}  # Если твой скрипт задаст этот ENV, CMake возьмет его
+)
+
+if(CLANG_TIDY_EXE)
+    message(STATUS ">>> Found clang-tidy: ${CLANG_TIDY_EXE}")
+		#    set(CMAKE_CXX_CLANG_TIDY 
+		#        "${CLANG_TIDY_EXE}"
+		#        "-checks=-*,performance-*,bugprone-*,modernize-*"
+		#        "--header-filter=^src/"
+		#        "--system-headers=false"
+		#    )
+else()
+    message(WARNING ">>> clang-tidy not found. Add 'export CLANG_TIDY=/путь/к/clang-tidy' в твой скрипт сборки.")
+endif()
 
 set(sources
     # common

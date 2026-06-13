@@ -182,7 +182,7 @@ namespace lang::syntax
 				using DeclStmt::DeclStmt;
 		public:
 				bool is_extern{false};
-				std::unique_ptr<AbstractType> type;
+				AbstractType* type;
     };
 
     class DeclVariable : public DeclName {
@@ -208,12 +208,12 @@ namespace lang::syntax
 
     class DeclFunction : public DeclName {
     public:
-        std::vector<std::unique_ptr<DeclVariable>> args;
+        std::vector<DeclVariable*> args;
         StmtPtr body;
 
         DeclFunction(
 					std::string_view _name
-        , std::vector<std::unique_ptr<DeclVariable>> _args
+        , std::vector<DeclVariable*> _args
         , common::SourceLocation _name_loc = default_pos()
         , StmtPtr _body = nullptr
         , common::SourceLocation _full_range_loc = default_pos()

@@ -7,6 +7,7 @@
 #include <string_view>
 #include <unordered_map>
 #include <common/common.h>
+#include <common/memory/arena_aloc.h>
 
 /**
  * @todo move to lang::semantic namespace or something like that
@@ -53,7 +54,7 @@ namespace lang
     
     class BuiltInType : public BaseType {
     private:
-        std::string name;
+        std::string_view name;
         TypeInfo info;
         
     public:
@@ -77,15 +78,14 @@ namespace lang
     };
 
     class FunctionType : public BaseType {
-    private:
-        std::vector<std::unique_ptr<AbstractType>> args_types;
-        std::unique_ptr<AbstractType> return_type;
+    public:
+        std::vector<AbstractType*> args_types;
+        AbstractType* return_type;
         common::SourceLocation keyword_loc;
 
-    public:
         FunctionType() = default;
-        FunctionType(std::vector<std::unique_ptr<AbstractType>> _args_types
-        ,            std::unique_ptr<AbstractType> _return_type
+        FunctionType(std::vector<AbstractType*> _args_types
+        ,            AbstractType* _return_type
         ,            common::SourceLocation _keyword_loc = common::SourceLocation()
         ): args_types(std::move(_args_types))
         ,  return_type(std::move(_return_type))
@@ -107,7 +107,7 @@ namespace lang
          * @brief name of type, save here to process in semantic
          * 
          */
-        std::string name;
+        std::string_view name;
         common::SourceLocation source_loc;
 
         UnresolvedType() = default;
@@ -128,7 +128,7 @@ namespace lang
         };
     protected: // var
         WrapperKind kind{WrapperKind::MUTABLE};
-        std::unique_ptr<AbstractType> inner;
+        AbstractType* inner;
         const BaseType* base_type{nullptr};
         common::SourceLocation source_loc;
 
@@ -137,7 +137,7 @@ namespace lang
     public: // api
         WrapperType() = default;
         WrapperType(WrapperKind _kind
-        ,           std::unique_ptr<AbstractType> _inner
+        ,           AbstractType* _inner
         ,           common::SourceLocation _loc = common::SourceLocation()
         ):  kind(_kind)
         ,   inner(std::move(_inner))
@@ -169,14 +169,15 @@ namespace lang
     class TypeTable
     {
     private:
-        std::unordered_map<std::string_view, std::unique_ptr<BaseType>> table;
+        std::unordered_map<std::string_view, BaseType*> table;
+				common::memory::ArenaAloc* arena;
 
     public:
         TypeTable() = default;
-        explicit TypeTable(std::unordered_map<std::string_view, std::unique_ptr<BaseType>> _table):
+        explicit TypeTable(std::unordered_map<std::string_view, BaseType*> _table):
             table(std::move(_table))
         {}
-        explicit TypeTable(std::unordered_map<std::string_view, std::unique_ptr<BaseType>>& _table):
+        explicit TypeTable(std::unordered_map<std::string_view, BaseType*>& _table):
             table(std::move(_table))
         {}
         explicit TypeTable(const TypeTable& _table) = delete;

@@ -56,8 +56,8 @@ namespace lang::syntax::parser
         return pos + (n - 1) >= tokens->size();
     }
 
-    void Parser::save_type_to_context(DeclName* node, std::unique_ptr<AbstractType> type) {
-				node->type = std::move(type);
+    void Parser::save_type_to_context(DeclName* node, AbstractType* type) {
+				node->type = type;
     }
     void Parser::add_to_extern_list(DeclName* node) {
 				node->is_extern = true;
@@ -118,7 +118,7 @@ namespace lang::syntax::parser
 
     // stmt's
 
-    std::unique_ptr<StmtNode> Parser::process_stmt() {
+    StmtNode* Parser::process_stmt() {
         breakpoint(); logger.debug("proccess_stmt()");
         // modules
         // import
@@ -128,7 +128,7 @@ namespace lang::syntax::parser
             if(!is_end()) pos.merge(peek().pos); // merging semicolon
             process_semicolon();
 						node->source_pos = pos;
-            add_to_imports_list(node.get());
+            add_to_imports_list(node);
             return node;
         }
         // export import
@@ -141,7 +141,7 @@ namespace lang::syntax::parser
             if(!is_end()) import_pos.merge(peek().pos);
             process_semicolon();
             node->source_pos = import_pos;
-            add_to_submodules(node.get());
+            add_to_submodules(node);
             return node;
         }
         
@@ -178,7 +178,7 @@ namespace lang::syntax::parser
     }
 
     // modules stmts
-    std::unique_ptr<ImportStmt> Parser::process_import_stmt() {
+    ImportStmt* Parser::process_import_stmt() {
         breakpoint(); logger.debug("proccess_import_stmt()");
         skip(); // skip IMPORT TOK
 
@@ -202,14 +202,14 @@ namespace lang::syntax::parser
         else sympath.absolute_path = rawpath;
         sympath.normalize();
 
-        return std::make_unique<ImportStmt>(sympath, path_loc);
+        return arena->make<ImportStmt>(sympath, path_loc);
     }
 
     // types stmts - unsupported for now
 
     // control flow stmts
 
-    std::unique_ptr<IfStmt> Parser::process_if_stmt() {
+    IfStmt* Parser::process_if_stmt() {
         breakpoint(); logger.debug("proccess_if_stmt()");
         auto loc = peek().pos;
         auto word_loc = peek().pos;
@@ -230,15 +230,15 @@ namespace lang::syntax::parser
 
         if(body->source_pos != common::SourceLocation()) loc.merge(body->source_pos);
 
-        return std::make_unique<IfStmt>(
-            std::move(cond), 
-            std::move(body), 
-            std::move(word_loc),
-            std::move(loc)
+        return arena->make<IfStmt>(
+            cond, 
+            body, 
+            word_loc,
+            loc
         );
     }
 
-    std::unique_ptr<ElseStmt> Parser::process_else_stmt() {
+    ElseStmt* Parser::process_else_stmt() {
         breakpoint(); logger.debug("proccess_else_stmt()");
         auto loc = peek().pos;
         auto word_loc = peek().pos;
@@ -251,14 +251,14 @@ namespace lang::syntax::parser
 
         if(body->source_pos != common::SourceLocation()) loc.merge(body->source_pos);
 
-        return std::make_unique<ElseStmt>(
-            std::move(body),
-            std::move(word_loc),
-            std::move(loc)
+        return arena->make<ElseStmt>(
+            body,
+            word_loc,
+            loc
         );
     }
 
-    std::unique_ptr<ForStmt> Parser::process_for_stmt() {
+    ForStmt* Parser::process_for_stmt() {
         breakpoint(); logger.debug("proccess_for_stmt()");
         auto loc = peek().pos;
         auto word_loc = peek().pos;
@@ -290,17 +290,17 @@ namespace lang::syntax::parser
 
         if(body->source_pos != common::SourceLocation()) loc.merge(body->source_pos);
 
-        return std::make_unique<ForStmt>(
-            std::move(decl),
-            std::move(cond),
-            std::move(incr),
-            std::move(body),
-            std::move(word_loc),
-            std::move(loc)
+        return arena->make<ForStmt>(
+            decl,
+            cond,
+            incr,
+            body,
+            word_loc,
+            loc
         );
     }
 
-    std::unique_ptr<WhileStmt> Parser::process_while_stmt() {
+    WhileStmt* Parser::process_while_stmt() {
         breakpoint(); logger.debug("proccess_while_stmt()");
         auto loc = peek().pos;
         auto word_loc = peek().pos;
@@ -320,21 +320,21 @@ namespace lang::syntax::parser
         else body = process_token();
 
         if(body->source_pos != common::SourceLocation()) loc.merge(body->source_pos);
-        return std::make_unique<WhileStmt>(
-            std::move(cond),
-            std::move(body),
-            std::move(word_loc),
-            std::move(loc)
+        return arena->make<WhileStmt>(
+            cond,
+            body,
+            word_loc,
+            loc
         );
     }
 
     // other stmts
 
-    std::unique_ptr<BlockStmt> Parser::process_scope() {
+    BlockStmt* Parser::process_scope() {
         breakpoint(); logger.debug("process_scope()");
         if(!is_end() && !match(TokenType::LBRACE)) throw expected_lbrace();
         
-        auto block = std::make_unique<BlockStmt>();
+        auto block = arena->make<BlockStmt>();
 
         auto loc = advance().pos;  // skip '{'
         while(!is_end() && !match(TokenType::RBRACE)) block->body.emplace_back(process_token());
@@ -345,24 +345,24 @@ namespace lang::syntax::parser
         return block;
     }
 
-    std::unique_ptr<ReturnStmt> Parser::process_return_stmt() {
+    ReturnStmt* Parser::process_return_stmt() {
         breakpoint(); logger.debug("proccess_return_stmt()");
         skip(); // skip RETURN tok
 
-        if(!is_end() && match(TokenType::SEMICOLON)) return std::make_unique<ReturnStmt>();
-        return std::make_unique<ReturnStmt>(process_expr());
+        if(!is_end() && match(TokenType::SEMICOLON)) return arena->make<ReturnStmt>();
+        return arena->make<ReturnStmt>(process_expr());
     }
 
-    std::unique_ptr<BreakStmt> Parser::process_break_stmt() {
+    BreakStmt* Parser::process_break_stmt() {
         breakpoint(); logger.debug("proccess_break_stmt()");
         skip(); // skip BREAK tok
-        return std::make_unique<BreakStmt>();
+        return arena->make<BreakStmt>();
     }
 
-    std::unique_ptr<ContinueStmt> Parser::process_continue_stmt() {
+    ContinueStmt* Parser::process_continue_stmt() {
         breakpoint(); logger.debug("proccess_continue_stmt()");
         skip(); // skip BREAK tok
-        return std::make_unique<ContinueStmt>();
+        return arena->make<ContinueStmt>();
     }
 
     // declare stmts
@@ -415,7 +415,7 @@ namespace lang::syntax::parser
         } return false;
     }
 
-    std::unique_ptr<DeclStmt> Parser::process_declare() {        
+    DeclStmt* Parser::process_declare() {        
         breakpoint(); logger.debug("process_declare()");
 
         bool is_export{false};
@@ -442,8 +442,8 @@ namespace lang::syntax::parser
         if(!is_end(2) && match(TokenType::LPAREN, 1)) {
             load_pos(pos);
             auto node = process_function_decl();
-            if(is_export) add_to_export_list(node.get());
-            if(is_extern) add_to_extern_list(node.get());
+            if(is_export) add_to_export_list(node);
+            if(is_extern) add_to_extern_list(node);
             return node;
         }
 
@@ -457,19 +457,19 @@ namespace lang::syntax::parser
         &&  match(TokenType::STACK, 2)))) {
             load_pos(pos);
             auto node = process_variable_decl();
-            if(is_export) add_to_export_list(node.get());
-            if(is_extern) add_to_extern_list(node.get());
+            if(is_export) add_to_export_list(node);
+            if(is_extern) add_to_extern_list(node);
             process_semicolon();
             return node;
         } throw unexpected_token(2);
     }
 
-    std::unique_ptr<AbstractType> Parser::process_type() {
+    AbstractType* Parser::process_type() {
         breakpoint(); logger.debug("process_type()");
 
         auto loc = peek().pos;
         if(!is_end() && match(TokenType::AMPERSAND)) { skip();
-            return std::make_unique<WrapperType>(
+            return arena->make<WrapperType>(
                 WrapperType::WrapperKind::REFERENCE,
                 process_type(),
                 loc
@@ -477,7 +477,7 @@ namespace lang::syntax::parser
         }
 
         if(!is_end() && match(TokenType::STAR)) { skip();
-            return std::make_unique<WrapperType>(
+            return arena->make<WrapperType>(
                 WrapperType::WrapperKind::POINTER,
                 process_type(),
                 loc
@@ -485,7 +485,7 @@ namespace lang::syntax::parser
         }
 
         if(!is_end() && match(TokenType::CONST)) { skip();
-            return std::make_unique<WrapperType>(
+            return arena->make<WrapperType>(
                 WrapperType::WrapperKind::CONST,
                 process_type(),
                 loc
@@ -493,7 +493,7 @@ namespace lang::syntax::parser
         }
 
         if(!is_end() && match(TokenType::MUTABLE)) { skip();
-            return std::make_unique<WrapperType>(
+            return arena->make<WrapperType>(
                 WrapperType::WrapperKind::MUTABLE,
                 process_type(),
                 loc
@@ -501,7 +501,7 @@ namespace lang::syntax::parser
         }
         
         if(!is_end() && match(TokenType::IDENTIFIER)) {
-            return std::make_unique<UnresolvedType>(advance().sym, loc);
+            return arena->make<UnresolvedType>(advance().sym, loc);
         }
 
         /*
@@ -512,8 +512,8 @@ namespace lang::syntax::parser
             if(!is_end() && !match(TokenType::LPAREN)) throw expected_lparen();
             skip(); // skip '('
 
-            std::vector<std::unique_ptr<AbstractType>> args_types;
-            std::unique_ptr<AbstractType> return_type = std::make_unique<UnresolvedType>("void");
+            std::vector<AbstractType*> args_types;
+            AbstractType* return_type = arena->make<UnresolvedType>("void");
 
             while(!is_end() && !match(TokenType::RPAREN)) {
                 args_types.emplace_back(process_type());
@@ -529,15 +529,15 @@ namespace lang::syntax::parser
                 return_type = process_type();
             } 
             
-            return std::make_unique<FunctionType>(
-                std::move(args_types),
-                std::move(return_type),
+            return arena->make<FunctionType>(
+                args_types,
+                return_type,
                 loc
             );
         } throw unexpected_token();
     }
 
-    std::unique_ptr<DeclVariable> Parser::process_variable_decl() {
+    DeclVariable* Parser::process_variable_decl() {
         breakpoint(); logger.debug("process_variable_decl()");
         auto loc = peek().pos;
 
@@ -557,29 +557,29 @@ namespace lang::syntax::parser
         &&  match(TokenType::STACK, 1)))) {skip(); // skip = or <-
             auto init_expr = process_expr();
             if(init_expr->source_pos != common::SourceLocation()) loc.merge(init_expr->source_pos);
-            auto node = std::make_unique<DeclVariable>(
+            auto node = arena->make<DeclVariable>(
                 name,
                 name_loc,
-                std::move(init_expr),
+                init_expr,
                 loc
             );
-            save_type_to_context(node.get(), std::move(type));
+            save_type_to_context(node, type);
             return node;
         }
 
         // can merge just to name loc, here no init expr 
         loc.merge(name_loc);
-        auto node = std::make_unique<DeclVariable>(
+        auto node = arena->make<DeclVariable>(
             name,
             name_loc,
             nullptr,
             loc
         );
-        save_type_to_context(node.get(), std::move(type));
+        save_type_to_context(node, type);
         return node;
     }
 
-    std::unique_ptr<DeclFunction> Parser::process_function_decl() {
+    DeclFunction* Parser::process_function_decl() {
         breakpoint(); logger.debug("process_function_decl()");
         auto loc = peek().pos;
         
@@ -595,7 +595,7 @@ namespace lang::syntax::parser
         // if(!is_end() && !match(TokenType::LPAREN)) throw expected_lparen();
         skip(); // skip '('
 
-        std::vector<std::unique_ptr<DeclVariable>> args;
+        std::vector<DeclVariable*> args;
         while(! is_end() && !match(TokenType::RPAREN)) {
             args.emplace_back(process_variable_decl());
             if(!is_end() && match(TokenType::RPAREN)) break;
@@ -607,27 +607,27 @@ namespace lang::syntax::parser
         // if forward declaration
         if(!is_end() && match(TokenType::SEMICOLON)) { 
             loc.merge(advance().pos); // skip ';'
-            auto node = std::make_unique<DeclFunction>(
+            auto node = arena->make<DeclFunction>(
                 name, 
-                std::move(args), 
-                std::move(name_loc),
+                args, 
+                name_loc,
                 nullptr,
-                std::move(loc)
+                loc
             );
-            save_type_to_context(node.get(), std::move(type));
+            save_type_to_context(node, type);
             return node;
         } 
         
         auto body = process_scope();
         if(body->source_pos != common::SourceLocation()) loc.merge(body->source_pos);
-        auto node = std::make_unique<DeclFunction>(
+        auto node = arena->make<DeclFunction>(
             name,
-            std::move(args),
-            std::move(name_loc),
-            std::move(body),
-            std::move(loc)
+            args,
+            name_loc,
+            body,
+            loc
         );
-        save_type_to_context(node.get(), std::move(type));
+        save_type_to_context(node, type);
         return node;
     }
 
@@ -635,13 +635,13 @@ namespace lang::syntax::parser
 
     // TODO:
     // can process location for ALL expr just here 
-    std::unique_ptr<ExprNode> Parser::process_expr() {
+    ExprNode* Parser::process_expr() {
         breakpoint(); logger.debug("process_expr");
         if(!is_end() && match(TokenType::STACK)) return process_stackalloc_expr();
         return process_operator();
     }
 
-    std::unique_ptr<StackAllocExpr> Parser::process_stackalloc_expr() {
+    StackAllocExpr* Parser::process_stackalloc_expr() {
         breakpoint(); logger.debug("process_stackalloc_expr()");
         skip(); // skip stack keyword
         if(!is_end() && !match(TokenType::LBRACKET)) throw expected_lbracket();
@@ -665,100 +665,100 @@ namespace lang::syntax::parser
         // check for initialization
         if(!is_end() && match(TokenType::ASSIGN)) throw stack_initialization_not_supported();
 
-        return std::make_unique<StackAllocExpr>(
-            std::move(dimensions),
-            std::move(locs)
+        return arena->make<StackAllocExpr>(
+            dimensions,
+            locs
         );
     }
     
     // TODO: add is_-_op funcs for TokenType not only for Operator
-    std::unique_ptr<ExprNode> Parser::process_operator() {
+    ExprNode* Parser::process_operator() {
         return process_assign_expr();
     }
-    std::unique_ptr<ExprNode> Parser::process_assign_expr() {
+    ExprNode* Parser::process_assign_expr() {
         breakpoint(); logger.debug("process_assign_expr()");
         auto left = process_logical_expr();
         if(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_assign_op(op)) { auto op_loc = advance().pos; // skip op
-                return std::make_unique<BinOpExpr>(
+                return arena->make<BinOpExpr>(
                     op,
-                    std::move(left),
+                    left,
                     process_assign_expr(),
-                    std::move(op_loc)
+                    op_loc
                 );
             }   
         } return left;
     }
-    std::unique_ptr<ExprNode> Parser::process_logical_expr() {
+    ExprNode* Parser::process_logical_expr() {
         breakpoint(); logger.debug("process_logical_expr()");
         auto left = process_compare_expr();
         while(!is_end(1) &&  utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_logical_op(op)) { auto op_loc = advance().pos; // skip op
-                left = std::make_unique<BinOpExpr>(
+                left = arena->make<BinOpExpr>(
                     op,
-                    std::move(left),
+                    left,
                     process_compare_expr(),
-                    std::move(op_loc)
+                    op_loc
                 );
             } else break;
         } return left;
     }
-    std::unique_ptr<ExprNode> Parser::process_compare_expr() {
+    ExprNode* Parser::process_compare_expr() {
         breakpoint(); logger.debug("process_compare_expr()");
         auto left = process_additive_expr();
         while(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_compare_op(op)) { auto op_loc = advance().pos; // skip op
-                left = std::make_unique<BinOpExpr>(op,
-                    std::move(left),
+                left = arena->make<BinOpExpr>(op,
+                    left,
                     process_additive_expr(),
-                    std::move(op_loc)
+                    op_loc
                 );
             } else break;
         } return left;
     }
-    std::unique_ptr<ExprNode> Parser::process_additive_expr() {
+    ExprNode* Parser::process_additive_expr() {
         breakpoint(); logger.debug("process_additive_expr()");
         auto left = process_multiple_expr();
         while(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_add_op(op)) { auto op_loc = advance().pos; // skip op
-                left = std::make_unique<BinOpExpr>(
+                left = arena->make<BinOpExpr>(
                     op,
-                    std::move(left),
+                    left,
                     process_multiple_expr(),
-                    std::move(op_loc)
+                    op_loc
                 );
             } else break;
         } return left;
     }
-    std::unique_ptr<ExprNode> Parser::process_multiple_expr() {
+    ExprNode* Parser::process_multiple_expr() {
         breakpoint(); logger.debug("process_multiple_expr()");
         auto left = process_unary_expr();
         while(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_mul_op(op)) { auto op_loc = advance().pos; // skip op
-                return std::make_unique<BinOpExpr>(op,
-                    std::move(left),
+                return arena->make<BinOpExpr>(op,
+                    left,
                     process_unary_expr(),
-                    std::move(op_loc)
+                    op_loc
                 );
             } else break;
         } return left;
     }
-    std::unique_ptr<ExprNode> Parser::process_unary_expr() {
+    ExprNode* Parser::process_unary_expr() {
         breakpoint(); logger.debug("process_unary_expr()");
         
         // PREfix op
         if(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op = utils::token_to_op(peek().ty);
             if(utils::is_prefix_op(op)) { auto op_loc = advance().pos; // skip op
-                return std::make_unique<PrefixUnaryOpExpr>(
+                return arena->make<PrefixUnaryOpExpr>(
                     op,
                     process_primary_expr(),
-                    std::move(op_loc)
+                    op_loc
                 );
             } throw expected_unary_op(); // bcs only prefix operator can be here
         }
@@ -769,21 +769,21 @@ namespace lang::syntax::parser
         if(!is_end(1) && utils::is_operator(peek().ty)) {
             auto op_loc = peek().pos;
             auto op = utils::token_to_op(peek().ty);
-            if(utils::is_postfix_op(op)) return std::make_unique<PostfixUnaryOpExpr>(
+            if(utils::is_postfix_op(op)) return arena->make<PostfixUnaryOpExpr>(
                 utils::token_to_op(advance().ty),
-                std::move(node),
-                std::move(op_loc)
+                node,
+                op_loc
             ); // throw expected_postfix_op(); conflict with binary operators
         } return node;
     }
-    std::unique_ptr<ExprNode> Parser::process_primary_expr() {
+    ExprNode* Parser::process_primary_expr() {
         breakpoint(); logger.debug("process_primary_expr()");
         if(!is_end() && match(TokenType::LPAREN)) {
             auto node_loc = advance().pos; // skip '('
             auto node = process_expr();
             if(!is_end() && !match(TokenType::RPAREN)) throw expected_rparen();
             node_loc.merge(advance().pos); // skip ')'
-            node->source_pos = std::move(node_loc);
+            node->source_pos = node_loc;
             return node;
         }
         if(!is_end() && match(TokenType::IDENTIFIER)) return process_name();
@@ -794,7 +794,7 @@ namespace lang::syntax::parser
 
     // names
 
-    std::unique_ptr<ExprNode> Parser::process_name() {
+    ExprNode* Parser::process_name() {
         breakpoint(); logger.debug("process_name()");
         if(!is_end(1) && !match(TokenType::IDENTIFIER)) throw expected_identifier();
         if(!is_end(2) && match(TokenType::DOUBLECOLON, 1)) return process_symbol_path();
@@ -802,7 +802,7 @@ namespace lang::syntax::parser
         return process_variable_expr();
     }
 
-    std::unique_ptr<SymbolPathExpr> Parser::process_symbol_path() {
+    SymbolPathExpr* Parser::process_symbol_path() {
         breakpoint(); logger.debug("process_namespace_expr()");
 
         auto name_loc = peek().pos;
@@ -812,14 +812,14 @@ namespace lang::syntax::parser
         // if(!is_end() && !match(TokenType::DOUBLECOLON)) throw expected_doublecolon();
         skip(); // skip '::'
 
-        return std::make_unique<SymbolPathExpr>(
+        return arena->make<SymbolPathExpr>(
             name,
             process_name(),
-            std::move(name_loc)
+            name_loc
         );
     }
 
-    std::unique_ptr<FunctionExpr> Parser::process_function_expr() {
+    FunctionExpr* Parser::process_function_expr() {
         breakpoint(); logger.debug("process_function_expr()");
         if(!is_end() && !match(TokenType::IDENTIFIER)) throw expected_function_name();
 
@@ -840,28 +840,28 @@ namespace lang::syntax::parser
             skip(); // skip comma
         } if(is_end()) throw expected_rparen();
         node_loc.merge(advance().pos); // skip ')'
-        return std::make_unique<FunctionExpr>(
+        return arena->make<FunctionExpr>(
             std::string_view(name),
-            std::move(args),
-            std::move(name_loc),
-            std::move(node_loc)
+            args,
+            name_loc,
+            node_loc
         );
     }
 
-    std::unique_ptr<VariableExpr> Parser::process_variable_expr() {
+    VariableExpr* Parser::process_variable_expr() {
         breakpoint(); logger.debug("process_variable_expr()");
         if(!is_end(1) && !match(TokenType::IDENTIFIER)) throw expected_variable_name();
         auto name_loc = peek().pos;
         std::string_view name = advance().sym;
-        return std::make_unique<VariableExpr>(
+        return arena->make<VariableExpr>(
             name,
-            std::move(name_loc)
+            name_loc
         );
     }
 
     // literals
 
-    std::unique_ptr<LiteralExpr> Parser::process_literal() {
+    LiteralExpr* Parser::process_literal() {
         breakpoint(); logger.debug("process_literal()");
         switch (peek().ty) {
             case(TokenType::NUMBER): return process_number_literal();
@@ -874,31 +874,31 @@ namespace lang::syntax::parser
         }
     }
 
-    std::unique_ptr<NumberLiteral> Parser::process_number_literal() {
+    NumberLiteral* Parser::process_number_literal() {
         breakpoint(); logger.debug("process_number_literal()");
         // useless - already checked by process_literal() to call this
         // if(!is_end() && !match(TokenType::NUMBER)) throw expected_number();
-        return std::make_unique<NumberLiteral>(
+        return arena->make<NumberLiteral>(
             peek().sym,
             advance().pos
         );
     }
 
-    std::unique_ptr<StringLiteral> Parser::process_string_literal() {
+    StringLiteral* Parser::process_string_literal() {
         breakpoint(); logger.debug("process_string_literal()");
         // useless - already checked by process_literal() to call this
         // if(!is_end() && !match(TokenType::STRING)) throw expected_string();
-        return std::make_unique<StringLiteral>(
+        return arena->make<StringLiteral>(
             peek().sym,
             advance().pos
         );
     }
 
-    std::unique_ptr<BoolLiteral> Parser::process_bool_literal() {
+    BoolLiteral* Parser::process_bool_literal() {
         breakpoint(); logger.debug("process_bool_literal()");
         // useless - already checked by process_literal() to call this
         // if(!is_end() && !match(TokenType::TRUE) || !match(TokenType::FALSE)) throw expected_bool();
-        return std::make_unique<BoolLiteral>(
+        return arena->make<BoolLiteral>(
             peek().sym,
             advance().pos
         );
