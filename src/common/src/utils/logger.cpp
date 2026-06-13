@@ -27,11 +27,11 @@ namespace common::utils
 
 		void Logger::add_profile(const std::string& _name, LoggerProfile _profile) noexcept {
 				if(!_name.empty()) {
-						profiles[_name] = _profile;
+						profiles[_name] = std::move(_profile);
 				}
 		}
 
-		void Logger::set_profile(const std::string& _name, LoggerProfile _profile) noexcept {
+		void Logger::set_profile(const std::string& _name, const LoggerProfile& _profile) noexcept {
 				if(!_name.empty()) profiles[_name] = _profile;
 				
 				name = _name;
@@ -39,7 +39,7 @@ namespace common::utils
 		}
 
 		void Logger::set_profile(LoggerProfile _profile) noexcept {
-				profile = _profile;
+				profile = std::move(_profile);
 		}
 
 		Logger::LoggerProfile Logger::get_profile() const noexcept {

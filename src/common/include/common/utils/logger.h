@@ -76,7 +76,7 @@ namespace common::utils
         std::string_view get_name() const noexcept;
 
 				void add_profile(const std::string&, LoggerProfile) noexcept;
-				void set_profile(const std::string&, LoggerProfile) noexcept;
+				void set_profile(const std::string&, const LoggerProfile&) noexcept;
 				void set_profile(LoggerProfile) noexcept;
 				LoggerProfile get_profile() const noexcept;
 
