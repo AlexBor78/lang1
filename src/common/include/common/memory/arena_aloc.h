@@ -3,40 +3,37 @@
 #include <memory>
 #include <memory_resource>
 
+#include <common/memory/alloc.h>
+
 namespace common::memory
 {
-	constexpr int INITIAL_SIZE = 64 * 1024;
 
-	class ArenaAloc {
+	class ArenaAlloc : public IAlloc {
 	private:
-		std::unique_ptr<std::byte[]> start_buf;
 		std::pmr::monotonic_buffer_resource arena;
 
 	public:
-		ArenaAloc(
-			size_t initial_size = INITIAL_SIZE
-		): start_buf(std::make_unique<std::byte[]>(initial_size)) 
-	 	,	 arena(
-				start_buf.get()
-			, initial_size
-			, std::pmr::new_delete_resource()
-			)
-		{}
-		
-		ArenaAloc(const ArenaAloc&) = delete;
-    ArenaAloc& operator=(const ArenaAloc&) = delete;
+		ArenaAlloc(const ArenaAlloc&) = delete;
+    ArenaAlloc& operator=(const ArenaAlloc&) = delete;
 
-		template <typename Type, typename... Args>
-    Type* make(Args&&... args) {
-			void* ptr = arena.allocate(sizeof(Type), alignof(Type));
-			return std::construct_at(static_cast<Type*>(ptr), std::forward<Args>(args)...);
-    }
+		ArenaAlloc(
+      size_t initial_size = INITIAL_SIZE,
+      std::pmr::memory_resource* upstream = std::pmr::new_delete_resource()
+    ):	arena(
+      		initial_size
+      	, upstream
+      	)
+    {}
 
-		inline std::pmr::memory_resource* get_resource() {
+		inline virtual std::pmr::memory_resource* get_resource() override {
 			return &arena;
 		}
 
-		inline void free() {
+		inline virtual void* allocate(size_t size, size_t align) override {
+			return arena.allocate(size, align);
+		}
+		
+		inline virtual void free() override {
 			arena.release();
 		}
 	};

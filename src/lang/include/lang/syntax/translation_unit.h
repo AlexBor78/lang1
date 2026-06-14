@@ -36,7 +36,7 @@ namespace lang::syntax {
         UnitID id;
 				FileID file_id;
 
-				std::unique_ptr<common::memory::ArenaAloc> ast_arena;
+				std::unique_ptr<common::memory::ArenaAlloc> ast_arena;
         syntax::AST ast;
 
         TranslationUnit() = default;
@@ -51,7 +51,7 @@ namespace lang::syntax {
 					UnitID _id
 				,	FileID _fid
 //			,	SymbolPath _sympath
-				,	std::unique_ptr<common::memory::ArenaAloc> _arena
+				,	std::unique_ptr<common::memory::ArenaAlloc> _arena
         ,	syntax::AST _ast
 				):	id(_id)
 				,		file_id(_fid)

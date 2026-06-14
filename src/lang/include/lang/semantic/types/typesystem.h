@@ -170,7 +170,7 @@ namespace lang
     {
     private:
         std::unordered_map<std::string_view, BaseType*> table;
-				common::memory::ArenaAloc* arena;
+				common::memory::ArenaAlloc* arena;
 
     public:
         TypeTable() = default;

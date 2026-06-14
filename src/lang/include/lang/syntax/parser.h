@@ -18,7 +18,7 @@ namespace lang::syntax::parser
 {
     class Parser {
     public: // api
-        Parser(common::memory::ArenaAloc* _arena):
+        Parser(common::memory::ArenaAlloc* _arena):
 					arena(_arena)
 				{}
 
@@ -28,7 +28,7 @@ namespace lang::syntax::parser
     private: // vars
         common::utils::Logger logger{"PARSER"};
         SyntaxContainer syntax_container;
-				common::memory::ArenaAloc* arena;
+				common::memory::ArenaAlloc* arena;
 
         const std::vector<Token>* tokens{nullptr};    
         bool success{true};

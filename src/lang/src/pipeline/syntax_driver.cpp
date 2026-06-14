@@ -47,7 +47,7 @@ namespace lang::pipeline {
 
 				// parsing
 				// allocating arena for ast
-				auto arena = std::make_unique<common::memory::ArenaAloc>(arena_size);
+				auto arena = std::make_unique<common::memory::ArenaAlloc>(arena_size);
         syntax::parser::Parser parser(
 				//	&program->logger
 						arena.get()

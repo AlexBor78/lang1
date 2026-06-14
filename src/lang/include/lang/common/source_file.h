@@ -28,7 +28,7 @@ namespace lang::syntax {
 	class SourceFile {
 	private:	
 		FileID id;
-		std::unique_ptr<common::memory::ArenaAloc> arena;
+		std::unique_ptr<common::memory::ArenaAlloc> arena;
 		std::string file_path;
 		std::pmr::string file;
 
@@ -36,7 +36,7 @@ namespace lang::syntax {
 		SourceFile(
 			FileID _id
 		,	std::string_view _file_path
-		,	std::unique_ptr<common::memory::ArenaAloc> _arena
+		,	std::unique_ptr<common::memory::ArenaAlloc> _arena
 		):	id(_id)
 		,		arena(std::move(_arena))
 		,		file_path(_file_path)
@@ -90,7 +90,7 @@ namespace lang::syntax {
 				storage[id] = std::make_unique<SourceFile>(
 					id
 				,	file_path
-				,	std::make_unique<common::memory::ArenaAloc>(
+				,	std::make_unique<common::memory::ArenaAlloc>(
 						calc_size_with_padding(
 							file_size
 						,	page_size
