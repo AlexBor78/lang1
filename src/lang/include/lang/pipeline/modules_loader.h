@@ -2,13 +2,10 @@
 
 #include <string>
 #include <vector>
-#include <unordered_set>
 
-#include <lang/common/compile/state.h>
-#include <lang/common/compile/options.h>
-#include <lang/common/compile/import_resolver.h>
-#include <lang/common/compile/source_file.h>
-#include <lang/semantic/types/semantic_types.h>
+#include <lang/common/symbol_path.h>
+#include <lang/common/compile_options.h>
+#include <lang/common/import_resolver.h>
 #include <lang/pipeline/syntax_driver.h>
 
 // constexpr const char FILE_SUFFIX[] = ".lang";

@@ -10,7 +10,7 @@
 
 #include <lang/syntax/ast.h>
 #include <lang/common/symbol_path.h>
-#include <lang/common/compile/source_file.h>
+#include <lang/common/source_file.h>
 
 namespace lang::syntax
 {

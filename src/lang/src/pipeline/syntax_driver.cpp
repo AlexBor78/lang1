@@ -5,7 +5,7 @@
 
 // syntax
 #include <common/streams/istream.h>
-#include <lang/common/compile/source_file.h>
+#include <lang/common/source_file.h>
 #include <lang/syntax/lexer.h>
 #include <lang/syntax/parser.h>
 

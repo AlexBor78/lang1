@@ -15,8 +15,7 @@ namespace lang::pipeline {
         run();
     }
 
-    void CompileDriver::run()
-    {
+    void CompileDriver::run() {
        program.compile_options = compile_options;
 
 			 // initializing logger
@@ -26,16 +25,13 @@ namespace lang::pipeline {
 					
 					program.logger.set_name("SYNTAX");
 					
-					// alocating arena for ast
-					program.ast_arena = std::make_unique<common::memory::ArenaAloc>(
-						program.compile_options.ast_arena_init_size
-					);
-
 					// parsing all files (loading them as units to untis mngr)
 					ModulesLoader loader(&program);
 					loader.load();
+
 					if(compile_options.syntax_only) return;
         }
+
         return;
         
         {   // semantic analyze

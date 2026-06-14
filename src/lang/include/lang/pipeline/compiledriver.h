@@ -1,7 +1,6 @@
 #pragma once
 
-#include <lang/common/compile/state.h>
-#include <lang/common/compile/program.h>
+#include <lang/common/program.h>
 
 namespace lang::pipeline
 {

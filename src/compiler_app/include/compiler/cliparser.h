@@ -4,7 +4,7 @@
 #include <vector>
 #include <string_view>
 
-#include <lang/common/compile/options.h>
+#include <lang/common/compile_options.h>
 
 namespace compiler_app
 {

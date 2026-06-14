@@ -1,7 +1,7 @@
 #pragma once
 
 #include <lang/semantic/types/semantic_types.h>
-#include <lang/common/compile/options.h>
+#include <lang/common/compile_options.h>
 
 namespace lang::pipeline
 {

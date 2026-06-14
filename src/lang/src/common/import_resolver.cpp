@@ -1,7 +1,7 @@
 #include <filesystem>
 #include <common/diagnostic/diagnostic.h>
 
-#include <lang/common/compile/import_resolver.h>
+#include <lang/common/import_resolver.h>
 
 namespace lang {
     /**

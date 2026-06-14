@@ -2,7 +2,7 @@
 
 #include <unordered_set>
 
-#include <lang/common/compile/program.h>
+#include <lang/common/program.h>
 #include <lang/syntax/stmt.h>
 
 namespace lang::pipeline
