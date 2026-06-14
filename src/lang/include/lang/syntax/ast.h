@@ -28,10 +28,10 @@ namespace lang::syntax
         {}
 
     public:
-        virtual void accept(ConstASTVisitor&) const noexcept = 0;
-        virtual void accept(ASTVisitor&) noexcept = 0;
         virtual ~BaseNode() = default;
         common::SourceLocation source_pos = {};
+        virtual void accept(ASTVisitor&) noexcept = 0;
+        virtual void accept(ConstASTVisitor&) const noexcept = 0;
     };
 
     class StmtNode : public BaseNode

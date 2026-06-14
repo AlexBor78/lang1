@@ -15,7 +15,8 @@ namespace lang::syntax
     class BlockStmt : public StmtNode {
     public:
         std::vector<StmtPtr> body;
-        explicit BlockStmt(common::SourceLocation _full_range_loc = default_pos()):
+        explicit BlockStmt(
+						common::SourceLocation _full_range_loc = default_pos()):
             StmtNode(std::move(_full_range_loc))
         {}
 
@@ -208,12 +209,12 @@ namespace lang::syntax
 
     class DeclFunction : public DeclName {
     public:
-        std::vector<DeclVariable*> args;
+        std::pmr::vector<DeclVariable*> args;
         StmtPtr body;
 
         DeclFunction(
 					std::string_view _name
-        , std::vector<DeclVariable*> _args
+        , std::pmr::vector<DeclVariable*> _args
         , common::SourceLocation _name_loc = default_pos()
         , StmtPtr _body = nullptr
         , common::SourceLocation _full_range_loc = default_pos()

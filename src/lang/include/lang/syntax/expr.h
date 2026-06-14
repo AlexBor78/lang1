@@ -219,8 +219,6 @@ namespace lang::syntax
 
     class BinOpExpr : public OperatorExpr
     {
-    private:
-
     public:
         ExprPtr left;
         ExprPtr right;
