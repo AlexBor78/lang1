@@ -1,0 +1,43 @@
+[SOURCES SPACE][SOURCES SPACE][SOURCES SPACE][SOURCES SPACE][SOURCES SPACE]
+[PUBLIC SPACE]
+[PRIVATE thread-specific space [AST][PRIVATE DATA][HIR]]
+[PRIVATE thread-specific space [AST][PRIVATE DATA][HIR]]
+[PRIVATE thread-specific space [AST][PRIVATE DATA][HIR]]
+[PRIVATE thread-specific space [AST][PRIVATE DATA][HIR]]
+
+
+## Main Idea
+dived public(exported) and private data,
+so fast and no mutex access to private data (L1/L2 cache),
+and public data in L3 cache - still not ot bad.
+
+
+## SymbolID
+`SymbolID` is unique for global symbol, and contains ptr to local,
+the idea is
+```cpp
+struct SymbolID {
+	bool global{false};
+	union {
+		size_t id;
+		Symbol* ptr;
+	};
+};
+```
+
+buutt, will be optimized to 
+
+```
+class SymbolID {
+pivate:
+	uintptr_t raw;
+public:
+	bool is_global();
+	Symbol* get_local_ptr();
+	size_t 	get_global_id();
+};
+```
+
+the idia that last 3-4 bytes of ptr is unused,
+so we can store boolean there, and use masks and closed api to use it.
+reducing memory usage by half for SymbolID (could be thousands)
