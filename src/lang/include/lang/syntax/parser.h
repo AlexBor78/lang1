@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <memory>
 
-#include <common/memory/arena_aloc.h>
+#include <common/memory/arena_alloc.h>
 #include <common/utils/logger.h>
 
 #include <lang/semantic/types/typesystem.h>

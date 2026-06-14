@@ -7,7 +7,7 @@
 #include <string_view>
 #include <unordered_map>
 #include <common/common.h>
-#include <common/memory/arena_aloc.h>
+#include <common/memory/arena_alloc.h>
 
 /**
  * @todo move to lang::semantic namespace or something like that

@@ -6,7 +6,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include <common/memory/arena_aloc.h>
+#include <common/memory/arena_alloc.h>
 
 #include <lang/syntax/ast/ast.h>
 #include <lang/common/symbol_path.h>

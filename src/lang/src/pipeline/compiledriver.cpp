@@ -5,7 +5,7 @@
 // utils
 #include <lang/utils/ast_utils.h>
 #include <lang/utils/syntax_utils.h>
-#include <common/memory/arena_aloc.h>
+#include <common/memory/arena_alloc.h>
 
 #include <lang/pipeline/compiledriver.h>
 

@@ -3,7 +3,7 @@
 #include <string>
 
 #include <common/utils/logger.h>
-#include <common/memory/arena_aloc.h>
+#include <common/memory/arena_alloc.h>
 
 #include <lang/common/compile_options.h>
 
