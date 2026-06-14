@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string_view>
-#include <lang/syntax/ast.h>
+#include <lang/syntax/ast/ast.h>
 
 namespace lang::syntax
 {
@@ -301,6 +301,7 @@ namespace lang::syntax
         virtual void accept(ASTVisitor&) noexcept override;
     };
 
+		// TODO: use std::pmr::vector so memory don't leak
     class StackAllocExpr : public ExprNode {
     public:
         std::vector<size_t> dimensions;

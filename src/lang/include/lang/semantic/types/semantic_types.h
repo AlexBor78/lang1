@@ -3,7 +3,7 @@
 
 #include <unordered_set>
 
-#include <lang/syntax/ast.h>
+#include <lang/syntax/ast/ast.h>
 #include <lang/semantic/types/scope.h>
 #include <lang/semantic/types/typesystem.h>
 

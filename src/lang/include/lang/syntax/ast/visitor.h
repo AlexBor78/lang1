@@ -1,8 +1,8 @@
 #pragma once
 
-#include <lang/syntax/ast.h>
-#include <lang/syntax/stmt.h>
-#include <lang/syntax/expr.h>
+#include <lang/syntax/ast/ast.h>
+#include <lang/syntax/ast/stmt.h>
+#include <lang/syntax/ast/expr.h>
 
 namespace lang::syntax
 {

@@ -1,5 +1,5 @@
-#include <lang/syntax/visitor.h>
-#include <lang/syntax/stmt.h>
+#include <lang/syntax/ast/visitor.h>
+#include <lang/syntax/ast/stmt.h>
 #include <iostream>
 #include <print>
 

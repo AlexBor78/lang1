@@ -4,15 +4,15 @@
 #include <memory>
 
 #include <common/memory/arena_aloc.h>
-
-#include <lang/syntax/ast.h>
-#include <lang/syntax/stmt.h>
-#include <lang/syntax/expr.h>
-#include <lang/utils/diagnostic.h>
 #include <common/utils/logger.h>
-#include <lang/syntax/token.h>
+
 #include <lang/semantic/types/typesystem.h>
-#include <lang/syntax/syntax_container.h>
+#include <lang/utils/diagnostic.h>
+#include <lang/syntax/container.h>
+#include <lang/syntax/ast/ast.h>
+#include <lang/syntax/ast/stmt.h>
+#include <lang/syntax/ast/expr.h>
+#include <lang/syntax/token.h>
 
 namespace lang::syntax::parser
 {

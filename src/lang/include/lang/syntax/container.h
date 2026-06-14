@@ -2,8 +2,8 @@
 
 #include <unordered_map>
 #include <unordered_set>
-#include <lang/syntax/ast.h>
-#include <lang/syntax/stmt.h>
+#include <lang/syntax/ast/ast.h>
+#include <lang/syntax/ast/stmt.h>
 #include <lang/semantic/types/typesystem.h>
 
 namespace lang::syntax {

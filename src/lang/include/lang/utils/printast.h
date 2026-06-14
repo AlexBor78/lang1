@@ -3,7 +3,7 @@
 #include <format>
 #include <string>
 #include <string_view>
-#include <lang/syntax/visitor.h>
+#include <lang/syntax/ast/visitor.h>
 
 namespace lang::utils
 {

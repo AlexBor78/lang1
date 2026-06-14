@@ -1,5 +1,5 @@
-#include <lang/syntax/visitor.h>
-#include <lang/syntax/expr.h>
+#include <lang/syntax/ast/visitor.h>
+#include <lang/syntax/ast/expr.h>
 
 namespace lang::syntax
 {

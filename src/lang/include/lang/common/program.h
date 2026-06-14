@@ -36,11 +36,5 @@ namespace lang
 				 * @note 		all data after syntax stage here
          */
 				syntax::UnitsStorage units_storage;
-				// syntax::UnitsStorage units_storage;
-
-//        /**
-//         * @brief   semantic stat
-//         */
-//        semantic::SemanticState semantic_states;
     };
 }

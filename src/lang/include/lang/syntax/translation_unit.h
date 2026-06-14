@@ -8,14 +8,13 @@
 
 #include <common/memory/arena_aloc.h>
 
-#include <lang/syntax/ast.h>
+#include <lang/syntax/ast/ast.h>
 #include <lang/common/symbol_path.h>
 #include <lang/common/source_file.h>
 
 namespace lang::syntax
 {
-    struct UnitID
-    {
+    struct UnitID {
         size_t id{ULLONG_MAX};
         inline bool operator==(const UnitID& other) const noexcept {
             return id == other.id;

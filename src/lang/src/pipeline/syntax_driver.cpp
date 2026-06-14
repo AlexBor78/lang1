@@ -3,14 +3,14 @@
 #include <format>
 #include <string>
 
+// to throw errors
+#include <common/diagnostic/diagnostic.h>
+
 // syntax
 #include <common/streams/istream.h>
 #include <lang/common/source_file.h>
 #include <lang/syntax/lexer.h>
 #include <lang/syntax/parser.h>
-
-// to throw errors
-#include <common/diagnostic/diagnostic.h>
 
 #include <lang/pipeline/syntax_driver.h>
 

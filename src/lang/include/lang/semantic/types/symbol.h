@@ -5,7 +5,7 @@
 #include <variant>
 
 #include <lang/common/symbol_path.h>
-#include <lang/syntax/stmt.h>
+#include <lang/syntax/ast/stmt.h>
 
 #include <lang/semantic/types/typesystem.h>
 

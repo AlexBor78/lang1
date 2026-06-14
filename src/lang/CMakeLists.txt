@@ -46,6 +46,7 @@ set(sources
     src/semantic/types/identifier.cpp
     src/semantic/types/module.cpp
     src/semantic/types/scope.cpp
+		src/semantic/types/hir.cpp
 
     # semantic analyzers
     src/semantic/analyzers/semantic_initializer.cpp

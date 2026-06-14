@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 #include <string_view>
-#include <lang/syntax/ast.h>
+#include <lang/syntax/ast/ast.h>
 #include <lang/common/symbol_path.h>
 #include <lang/semantic/types/typesystem.h>
 

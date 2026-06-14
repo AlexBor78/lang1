@@ -3,7 +3,7 @@
 #include <unordered_set>
 
 #include <lang/common/program.h>
-#include <lang/syntax/stmt.h>
+#include <lang/syntax/ast/stmt.h>
 
 namespace lang::pipeline
 {

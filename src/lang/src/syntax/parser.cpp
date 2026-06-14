@@ -595,7 +595,7 @@ namespace lang::syntax::parser
         // if(!is_end() && !match(TokenType::LPAREN)) throw expected_lparen();
         skip(); // skip '('
 
-        std::vector<DeclVariable*> args;
+        std::pmr::vector<DeclVariable*> args(arena->get_resource());
         while(! is_end() && !match(TokenType::RPAREN)) {
             args.emplace_back(process_variable_decl());
             if(!is_end() && match(TokenType::RPAREN)) break;

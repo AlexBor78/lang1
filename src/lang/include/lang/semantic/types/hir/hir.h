@@ -8,7 +8,7 @@
 #include <variant>
 #include <string_view>
 
-#include <lang/syntax/ast.h>
+#include <lang/syntax/ast/ast.h>
 #include <lang/semantic/types/symbol.h>
 
 namespace lang::semantic::hir {

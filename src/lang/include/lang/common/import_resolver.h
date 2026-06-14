@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <common/utils/logger.h>
 #include <lang/common/symbol_path.h>
-#include <lang/syntax/stmt.h>
+#include <lang/syntax/ast/stmt.h>
 
 namespace lang {
 

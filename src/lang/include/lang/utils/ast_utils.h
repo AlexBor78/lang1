@@ -1,7 +1,7 @@
 #pragma once
 
-#include <lang/syntax/ast.h>
-#include <lang/syntax/expr.h>
+#include <lang/syntax/ast/ast.h>
+#include <lang/syntax/ast/expr.h>
 #include <lang/syntax/token.h>
 
 namespace lang::utils
