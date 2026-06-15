@@ -9,13 +9,17 @@ namespace common::memory {
 
 	class PoolAlloc : public IAlloc {
 	private:
-    std::pmr::pool_options options{0, 1024 * 1024}; 
-    std::pmr::unsynchronized_pool_resource pool{options, std::pmr::new_delete_resource()};
+    static constexpr std::pmr::pool_options options{0, 1024 * 1024}; 
+    std::pmr::unsynchronized_pool_resource pool;
 
 	public:
-    PoolAlloc() = default;
     PoolAlloc(const PoolAlloc&) = delete;
     PoolAlloc& operator=(const PoolAlloc&) = delete;
+		PoolAlloc(
+      std::pmr::memory_resource* upstream = std::pmr::new_delete_resource()
+		): pool(options, upstream)
+		{}
+
 
 		inline virtual std::pmr::memory_resource* get_resource() override {
         return &pool;
