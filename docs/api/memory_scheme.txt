@@ -1,43 +1,60 @@
-[SOURCES SPACE][SOURCES SPACE][SOURCES SPACE][SOURCES SPACE][SOURCES SPACE]
-[PUBLIC SPACE]
-[PRIVATE thread-specific space [AST][PRIVATE DATA][HIR]]
-[PRIVATE thread-specific space [AST][PRIVATE DATA][HIR]]
-[PRIVATE thread-specific space [AST][PRIVATE DATA][HIR]]
-[PRIVATE thread-specific space [AST][PRIVATE DATA][HIR]]
+```
+LEVEL 0: ROOT ALLOCATOR
+[ROOT ASYNC POOL] (AsyncPoolAlloc, upstream: OS)
+    |
+    -> Allocates as a single contiguous block
 
+LEVEL 1: GLOBAL STATE (allocating on root pool)
+[PROGRAM / TARGETS STORAGE]
+    - Contains: Metadata, TargetID list, compilation options
+    - [GLOBAL POOL] (PoolAlloc, upstream: ROOT ASYNC POOL)
+         -> Purpose: Allocates large program objects
+    - [GLOBAL STRINGS POOL] (PoolAlloc, upstream: ROOT ASYNC POOL)
+         -> Stores: StringsStorage (guarantees single StringID for "main" across the program)
+    - [GLOBAL SEMANTIC POOL] (PoolAlloc, upstream: ROOT ASYNC POOL)
+         -> Stores: CoreType table (guarantees single CoreTypeID for "int" everywhere)
+
+
+THREAD LEVEL 0: THREAD ROOT ALLOCATOR
+[THREAD ROOT POOL] (AsyncPoolAlloc, upstream: OS)
+    |
+    -> Allocates as a single contiguous block
+
+THREAD LEVEL 1: COMPILATION CONTEXT
+[COMPILE TARGET] (N independent instances)
+    - Contains: TargetID, TargetState, Module (HIR root)
+    - [LOCAL REGION POOL] (PoolAlloc, upstream: THREAD ROOT POOL)
+         -> Purpose: Complete thread independence. Zero contention with global level
+         - [SOURCE ARENA] (monotonic_buffer) -> Raw source file text
+         - [AST ARENA]    (monotonic_buffer) -> AST nodes
+         - [HIR ARENA]    (monotonic_buffer) -> HIR nodes
+         - [LOCAL DATA POOL] (unsynchronized_pool) -> Local Symbols, Scopes, WrappedTypes
+```
 
 ## Main Idea
-dived public(exported) and private data,
-so fast and no mutex access to private data (L1/L2 cache),
-and public data in L3 cache - still not ot bad.
 
+divede data to "global" and "tread-local";
+global using async-save allocators + mutex
+thread-local is sync
 
-## SymbolID
-`SymbolID` is unique for global symbol, and contains ptr to local,
-the idea is
-```cpp
-struct SymbolID {
-	bool global{false};
-	union {
-		size_t id;
-		Symbol* ptr;
-	};
-};
-```
+global stores global data such as:
+- Program struct
+- StringsStorage
+- some global (marked with`export` keyword) symbols
+- TargetsStorage
+	(CompileTarget structure is not introduced yet, it will used as main container,
+	will remove need in SourcesStorage and UnitsStorage (Target will store it)
+	)
 
-buutt, will be optimized to 
+thread-local is stored in every CompileTarget instance, such as
+- root pool, for evrything there
+- SourceFile with it's arena
+- TranslationUint(ast) with it's arena 
+- Module(hir) with it's arena
+- some data wirh it's pool
 
-```
-class SymbolID {
-pivate:
-	uintptr_t raw;
-public:
-	bool is_global();
-	Symbol* get_local_ptr();
-	size_t 	get_global_id();
-};
-```
+## Double root pool
+the idea of creating root pool, and then "global" pool on top is that:
+root pool itself can be on diferend end of memory
+so we adding one pool nearby that allocates using root pool
 
-the idia that last 3-4 bytes of ptr is unused,
-so we can store boolean there, and use masks and closed api to use it.
-reducing memory usage by half for SymbolID (could be thousands)
