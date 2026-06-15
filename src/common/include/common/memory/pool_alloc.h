@@ -1,28 +1,25 @@
 #pragma once
 
-#include <memory>
 #include <memory_resource>
-
 #include <common/memory/alloc.h>
 
 namespace common::memory {
-
-	class PoolAlloc : public IAlloc {
+	template<class PoolType>
+	class TemplatePoolAlloc : public IAlloc {
 	private:
     static constexpr std::pmr::pool_options options{0, 1024 * 1024}; 
-    std::pmr::unsynchronized_pool_resource pool;
+    PoolType pool;
 
 	public:
-    PoolAlloc(const PoolAlloc&) = delete;
-    PoolAlloc& operator=(const PoolAlloc&) = delete;
-		PoolAlloc(
+    TemplatePoolAlloc(const TemplatePoolAlloc&) = delete;
+    TemplatePoolAlloc& operator=(const TemplatePoolAlloc&) = delete;
+		TemplatePoolAlloc(
       std::pmr::memory_resource* upstream = std::pmr::new_delete_resource()
 		): pool(options, upstream)
 		{}
 
-
 		inline virtual std::pmr::memory_resource* get_resource() override {
-        return &pool;
+      return &pool;
     }
 
 		inline virtual void* allocate(size_t size, size_t align) override {
@@ -37,4 +34,7 @@ namespace common::memory {
 			pool.release();
 		}
 	};
+
+	using PoolAlloc = TemplatePoolAlloc<std::pmr::unsynchronized_pool_resource>;
+	using AsyncPoolAlloc = TemplatePoolAlloc<std::pmr::synchronized_pool_resource>;
 }

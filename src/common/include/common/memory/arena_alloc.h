@@ -1,8 +1,6 @@
 #pragma once
 
-#include <memory>
 #include <memory_resource>
-
 #include <common/memory/alloc.h>
 
 namespace common::memory
