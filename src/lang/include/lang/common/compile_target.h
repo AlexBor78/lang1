@@ -14,13 +14,18 @@
 namespace lang {
 	struct TargetID{
 		size_t id{ULLONG_MAX};
+
+		inline bool operator==(const TargetID& other) const {
+			return id == other.id;
+		}
+
 	};
 }
 
 namespace std {
 	template<>
 	struct hash<lang::TargetID> {
-		size_t operator()(const lang::syntax::FileID& id) const {
+		size_t operator()(const lang::TargetID& id) const {
 			return hash<size_t>{}(id.id);
 		}
 	};
