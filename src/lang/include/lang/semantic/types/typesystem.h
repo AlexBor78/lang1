@@ -1,217 +1,233 @@
 #pragma once
 
-#include <memory>
 #include <vector>
-#include <string>
 #include <cstdint>
 #include <string_view>
 #include <unordered_map>
 #include <common/common.h>
-#include <common/memory/arena_alloc.h>
+#include <common/memory/pool_alloc.h>
+#include <common/utils/basic_id.h>
+#include <common/utils/strings_storage.h>
 
 /**
- * @todo move to lang::semantic namespace or something like that
+ * @todo move to lang::semantic::typesystem namespace or something like that
  */
-namespace lang
-{
+namespace lang {
+  /**
+   * @brief class needed to have polymorphism with CoreType and wrappers types
+   */
+  class AbstractType {
+  protected:
+  	AbstractType() = default;
 
-    /**
-     * @brief class needed to have polymorphism with BuiltInType and wrappers types
-     * 
-     */
-    class AbstractType {
-    protected:
-        AbstractType() = default;
+  public:
+  	virtual ~AbstractType() = default;
+  };
 
-    public:
-        virtual ~AbstractType() = default;
-        virtual bool is_builtin() {return false;}
-        // virtual AbstractType& operator=(AbstractType& other) = default;
+  /**
+   * @brief Abstraction used in TypesTable
+            CoreType - Type without Wrappers, 
+            it can be BuiltinType, FunctionType or UserType (e.g. strcut, alias)
+   * 
+   */
+  class CoreType : public AbstractType {
+  protected:
+		using AbstractType::AbstractType;
 
-        common::SourceLocation get_source_loc() const;
-    };
+	public:
+  	virtual bool is_builtin() {return false;}
+  };
 
-    /**
-     * @brief Abstraction used in TypesTable
-              BaseType - Type without Wrappers, 
-              it can be BuiltinType or CustomType (e.g. strcut, alias)
-     * 
-     */
-    class BaseType : public AbstractType {
-    protected:
-        BaseType() = default;
-    };
+	using CoreTypeID = common::utils::BasicID<CoreType>;
+	using TypeID = common::utils::BasicID<AbstractType>;
 
-    /**
-     * @brief struct to easier configure builtin types
-     * 
-     */
-    struct TypeInfo {
-        bool is_numeric{false};
-        bool is_integer{false};
-        bool is_signed{false};
-    };
-    
-    class BuiltInType : public BaseType {
-    private:
-        std::string_view name;
-        TypeInfo info;
-        
-    public:
-        inline std::string_view get_name() const noexcept {
-            return name;
-        }
-        inline TypeInfo get_type_info() const noexcept {
-            return info;
-        }
+  /**
+   * @brief struct to easier configure builtin types
+   */
+  struct TypeInfo {
+  	bool is_numeric{false};
+  	bool is_integer{false};
+  	bool is_signed{false};
+		int8_t size{0}; // size in bytes
+  };
+  
+  class BuiltInType : public CoreType {
+  public:
+  	StringID name;
+  	TypeInfo info;
 
-        virtual bool is_builtin() override {return true;}
-        explicit BuiltInType
-        (             std::string_view _name
-        ,             TypeInfo _info = TypeInfo{.is_numeric = false
-                      ,                         .is_integer = false
-                      ,                         .is_signed = false
-                      }
-        ):  name(_name)
-        ,   info(_info)
-        {}
-    };
+  	virtual bool is_builtin() override {return true;}
 
-    class FunctionType : public BaseType {
-    public:
-        std::vector<AbstractType*> args_types;
-        AbstractType* return_type;
-        common::SourceLocation keyword_loc;
+  	explicit BuiltInType(
+			StringID _name
+  	, TypeInfo _info = TypeInfo()
+  	):  name(_name)
+  	,   info(_info)
+  	{}
+  };
 
-        FunctionType() = default;
-        FunctionType(std::vector<AbstractType*> _args_types
-        ,            AbstractType* _return_type
-        ,            common::SourceLocation _keyword_loc = common::SourceLocation()
-        ): args_types(std::move(_args_types))
-        ,  return_type(std::move(_return_type))
-        ,  keyword_loc(_keyword_loc)
-        {}
-    };
+  class FunctionType : public CoreType {
+  public:
+  	TypeID return_type;
+  	std::pmr::vector<TypeID> args_types;
 
-     // alternative name - DeclNotes
-    /**
-     * @brief temporary type for parser, just name of type, 
-              will not be unique: if N "int" vars -> N temporary types with name "int"
-              live until semantic
-     * 
-     * 
-     */
-    class UnresolvedType : public BaseType {
-    public:
-        /**
-         * @brief name of type, save here to process in semantic
-         * 
-         */
-        std::string_view name;
-        common::SourceLocation source_loc;
+  	FunctionType() = default;
+  	FunctionType(
+			std::pmr::vector<TypeID> _args_types
+  	, TypeID _return_type
+  	):	return_type(std::move(_return_type))
+		,		args_types(std::move(_args_types))
+  	{}
+  };
 
-        UnresolvedType() = default;
-        UnresolvedType(std::string_view _name
-        ,              common::SourceLocation _loc = common::SourceLocation()
-        ):  name(_name)
-        ,   source_loc(_loc)
-        {}
-    };
+  /**
+   * @brief temporary type for parser, just name of type, 
+            will not be unique: if N "int" vars -> N temporary types with name "int"
+            live until semantic
+   * 
+   */
+  class UnresolvedType : public CoreType {
+  public:
+  	/**
+  	 * @brief name of type, save here to process in semantic
+		 * @note	string is allocated in SourceFile
+  	 */
+  	std::string_view name;
 
-    class WrapperType : public AbstractType
-    {
-    public: enum class WrapperKind : uint8_t {
-            CONST,
-            MUTABLE,
-            POINTER,
-            REFERENCE,
-        };
-    protected: // var
-        WrapperKind kind{WrapperKind::MUTABLE};
-        AbstractType* inner;
-        const BaseType* base_type{nullptr};
-        common::SourceLocation source_loc;
+  	UnresolvedType() = default;
+  	UnresolvedType(
+			std::string_view _name
+  	):  name(_name)
+  	{}
+  };
 
-        bool is_final() const noexcept; // return base_type; if (base_type) -> it's final wrapper
+	enum class WrapperKind : uint8_t {
+		CONST,
+		MUTABLE,
+		POINTER,
+		REFERENCE,
+	};
 
-    public: // api
-        WrapperType() = default;
-        WrapperType(WrapperKind _kind
-        ,           AbstractType* _inner
-        ,           common::SourceLocation _loc = common::SourceLocation()
-        ):  kind(_kind)
-        ,   inner(std::move(_inner))
-        ,   source_loc(_loc)
-        {}
+  class WrapperType : public AbstractType {
+  protected: // var
+  	WrapperKind kind{WrapperKind::MUTABLE};
+		bool final{false};
+  	CoreTypeID base_type;
+  	TypeID inner;
 
-        WrapperType(WrapperKind _kind
-        ,           const BaseType* _base
-        ,           common::SourceLocation _loc = common::SourceLocation()
-        ):  kind(_kind)
-        ,   base_type(_base)
-        ,   source_loc(_loc)
-        {}
-        
-        WrapperKind get_kind() const noexcept;
-        AbstractType* get_into() const noexcept;
-        BaseType* get_base_type() const noexcept;
-        // virtual WrapperType& operator=(WrapperType& other) {
-        //     this->inner = std::move(other.inner);
-        //     this->base_type = other.base_type;
-        //     this->kind = other.kind;
-        // }
-    };
+  public: // api
+		using WrapperKind = WrapperKind;
+  	WrapperType() = default;
+  	WrapperType(
+			WrapperKind _kind
+  	, TypeID _inner
+  	):  kind(_kind)
+  	,   inner(std::move(_inner))
+  	{}
 
-    constexpr WrapperType::WrapperKind operator|(WrapperType::WrapperKind, WrapperType::WrapperKind) noexcept;
-    constexpr WrapperType::WrapperKind& operator|=(WrapperType::WrapperKind&, WrapperType::WrapperKind) noexcept;
-    constexpr bool operator&(WrapperType::WrapperKind, WrapperType::WrapperKind) noexcept;
+  	WrapperType(
+			WrapperKind _kind
+  	, CoreTypeID 	_base
+  	):  kind(_kind)
+		,		final(true)
+  	,   base_type(_base)
+  	{}
+  	
+  	bool is_final() const noexcept;
+  	TypeID unwrap() const;
+  	CoreTypeID unwrap_to_core() const noexcept;
+  	WrapperKind get_kind() const noexcept;
+  };
 
-    class TypeTable
-    {
-    private:
-        std::unordered_map<std::string_view, BaseType*> table;
-				common::memory::ArenaAlloc* arena;
+  constexpr WrapperKind operator|(WrapperKind, WrapperKind) noexcept;
+  constexpr WrapperKind& operator|=(WrapperKind&, WrapperKind) noexcept;
+  constexpr bool operator&(WrapperKind, WrapperKind) noexcept;
 
-    public:
-        TypeTable() = default;
-        explicit TypeTable(std::unordered_map<std::string_view, BaseType*> _table):
-            table(std::move(_table))
-        {}
-        explicit TypeTable(std::unordered_map<std::string_view, BaseType*>& _table):
-            table(std::move(_table))
-        {}
-        explicit TypeTable(const TypeTable& _table) = delete;
-        explicit TypeTable(TypeTable& _table):
-            table(std::move(_table.table))
-        {}
-        explicit TypeTable(TypeTable&& _table):
-            table(std::move(_table.table))
-        {}
+}
 
-        const BaseType* get_type(std::string_view) const noexcept;
+namespace std {
+	template<>
+	struct hash<std::pair<lang::WrapperKind, common::utils::BasicID<lang::AbstractType>>> {
+		size_t operator()(const std::pair<lang::WrapperKind, common::utils::BasicID<lang::AbstractType>>& p) const noexcept {
+			size_t h1 = std::hash<uint8_t>{}(static_cast<uint8_t>(p.first));
+			size_t h2 = std::hash<common::utils::BasicID<lang::AbstractType>>{}(p.second);
+			
+			// (boost hash_combine style)
+			return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
+		}
+	};
+	template<>
+	struct hash<std::pair<lang::WrapperKind, common::utils::BasicID<lang::CoreType>>> {
+		size_t operator()(const std::pair<lang::WrapperKind, common::utils::BasicID<lang::AbstractType>>& p) const noexcept {
+			size_t h1 = std::hash<uint8_t>{}(static_cast<uint8_t>(p.first));
+			size_t h2 = std::hash<common::utils::BasicID<lang::AbstractType>>{}(p.second);
+			
+			// (boost hash_combine style)
+			return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
+		}
+	};
+}
 
-        const BaseType* add_builtin_type(std::string_view);
-        const BaseType* add_builtin_type(std::string_view, TypeInfo);
+namespace lang {
+class TypeTable {
+	private:
+		size_t next_core_id{0};
+		size_t next_wrapper_id{0};
+		common::memory::IPoolAlloc* pool;
+	
+		// CoreTypes
+	  std::pmr::unordered_map<StringID, CoreTypeID> core_table;
+		std::pmr::unordered_map<CoreTypeID, CoreType*> core_context;
+	
+		// WrapperTypes
+		std::pmr::unordered_map<
+			std::pair<WrapperKind, TypeID>
+		,	TypeID
+		>	wrapper_table;
+		std::pmr::unordered_map<
+			std::pair<WrapperKind, CoreTypeID>
+		,	TypeID
+		>	core_wrapper_table;
+		std::pmr::unordered_map<TypeID, WrapperType*> wrapper_context;
+	
+	public:
+		TypeTable(
+			common::memory::IPoolAlloc* _pool
+		):	pool(_pool)
+		,		core_table(pool->get_resource())
+		,		core_context(pool->get_resource())
+		,		wrapper_table(pool->get_resource())
+		,		wrapper_context(pool->get_resource())
+		{}
+	
+		// CoreTypes
+		CoreTypeID add_core(StringID);
+	  CoreTypeID add_builtin(StringID, TypeInfo = TypeInfo());
+	  bool contains(StringID) const noexcept;
+	  CoreTypeID get_core(StringID) const noexcept;
+		const CoreType* get_core(CoreTypeID) const noexcept;
+	
+		// WrapperTypes
+		TypeID wrap(WrapperKind, CoreTypeID);
+		TypeID wrap(WrapperKind, TypeID);
+	
+		WrapperType* get_wrapper(TypeID);
+};
 
-        // const BaseType* add_type(std::string_view);
-        // const BaseType* add_type(std::string_view, TypeInfo);
-        bool contains(std::string_view) const noexcept;
-    };
 
+inline constexpr WrapperKind operator|(WrapperKind a, WrapperKind b) noexcept {
+	return static_cast<WrapperKind>(
+		static_cast<uint8_t>(a) | static_cast<uint8_t>(b)
+	);
+}
 
-    constexpr WrapperType::WrapperKind operator|(WrapperType::WrapperKind a, WrapperType::WrapperKind b) noexcept {
-        return static_cast<WrapperType::WrapperKind>(
-            static_cast<uint8_t>(a) | static_cast<uint8_t>(b)
-        );
-    }
+inline constexpr WrapperKind& operator|=(WrapperKind& a, WrapperKind b) noexcept {
+	return a = static_cast<WrapperKind>(
+		static_cast<uint8_t>(a) | static_cast<uint8_t>(b)
+	);
+}
 
-    constexpr WrapperType::WrapperKind& operator|=(WrapperType::WrapperKind& a, WrapperType::WrapperKind b) noexcept {
-        return a = static_cast<WrapperType::WrapperKind>(
-            static_cast<uint8_t>(a) | static_cast<uint8_t>(b)
-        );
-    }
-
-    constexpr bool operator&(WrapperType::WrapperKind a, WrapperType::WrapperKind b) noexcept {
-        return (static_cast<uint8_t>(a) & static_cast<uint8_t>(b)) != 0;
-    }
+inline constexpr bool operator&(WrapperKind a, WrapperKind b) noexcept {
+	return (static_cast<uint8_t>(a) & static_cast<uint8_t>(b)) != 0;
+}
 }

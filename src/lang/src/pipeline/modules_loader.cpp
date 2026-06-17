@@ -3,7 +3,8 @@
 #include <vector>
 #include <cassert>
 #include <filesystem>
-#include <unordered_set>
+
+#include <print>
 
 #include <lang/utils/diagnostic.h>
 #include <lang/pipeline/modules_loader.h>
@@ -36,19 +37,21 @@ namespace lang::pipeline
         debug_break();
 
 				const std::string file_path = std::filesystem::canonical(_file_path).string();
+				auto str_id = program->dirty_strings.add(file_path);
 
         // check if file already processed
-        if(program->sources_storage.contains(file_path)) return;
+        if(program->targets_storage.contains(str_id)) return;
+        //if(program->sources_storage.contains(file_path)) return;
         
         // process file
 				program->logger.set_name("SYNTAX");
 				program->logger.log("processing file: {}", file_path);
+				program->targets_storage.add_path(str_id);
         auto unresolved_imports = syntax_driver.process_file(file_path);
         const auto resolved_imports = import_resolver.process_imports(unresolved_imports);
 
         // updating data for relative paths solving
 				const auto sympath = import_resolver.gen_sympath(file_path);
-//				const auto workdir = file_path.substr(0, file_path.size() - sympath.absolute_path.normalized_path.size() - ext_len);
 				const auto workdir = std::filesystem::path(file_path).parent_path().string();
 
 				import_resolver.set_worksympath(sympath);
@@ -60,27 +63,28 @@ namespace lang::pipeline
 
     void ModulesLoader::load(SymbolPath sympath) {
         debug_break();
+
         
         // generating file paths
         const std::string _file_path = import_resolver.gen_path(sympath);
 				const std::string file_path = std::filesystem::canonical(_file_path).string();
-
+				auto str_id = program->dirty_strings.add(file_path);
+				
 // TODO: add load_root(file_ath) func, and move main load(file_path) logic
 //				load(file_path);
 //				return;
 				
         // updating info for relative paths solving
 				import_resolver.set_worksympath(sympath);
-//         import_resolver.set_workdir(file_path.substr(0, 
-// 					file_path.size() - sympath.absolute_path.normalized_path.size() - ext_len
-// 				));
 
         // check just in case if file was already processed
-        if(program->sources_storage.contains(file_path)) return;
+        if(program->targets_storage.contains(str_id)) return;
+        //if(program->sources_storage.contains(file_path)) return;
 
         // process files
 				program->logger.set_name("SYNTAX");
 				program->logger.log("processing file: {}", file_path);
+				program->targets_storage.add_path(str_id);
         auto unresolved_imports = syntax_driver.process_file(file_path);
 
         // recursively load all other files

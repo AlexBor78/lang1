@@ -35,16 +35,16 @@ namespace lang {
 	struct CompileTarget {
 	private:
  		// do not use; it is upstream for 'pool' field
-		std::unique_ptr<common::memory::PoolAlloc>	root_pool;																													 
+		std::unique_ptr<common::memory::IPoolAlloc>	root_pool;																													 
 	public:
 		TargetID id;
 
-		common::memory::PoolAlloc*  pool;
+		common::memory::PoolAlloc  pool;
 
 		common::memory::ArenaAlloc* source_arena{nullptr};
 		syntax::SourceFile* source;
 
-		common::memory::ArenaAlloc* ast_arena{nullptr};
+		common::memory::ArenaAlloc* unit_arena{nullptr};
 		syntax::TranslationUnit* unit;
 
 		common::memory::ArenaAlloc* hir_arena{nullptr};
@@ -54,32 +54,52 @@ namespace lang {
 
 		CompileTarget(
 			TargetID _id
-		,	std::unique_ptr<common::memory::PoolAlloc> _root_pool = nullptr
+		,	std::unique_ptr<common::memory::IPoolAlloc> _root_pool = nullptr
 		):	root_pool(std::move(_root_pool))
 		,		id(_id)
+		,		pool(root_pool->get_resource())
 		{}
+
+		inline void create_source_arena(size_t size) {
+			source_arena = pool.make<common::memory::ArenaAlloc>(size);
+		}
+
+		inline syntax::SourceFile* create_source(std::string_view file_path) {
+			return source = source_arena->make<syntax::SourceFile>(
+				file_path
+			,	source_arena
+			);
+		}
+
+		inline void create_unit_arena(size_t size) {
+			unit_arena = pool.make<common::memory::ArenaAlloc>(size);
+		}
+
+		inline void create_unit(syntax::AST ast) {
+			unit = unit_arena->make<syntax::TranslationUnit>(std::move(ast));
+		}
 	};
 
 	class TargetsStorage {
 	private:
 		size_t next_id{0};
-		common::memory::AsyncPoolAlloc* pool;
+		common::memory::IPoolAlloc* pool;
 		std::pmr::unordered_map<TargetID, CompileTarget*> storage;
 		std::pmr::unordered_set<StringID> paths;
 
 	public:
 		TargetsStorage(
-			common::memory::AsyncPoolAlloc* _pool
+			common::memory::IPoolAlloc* _pool
 		):	pool(_pool)
 		,		storage(pool->get_resource())
 		,		paths(pool->get_resource())
 		{}
 
 		CompileTarget* add(
-				std::unique_ptr<common::memory::PoolAlloc> _root_pool
+				std::unique_ptr<common::memory::IPoolAlloc> _root_pool
 		) {
 			TargetID id{.id = next_id++};
-			auto target = pool->make<CompileTarget>(
+			auto target = _root_pool->make<CompileTarget>(
 					id, std::move(_root_pool)
 			);
 			storage[id] = target;

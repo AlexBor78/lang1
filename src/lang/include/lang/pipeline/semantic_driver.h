@@ -1,23 +1,20 @@
 #pragma once
 
-#include <lang/semantic/types/semantic_types.h>
-#include <lang/common/compile_options.h>
+#include <lang/common/program.h>
 
 namespace lang::pipeline
 {
     class SemanticDriver
     {
     public:
-        SemanticDriver(const CompileOptions* _compile_options
-        ,              semantic::SemanticState* _semantic_state
-        ): compile_options(_compile_options)
-        ,  semantic_state(_semantic_state)
+        SemanticDriver(
+					Program* _program
+        ): program(_program)
         {}
 
         void analyze();
 
     private: // vars
-        const CompileOptions* compile_options;
-        semantic::SemanticState* semantic_state{nullptr};
+				Program* program;
     };
 }

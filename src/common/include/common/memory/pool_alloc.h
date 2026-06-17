@@ -4,8 +4,12 @@
 #include <common/memory/alloc.h>
 
 namespace common::memory {
+	class IPoolAlloc : public IAlloc {
+		virtual void deallocate(void* ptr, size_t size, size_t align) = 0;
+	};
+
 	template<class PoolType>
-	class TemplatePoolAlloc : public IAlloc {
+	class TemplatePoolAlloc : public IPoolAlloc {
 	private:
     static constexpr std::pmr::pool_options options{0, 1024 * 1024}; 
     PoolType pool;
@@ -26,7 +30,7 @@ namespace common::memory {
 			return pool.allocate(size, align);
 		}
 
-		inline void deallocate(void* ptr, size_t size, size_t align) {
+		inline virtual void deallocate(void* ptr, size_t size, size_t align) override {
 			pool.deallocate(ptr, size, align);
 		}
 		

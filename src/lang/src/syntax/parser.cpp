@@ -470,38 +470,34 @@ namespace lang::syntax::parser
         auto loc = peek().pos;
         if(!is_end() && match(TokenType::AMPERSAND)) { skip();
             return arena->make<WrapperType>(
-                WrapperType::WrapperKind::REFERENCE,
-                process_type(),
-                loc
+                WrapperKind::REFERENCE,
+                TypeID(process_type())
             );
         }
 
         if(!is_end() && match(TokenType::STAR)) { skip();
             return arena->make<WrapperType>(
-                WrapperType::WrapperKind::POINTER,
-                process_type(),
-                loc
+                WrapperKind::POINTER,
+                TypeID(process_type())
             );
         }
 
         if(!is_end() && match(TokenType::CONST)) { skip();
             return arena->make<WrapperType>(
-                WrapperType::WrapperKind::CONST,
-                process_type(),
-                loc
+                WrapperKind::CONST,
+                TypeID(process_type())
             );
         }
 
         if(!is_end() && match(TokenType::MUTABLE)) { skip();
             return arena->make<WrapperType>(
-                WrapperType::WrapperKind::MUTABLE,
-                process_type(),
-                loc
+                WrapperKind::MUTABLE,
+                TypeID(process_type())
             );
         }
         
         if(!is_end() && match(TokenType::IDENTIFIER)) {
-            return arena->make<UnresolvedType>(advance().sym, loc);
+            return arena->make<UnresolvedType>(advance().sym);
         }
 
         /*
@@ -512,7 +508,7 @@ namespace lang::syntax::parser
             if(!is_end() && !match(TokenType::LPAREN)) throw expected_lparen();
             skip(); // skip '('
 
-            std::vector<AbstractType*> args_types;
+            std::pmr::vector<TypeID> args_types(arena->get_resource());
             AbstractType* return_type = arena->make<UnresolvedType>("void");
 
             while(!is_end() && !match(TokenType::RPAREN)) {
@@ -531,8 +527,7 @@ namespace lang::syntax::parser
             
             return arena->make<FunctionType>(
                 args_types,
-                return_type,
-                loc
+                TypeID(return_type)
             );
         } throw unexpected_token();
     }

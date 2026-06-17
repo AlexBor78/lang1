@@ -30,7 +30,7 @@ namespace lang {
 		};
 
 		int64_t next_id{0};
-		common::memory::PoolAlloc* pool;
+		common::memory::IPoolAlloc* pool;
 		std::pmr::unordered_map<
 			std::pmr::string
 		, StringID
@@ -40,7 +40,7 @@ namespace lang {
 
 	public:
 		StringsStorage(
-			common::memory::PoolAlloc* _pool
+			common::memory::IPoolAlloc* _pool
 		): pool(_pool)
 		{}
 
@@ -52,6 +52,10 @@ namespace lang {
 			StringID id(next_id++);
 			storage[*new_str]	= id;
 			return id;
+		}
+
+		inline bool contains(std::string_view str) const noexcept {
+			return storage.contains(str);
 		}
 
 		std::string_view get(StringID id) {
