@@ -1,13 +1,9 @@
 #pragma once
 
-#include <climits>
-#include <cstddef>
 #include <variant>
 
 #include <common/memory/arena_alloc.h>
-#include <common/utils/basic_id.h>
-#include <lang/common/symbol_path.h>
-#include <lang/syntax/ast/stmt.h>
+//#include <lang/common/symbol_path.h>
 
 #include <lang/semantic/types/typesystem.h>
 
@@ -20,25 +16,29 @@ namespace lang::semantic {
 	using TypeID		= common::utils::BasicID<AbstractType>;
 	using ModuleID	= common::utils::BasicID<Module>;
 
+	namespace hir {
+		class DeclVar;
+		class DeclFunc;
+	}
+
 	struct TypeSymbol {
 	};
 
 	struct VarSymbol {
-		syntax::DeclVariable* decl;
-		AbstractType* type;
+		hir::DeclVar* decl;
+		TypeID type;
 	};
 
 	struct FuncSymbol {
-		syntax::DeclFunction* decl;
-		AbstractType* return_type;
-		AbstractType* type;
+		hir::DeclFunc* decl;
+		TypeID return_type;
+		TypeID type;
 		ScopeID scope;
 	};
 
 	struct Module {
-		ScopeID scope;
-		common::memory::ArenaAlloc* arena{nullptr};
-
+		ScopeID public_scope; 	// allocated in "global storage"
+		ScopeID private_scope;	// allocated in thread-local memory
 	};
 
 	class Symbol {
@@ -61,13 +61,18 @@ namespace lang::semantic {
 		explicit Symbol(Module m) : symbol(std::move(m)) {}
 
 		template <class T>
-		inline const T* as() const noexcept {
-			return std::get_if<T>(&symbol);
+		inline bool is() const noexcept {
+	    return std::holds_alternative<T>(symbol);
 		}
 
 		template <class T>
-		inline T* as() noexcept {
-			return std::get_if<T>(&symbol);
+		inline T& as() {
+			return std::get<T>(&symbol);
+		}
+
+		template <class T>
+		inline const T& as() const {
+			return std::get<T>(&symbol);
 		}
 	};
 }
