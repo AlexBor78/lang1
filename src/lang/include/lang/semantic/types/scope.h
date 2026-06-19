@@ -1,66 +1,58 @@
 #pragma once
 
-#include <memory>
 #include <unordered_map>
+
+#include <common/utils/basic_id.h>
+#include <common/utils/strings_storage.h>
 
 #include <lang/common/symbol_path.h>
 #include <lang/semantic/types/symbol.h>
 #include <lang/semantic/types/typesystem.h>
 
-namespace lang::semantic 
-{
-    class Scope
-    {
-    private:
-        /**
-         * @brief pointer to parent scope; nullptr - it is global scope
-         */
-        Scope* parent{nullptr};
+namespace lang::semantic {
+	class Scope;
+	using ScopeID = common::utils::BasicID<Scope>;
+	class Scope
+	{
+	private:
+		/**
+		 * @brief pointer to parent scope; nullptr - it is global scope
+		 */
+		Scope* parent{nullptr};
 
-        /**
-         * @brief list of symbol in scope
-         */
-        std::pmr::unordered_map<SymbolID, Symbol*> symbols;
+		common::memory::IPoolAlloc* pool;
 
-    public:
-        explicit Scope(Scope* _parent = nullptr):
-            parent(_parent)
-        {}
+		std::pmr::unordered_map<StringID, SymbolID> symbols;
+		std::pmr::unordered_map<SymbolID, Symbol*> symbols_context;
 
-        bool is_global() const noexcept;
+		TypesTable types_table;
 
-        const Scope* get_parent() const noexcept;
-        Scope* get_parent() noexcept;
+	public:
+		explicit Scope(
+			common::memory::IPoolAlloc* _pool
+		,	Scope* _parent = nullptr
+		):	parent(_parent)
+		,		symbols(_pool->get_resource())
+		,		symbols_context(_pool->get_resource())
+		,		types_table(_pool)
+		{}
 
-        /**
-         * @brief   check if given symbol contains from this scope to global
-         */
-        bool contains(SymbolID) const noexcept;
-        /**
-         * @brief   check if given symbol contains from this scope to global
-         */
-        bool contains(TypeID) const noexcept;
+		bool is_global() const noexcept;
 
-        /**
-         * @brief   check if given symbol contains in THIS scope only
-         */
-        bool contains_local(SymbolID) const noexcept;
+		//  const Scope* get_parent() const noexcept;
+		//  Scope* get_parent() noexcept;
 
-        /**
-         * @brief   check if given type contains in THIS scope only
-         */
-        bool contains_local(TypeID) const noexcept;
+		bool contains(StringID) const noexcept;
+		bool contains(SymbolID) const noexcept;
+		bool contains(CoreTypeID) const noexcept;
 
+		bool contains_local(StringID) const noexcept;
+		bool contains_local(SymbolID) const noexcept;
+		bool contains_local(CoreTypeID) const noexcept;
 
-        void add(SymbolID, Symbol*);
-        const Symbol* get(SymbolID) const noexcept;
-        Symbol* get(SymbolID) noexcept;
-        Symbol& at(SymbolID);
-
-        void add(TypeID, Symbol*);
-        const AbstractType* get(TypeID) const noexcept;
-        AbstractType* get(TypeID) noexcept;
-        AbstractType& at(TypeID);
-
-    };
+		Symbol* add_symbol(StringID);
+		CoreTypeID add_type(StringID);
+		SymbolID get_symbol_by_name(StringID) noexcept;
+		CoreTypeID get_type_by_name(StringID) noexcept;
+	};
 }

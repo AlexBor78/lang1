@@ -169,7 +169,7 @@ namespace std {
 }
 
 namespace lang {
-class TypeTable {
+class TypesTable {
 	private:
 		size_t next_core_id{0};
 		size_t next_wrapper_id{0};
@@ -191,7 +191,7 @@ class TypeTable {
 		std::pmr::unordered_map<TypeID, WrapperType*> wrapper_context;
 	
 	public:
-		TypeTable(
+		TypesTable(
 			common::memory::IPoolAlloc* _pool
 		):	pool(_pool)
 		,		core_table(pool->get_resource())
