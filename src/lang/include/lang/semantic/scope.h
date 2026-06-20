@@ -21,12 +21,14 @@ namespace lang::semantic {
 		 */
 		Scope* parent{nullptr};
 
+		int64_t next_id{0};
+
 		common::memory::IPoolAlloc* pool;
 
 		std::pmr::unordered_map<StringID, SymbolID> symbols;
 		std::pmr::unordered_map<SymbolID, Symbol*> symbols_context;
 
-		TypesTable types_table;
+		TypesTable _types_table;
 
 	public:
 		explicit Scope(
@@ -35,26 +37,41 @@ namespace lang::semantic {
 		):	parent(_parent)
 		,		symbols(_pool->get_resource())
 		,		symbols_context(_pool->get_resource())
-		,		types_table(_pool)
+		,		_types_table(_pool)
 		{}
 
-		bool is_global() const noexcept;
+		// returns true if it is root scope (e.g. root private scope, or root global scope)
+		inline bool is_final() const noexcept {
+			return parent == nullptr;
+		}
 
 		//  const Scope* get_parent() const noexcept;
 		//  Scope* get_parent() noexcept;
 
-		bool contains(StringID) const noexcept;
-		bool contains(SymbolID) const noexcept;
-		bool contains(CoreTypeID) const noexcept;
+		SymbolID add_symbol(StringID, Symbol*);
+		inline TypesTable& types_table() noexcept {
+			return _types_table;
+		}
 
-		bool contains_local(StringID) const noexcept;
-		bool contains_local(SymbolID) const noexcept;
-		bool contains_local(CoreTypeID) const noexcept;
+		// return false in case of cannot find (symbol/type can be in global scope)
+		inline bool contains(StringID id) const noexcept {
+			if(contains_local(id)) return true;
+			if(parent) return parent->contains(id);
+			return false;
+		}
 
-		Symbol* add_symbol(StringID);
-		CoreTypeID add_type(StringID);
-		SymbolID get_symbol_by_name(StringID) noexcept;
-		CoreTypeID get_type_by_name(StringID) noexcept;
+		inline bool contains_local(StringID id) const noexcept {
+			return 	symbols.contains(id)
+			&&			_types_table.contains(id)
+			;
+		}
+
+		SymbolID get_symbol_by_name(StringID name) {
+			if(!contains(name)) throw common::diagnostic::InterError("undefind name");
+			if(contains_local(name)) return symbols.at(name);
+			if(parent) return parent->get_symbol_by_name(name);
+			throw common::diagnostic::InterError("unreacheble: cannot get symbol, that contains");
+		}
 	};
 }
 
