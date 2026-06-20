@@ -30,7 +30,6 @@ endif()
 
 set(sources
     # common
-    src/common/units_manager.cpp
 		src/common/import_resolver.cpp
 
     # syntax

@@ -32,10 +32,10 @@
 // }
 
 namespace lang::syntax {
-    struct TranslationUnit {
+    struct TranslationBundle {
         syntax::AST ast;
 
-				TranslationUnit(
+				TranslationBundle(
 					syntax::AST _ast
 				):	ast(std::move(_ast))
 				{}

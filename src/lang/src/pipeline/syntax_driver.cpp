@@ -55,13 +55,13 @@ namespace lang::pipeline {
 
 		// parsing
 		// allocating arena for ast
-		target->create_unit_arena(arena_size);
+		target->create_bundle_arena(arena_size);
 		program->logger.set_name("PARSER");
     syntax::parser::Parser parser(
 		//	&program->logger
-			target->unit_arena	
+			target->bundle_arena	
 		); auto result = parser.parse(tokens);
-		target->create_unit(std::move(result.ast));
+		target->create_bundle(std::move(result.ast));
 
 		auto imports = result.imports_list;
 		imports.insert(

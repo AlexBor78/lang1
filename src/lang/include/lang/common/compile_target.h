@@ -9,7 +9,7 @@
 #include <common/utils/strings_storage.h>
 
 #include <lang/common/source_file.h>
-#include <lang/syntax/translation_unit.h>
+#include <lang/syntax/translation_bundle.h>
 
 namespace lang {
 	struct TargetID{
@@ -44,13 +44,12 @@ namespace lang {
 		common::memory::ArenaAlloc* source_arena{nullptr};
 		syntax::SourceFile* source;
 
-		common::memory::ArenaAlloc* unit_arena{nullptr};
-		syntax::TranslationUnit* unit;
+		common::memory::ArenaAlloc* bundle_arena{nullptr};
+		syntax::TranslationBundle* bundle;
 
 		common::memory::ArenaAlloc* hir_arena{nullptr};
-
-		// for allocating scopes, symbols, etc
 		common::memory::PoolAlloc* 	data_pool{nullptr};
+		// CompileUnit unit; // it will be none semantic module (stores module symbol, hir, data structs, may be more)
 
 		CompileTarget(
 			TargetID _id
@@ -71,12 +70,12 @@ namespace lang {
 			);
 		}
 
-		inline void create_unit_arena(size_t size) {
-			unit_arena = pool.make<common::memory::ArenaAlloc>(size);
+		inline void create_bundle_arena(size_t size) {
+			bundle_arena = pool.make<common::memory::ArenaAlloc>(size);
 		}
 
-		inline void create_unit(syntax::AST ast) {
-			unit = unit_arena->make<syntax::TranslationUnit>(std::move(ast));
+		inline void create_bundle(syntax::AST ast) {
+			bundle = bundle_arena->make<syntax::TranslationBundle>(std::move(ast));
 		}
 	};
 
