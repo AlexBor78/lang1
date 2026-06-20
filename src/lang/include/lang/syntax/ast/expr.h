@@ -4,7 +4,7 @@
 #include <string_view>
 #include <lang/syntax/ast/ast.h>
 
-namespace lang::syntax
+namespace lang::syntax::ast
 {
     class LiteralExpr : public ExprNode
     {

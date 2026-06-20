@@ -5,8 +5,8 @@
 #include <common/memory/arena_alloc.h>
 #include <common/utils/logger.h>
 
-#include <lang/semantic/typesystem.h>
 #include <lang/utils/diagnostic.h>
+#include <lang/syntax/unresolved_type.h>
 #include <lang/syntax/container.h>
 #include <lang/syntax/ast/ast.h>
 #include <lang/syntax/ast/stmt.h>
@@ -37,11 +37,11 @@ namespace lang::syntax::parser
         void reset_state();
         void breakpoint();
 
-        void save_type_to_context(DeclName*, AbstractType*);
-        void add_to_extern_list(DeclName*);
-        void add_to_export_list(DeclStmt*);
-        void add_to_imports_list(ImportStmt*);
-        void add_to_submodules(ImportStmt*);
+        void save_type_to_context(ast::DeclName*, semantic::AbstractType*);
+        void add_to_extern_list(ast::DeclName*);
+        void add_to_export_list(ast::DeclStmt*);
+        void add_to_imports_list(ast::ImportStmt*);
+        void add_to_submodules(ast::ImportStmt*);
 
         bool         is_end(size_t n = 1) const;
         bool         match(TokenType, size_t offset = 0) const;
@@ -62,58 +62,58 @@ namespace lang::syntax::parser
         
     // stmts
         void process_semicolon();
-        StmtPtr process_token();
-        StmtNode*          process_stmt();
+        ast::StmtPtr process_token();
+        ast::StmtNode*          process_stmt();
         
         // moduless
-        ImportStmt*        process_import_stmt();
+        ast::ImportStmt*        process_import_stmt();
 
         // control flow
-        IfStmt*            process_if_stmt();
-        ElseStmt*          process_else_stmt();
-        ForStmt*           process_for_stmt();
-        WhileStmt*         process_while_stmt();
+        ast::IfStmt*            process_if_stmt();
+        ast::ElseStmt*          process_else_stmt();
+        ast::ForStmt*           process_for_stmt();
+        ast::WhileStmt*         process_while_stmt();
 
         // other stmt's
-        BlockStmt*         process_scope();
-        BreakStmt*         process_break_stmt();
-        ContinueStmt*      process_continue_stmt();
-        ReturnStmt*        process_return_stmt();
+        ast::BlockStmt*         process_scope();
+        ast::BreakStmt*         process_break_stmt();
+        ast::ContinueStmt*      process_continue_stmt();
+        ast::ReturnStmt*        process_return_stmt();
 
         // declare
-        AbstractType*      process_type();
-        DeclStmt*          process_declare();
-        DeclVariable*      process_variable_decl();
-        StackAllocExpr*    process_stackalloc_expr();
-        DeclFunction*      process_function_decl();
+        semantic::AbstractType*      process_type();
+        ast::DeclStmt*          process_declare();
+        ast::DeclVariable*      process_variable_decl();
+        ast::StackAllocExpr*    process_stackalloc_expr();
+        ast::DeclFunction*      process_function_decl();
 
     // exprs
-        ExprNode*          process_expr();
+        ast::ExprNode*          process_expr();
         
         // operators
-        ExprNode*          process_operator();
-        ExprNode*          process_assign_expr();
-        ExprNode*          process_logical_expr();
-        ExprNode*          process_compare_expr();
-        ExprNode*          process_additive_expr();
+        ast::ExprNode*          process_operator();
+        ast::ExprNode*          process_assign_expr();
+        ast::ExprNode*          process_logical_expr();
+        ast::ExprNode*          process_compare_expr();
+        ast::ExprNode*          process_additive_expr();
         /**
          * @todo rename to process_multiply_expr()
          */
-        ExprNode*          process_multiple_expr();
-        ExprNode*          process_unary_expr();
-        ExprNode*          process_primary_expr();
+        ast::ExprNode*          process_multiple_expr();
+        ast::ExprNode*          process_unary_expr();
+        ast::ExprNode*          process_primary_expr();
         
         // names
-        ExprNode*          process_name();
-        FunctionExpr*      process_function_expr();
-        VariableExpr*      process_variable_expr();
-        SymbolPathExpr*    process_symbol_path();
+        ast::ExprNode*          process_name();
+        ast::FunctionExpr*      process_function_expr();
+        ast::VariableExpr*      process_variable_expr();
+        ast::SymbolPathExpr*    process_symbol_path();
 
         // literals
-        LiteralExpr*       process_literal();
-        NumberLiteral*     process_number_literal();
-        StringLiteral*     process_string_literal();
-        BoolLiteral*       process_bool_literal();
+        ast::LiteralExpr*       process_literal();
+        ast::NumberLiteral*     process_number_literal();
+        ast::StringLiteral*     process_string_literal();
+        ast::BoolLiteral*       process_bool_literal();
 
     private: // diagnostic creating
 

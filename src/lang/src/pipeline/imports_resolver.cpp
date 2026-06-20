@@ -3,7 +3,7 @@
 
 #include <lang/pipeline/imports_resolver.h>
 
-namespace lang {
+namespace lang::pipeline {
     /**
      * @brief generating path to file by symbolpath and given path start
      * 
@@ -73,7 +73,7 @@ namespace lang {
     }
 
     std::vector<SymbolPath> ImportResolver::process_imports(
-				const std::unordered_set<syntax::ImportStmt*>& imports) {
+				const std::unordered_set<syntax::ast::ImportStmt*>& imports) {
         std::vector<SymbolPath> output;
         for(const auto* node : imports) {
 						SymbolPath sympath;

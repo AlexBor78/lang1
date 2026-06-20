@@ -9,7 +9,7 @@
 #include <string_view>
 
 #include <lang/syntax/ast/ast.h>
-#include <lang/semantic/typesystem.h>
+#include <lang/semantic/types.h>
 #include <lang/semantic/symbol.h>
 
 namespace lang::semantic::hir {
@@ -21,8 +21,7 @@ namespace lang::semantic::hir {
   class DeclStmt;
   class BaseNode;
 
-//	using TypeID = AbstractType*; // just for now
-	using ASTPtr 	=	syntax::BaseNode*;
+	using ASTPtr 	=	syntax::ast::BaseNode*;
   using StmtPtr = StmtNode*;
   using ExprPtr = ExprNode*;
   using HIR = std::vector<BaseNode*>;

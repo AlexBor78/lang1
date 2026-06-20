@@ -6,7 +6,7 @@
 #include <lang/common/symbol_path.h>
 #include <lang/syntax/ast/stmt.h>
 
-namespace lang {
+namespace lang::pipeline {
 
 	class ImportResolver {
 	private:
@@ -33,7 +33,7 @@ namespace lang {
 
 		std::string gen_path(const SymbolPath&);
 		std::vector<SymbolPath> process_imports(
-				const std::unordered_set<syntax::ImportStmt*>&
+				const std::unordered_set<syntax::ast::ImportStmt*>&
 		);
 
 		inline const SymbolPath& get_worksympath() const noexcept {

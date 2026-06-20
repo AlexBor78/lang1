@@ -1,10 +1,9 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 #include <common/common.h>
 
-namespace lang::syntax
+namespace lang::syntax::ast
 {
     class ConstASTVisitor;
     class ASTVisitor;

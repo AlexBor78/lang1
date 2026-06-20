@@ -22,7 +22,7 @@ namespace lang::pipeline
          * @return semantic::ModuleID 
          */
 //        syntax::SyntaxContainer process_file(const std::string&);
-				std::unordered_set<syntax::ImportStmt*> process_file(const std::string&);
+				std::unordered_set<syntax::ast::ImportStmt*> process_file(const std::string&);
 
 
     private: // var

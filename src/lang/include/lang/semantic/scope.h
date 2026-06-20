@@ -7,13 +7,14 @@
 
 #include <lang/common/symbol_path.h>
 #include <lang/semantic/symbol.h>
-#include <lang/semantic/typesystem.h>
+#include <lang/semantic/types.h>
+#include <lang/semantic/typestable.h>
 
 namespace lang::semantic {
 	class Scope;
 	using ScopeID = common::utils::BasicID<Scope>;
-	class Scope
-	{
+
+	class Scope {
 	private:
 		/**
 		 * @brief pointer to parent scope; nullptr - iether it is a global, OR hiest local scope
@@ -55,39 +56,5 @@ namespace lang::semantic {
 		SymbolID get_symbol_by_name(StringID) noexcept;
 		CoreTypeID get_type_by_name(StringID) noexcept;
 	};
-
-	class GlobalSemanticStorage {
-	private:
-		int64_t next_scope_id{0};
-		int64_t next_symbol_id{0};
-		common::memory::IPoolAlloc* pool;
-		std::pmr::unordered_map<ScopeID, Scope*> scopes;
-		std::pmr::unordered_map<SymbolID, Symbol*> symbols;
-		
-	public:
-		GlobalSemanticStorage(
-			common::memory::IPoolAlloc* _pool
-		):	pool(_pool)
-		,		scopes(pool->get_resource())
-		,		symbols(pool->get_resource())
-		{}
-
-		inline ScopeID add(Scope* ptr) {
-			ScopeID id(next_scope_id++);
-			scopes[id] = ptr;
-			return id;
-		}
-		SymbolID add(Symbol* ptr) {
-			SymbolID id(next_symbol_id++);
-			symbols[id] = ptr;
-			return id;
-		}
-
-		inline Scope* get(ScopeID id) {
-			return scopes.at(id);
-		}
-		inline Symbol* get(SymbolID id) {
-			return symbols.at(id);
-		}
-	};
 }
+

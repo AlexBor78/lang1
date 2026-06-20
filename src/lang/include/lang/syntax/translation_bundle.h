@@ -4,10 +4,10 @@
 
 namespace lang::syntax {
 	struct TranslationBundle {
-		syntax::AST ast;
+		ast::AST ast;
 		
 		TranslationBundle(
-			syntax::AST _ast
+			ast::AST _ast
 		):	ast(std::move(_ast))
 		{}
 	};

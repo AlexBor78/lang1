@@ -13,7 +13,7 @@
 #include <lang/pipeline/syntax_driver.h>
 
 namespace lang::pipeline {
-  std::unordered_set<syntax::ImportStmt*> SyntaxDriver::process_file(
+  std::unordered_set<syntax::ast::ImportStmt*> SyntaxDriver::process_file(
 		const std::string& file_path) {
 
     // tring to open file

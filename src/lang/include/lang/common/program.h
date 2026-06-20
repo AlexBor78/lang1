@@ -5,9 +5,8 @@
 #include <common/utils/logger.h>
 
 #include <lang/common/compile_options.h>
-#include <lang/common/compile_target.h>
-
-#include <lang/semantic/scope.h> // global semantic storage
+#include <lang/common/targets_storage.h>
+#include <lang/semantic/global_storage.h>
 
 namespace lang
 {
@@ -50,6 +49,6 @@ namespace lang
 				StringsStorage strings_storage{&global_pool};
 
 				common::memory::PoolAlloc global_semantic_data_pool{global_pool.get_resource()};
-				semantic::GlobalSemanticStorage global_semantic_storage{&global_pool};
+				semantic::GlobalStorage global_semantic_storage{&global_pool};
     };
 }

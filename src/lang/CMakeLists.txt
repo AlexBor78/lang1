@@ -57,7 +57,7 @@ set(sources
     # utils
     src/utils/diagnostic_builder.cpp
     src/utils/printast.cpp
-    src/utils/utils.cpp
+    src/utils/syntax_utils.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${sources})

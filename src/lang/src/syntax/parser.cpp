@@ -1,12 +1,16 @@
 #include <format>
 #include <lang/utils/syntax_utils.h>
-#include <lang/utils/ast_utils.h>
+#include <lang/syntax/unresolved_type.h>
 #include <lang/syntax/parser.h>
 
 // #define PARSER_DEBUG
 
+
+
 namespace lang::syntax::parser
 {
+// just for now
+using namespace ast;
 // public api
 
     SyntaxContainer Parser::parse(const std::vector<Token>& _tokens) {
@@ -56,7 +60,7 @@ namespace lang::syntax::parser
         return pos + (n - 1) >= tokens->size();
     }
 
-    void Parser::save_type_to_context(DeclName* node, AbstractType* type) {
+    void Parser::save_type_to_context(DeclName* node, semantic::AbstractType* type) {
 				node->type = type;
     }
     void Parser::add_to_extern_list(DeclName* node) {
@@ -464,35 +468,35 @@ namespace lang::syntax::parser
         } throw unexpected_token(2);
     }
 
-    AbstractType* Parser::process_type() {
+    semantic::AbstractType* Parser::process_type() {
         breakpoint(); logger.debug("process_type()");
 
         auto loc = peek().pos;
         if(!is_end() && match(TokenType::AMPERSAND)) { skip();
-            return arena->make<WrapperType>(
-                WrapperKind::REFERENCE,
-                TypeID(process_type())
+            return arena->make<semantic::WrapperType>(
+               semantic::WrapperKind::REFERENCE,
+               semantic::TypeID(process_type())
             );
         }
 
         if(!is_end() && match(TokenType::STAR)) { skip();
-            return arena->make<WrapperType>(
-                WrapperKind::POINTER,
-                TypeID(process_type())
+            return arena->make<semantic::WrapperType>(
+                semantic::WrapperKind::POINTER,
+                semantic::TypeID(process_type())
             );
         }
 
         if(!is_end() && match(TokenType::CONST)) { skip();
-            return arena->make<WrapperType>(
-                WrapperKind::CONST,
-                TypeID(process_type())
+            return arena->make<semantic::WrapperType>(
+                semantic::WrapperKind::CONST,
+                semantic::TypeID(process_type())
             );
         }
 
         if(!is_end() && match(TokenType::MUTABLE)) { skip();
-            return arena->make<WrapperType>(
-                WrapperKind::MUTABLE,
-                TypeID(process_type())
+            return arena->make<semantic::WrapperType>(
+                semantic::WrapperKind::MUTABLE,
+                semantic::TypeID(process_type())
             );
         }
         
@@ -508,8 +512,8 @@ namespace lang::syntax::parser
             if(!is_end() && !match(TokenType::LPAREN)) throw expected_lparen();
             skip(); // skip '('
 
-            std::pmr::vector<TypeID> args_types(arena->get_resource());
-            AbstractType* return_type = arena->make<UnresolvedType>("void");
+            std::pmr::vector<semantic::TypeID> args_types(arena->get_resource());
+            semantic::AbstractType* return_type = arena->make<UnresolvedType>("void");
 
             while(!is_end() && !match(TokenType::RPAREN)) {
                 args_types.emplace_back(process_type());
@@ -525,9 +529,9 @@ namespace lang::syntax::parser
                 return_type = process_type();
             } 
             
-            return arena->make<FunctionType>(
+            return arena->make<semantic::FunctionType>(
                 args_types,
-                TypeID(return_type)
+                semantic::TypeID(return_type)
             );
         } throw unexpected_token();
     }

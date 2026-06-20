@@ -1,16 +1,15 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 #include <string_view>
 #include <lang/syntax/ast/ast.h>
 #include <lang/common/symbol_path.h>
-#include <lang/semantic/typesystem.h>
+#include <lang/semantic/types.h>
 
 /**
  * @todo rename _pos to _full_range_loc, all pos like to loc like.
  */
-namespace lang::syntax
+namespace lang::syntax::ast
 {   
     class BlockStmt : public StmtNode {
     public:
@@ -183,7 +182,7 @@ namespace lang::syntax
 				using DeclStmt::DeclStmt;
 		public:
 				bool is_extern{false};
-				AbstractType* type;
+				semantic::AbstractType* type;
     };
 
     class DeclVariable : public DeclName {

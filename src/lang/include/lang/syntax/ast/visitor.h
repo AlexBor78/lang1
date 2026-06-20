@@ -4,7 +4,7 @@
 #include <lang/syntax/ast/stmt.h>
 #include <lang/syntax/ast/expr.h>
 
-namespace lang::syntax
+namespace lang::syntax::ast
 {
     class ConstASTVisitor
     {
