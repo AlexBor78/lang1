@@ -12,7 +12,7 @@ just list of all task, just to not forget :)
     - [ ] `FileLocation` -> `FilePosition`
     - [ ] everywhere position to location where it is location (mainly in ast)
     - [ ] `DiagnosticBuilder` -> `DiagnosticGenerator`
-    - [ ] `TypeTable` -> `TypesTable`
+    - [X] `TypeTable` -> `TypesTable`
 - [ ] rewrite shitcode
     - [ ] rewrite `ModulesLoader` implementation
     
@@ -27,48 +27,35 @@ just list of all task, just to not forget :)
 - [ ] update and improve PrintAST.
 
 ### Diagnostic
+- [ ] don't use exceptions, instead use rust Result like structure as return type
 - [ ] lazy generating error (not needed yet, will need in future)
 - [ ] add colors to logger output
 - [ ] add colors to builded errors
 - [ ] add syntax highlight
 
-### AST
-improve structure with MI (multiple inherit)    
-- [ ] make more base node
-    - [ ] KeywordStmt
-    - [X] StructureStmt
-    - [ ] StmtWithCond
-- [ ] use them to create concrete nodes
-    - [ ] IfStmt with StructureStmt, StmtWithCond, KeywordStmt
-    - [ ] ElseStmt with StructureStmt, KeywordStmt 
-    - [ ] etc
-
 ### Syntax
-- [ ] Lexer
-    - [ ] extend literals (0xFF, unicode, \xFF, etc)
 - [ ] Parser
-    - [ ] save import_list
+    - [X] save import_list
     - [ ] fix not passed very complex operators sequences in test.lang
     - [ ] update error generating 
         - [ ] pass location to generating func
         - [ ] on error like expected X - location should be not next token, but after last token
 
 ### pipeline - drivers which control process of compilation
-- [X] SyntaxDriver - Lexer + parser
+- [X] CompileDriver - process all imported modules
 - [X] ModulesLoader - loads all imported modules before semantic analyze (by SyntaxDriver)
-- [ ] CompileDriver - process all imported modules
-    - [ ] SemanticDrivers
-        - [ ] SymbolsCollector
-        - [ ] NamesChecker
-        - [ ] some types checkers
-        - [ ] some logic checkers
-        - [ ] some optimizers
-    - [ ] Codegen 
+- [X] SyntaxDriver - Lexer + parser
+- [ ] SemanticDrivers
+    - [ ] HIRBuilder (collects `export`ed symbols; builder HIR out of AST)
+    - [ ] NamesChecker
+    - [ ] some types checkers
+    - [ ] some logic checkers
+    - [ ] some optimizers
+- [ ] Codegen 
 
 ### semantic
 1. clean up existed code
 2. implement base semantic stage
-- [ ] SymbolsCollector - collect all symbol declarations
 - [ ] NameChecker check if identifier exists (var and functions)
 - [ ] TypeBuilder - fill TypeTable with types (not supported for now, in future: aliases, structs, enum)
 - [ ] TypeInitializer - create real types from UnsolvedTypes (BTW check if type exists)
@@ -96,7 +83,7 @@ semantic is now current stage
 - [ ] add docker build option
 
 ### add user-api to compiler cli app (POSIX like, or even use POSIX standard)
-- [ ] make POSIX-like cli compiler with support of:
-    - [ ] import paths
-    - [ ] different compile flags
-    - [ ] etc
+- [X] make POSIX-like cli compiler with support of:
+    - [X] import paths
+    - [X] different compile flags
+    - [X] etc

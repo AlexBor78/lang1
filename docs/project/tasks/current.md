@@ -16,26 +16,6 @@ do not devide data and ast, but have diffrent asts.
 
 ## Current stage - redesign architecture
 
-1. [ ] redesign memory usage
-    [X] introduce ArenaAloc
-    [ ] Lexer part
-      [ ] introduce SourceFile (structure that store WHOLE file)
-      [ ] store all files in one arena (till end of compilation)
-      [ ] do not store strings in tokens, only string views
-      [ ] adapt lexer to use SourceFile
-    [ ] Parser part
-      [ ] change all smart ptrs in ast to stuped ones
-      [ ] allocate all ast in separated arena
-      [ ] 
+1. [ ] HIRBUilder for SyntaxAST -> SemanticAST
 
-
-2. [ ] redesign AST 
-    [ ] add whole bunch off shit that been moved to contexts
-    [ ] move to ArenaAloc for AST
-    [ ] adapt parser to use AST
-3. [ ] HIR (Basicaly second AST with different data)
-    [ ] redesign semantic types (scope, symbol)
-    [ ] design HIR
-      [ ] introduce StringsPool to store strings and use string_views
-4. [ ] "translaor" for SyntaxAST -> SemanticAST
 

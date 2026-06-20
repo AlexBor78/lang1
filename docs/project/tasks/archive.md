@@ -66,6 +66,28 @@
     - [X] make SymbolsContext that will be used to store all symbols (using scope, context, TypesTable, etc, and have api)
         note: SymbolsCon
 
+### Once of refactoring: redesign memory use (using allocators now); change semantic types; etc
+1. [X] redesign memory usage
+    [X] introduce ArenaAloc
+    [X] Lexer part
+      [X] introduce SourceFile (structure that store WHOLE file)
+      [X] store all files in one arena (till end of compilation)
+      [X] do not store strings in tokens, only string views
+      [X] adapt lexer to use SourceFile
+    [X] Parser part
+      [X] change all smart ptrs in ast to stuped ones
+      [X] allocate all ast in separated arena
+
+
+2. [X] redesign AST 
+    [X] add whole bunch off shit that been moved to contexts
+    [X] move to ArenaAloc for AST
+    [X] adapt parser to use AST
+3. [X] HIR (Basicaly second AST with different data)
+    [X] redesign semantic types (scope, symbol)
+    [X] design HIR
+      [X] introduce StringsPool to store strings and use string_views
+
 
 ## Documentation stage
 - [X] add doxygen

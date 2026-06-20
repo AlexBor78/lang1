@@ -2,11 +2,8 @@
 
 moved all stuff here that is not soon
 
-- [ ] design modules system (files and logic)
+- [ ] Increment build (files and logic)
     - [ ] check if file was edited (by hash)
-        - [ ] crypto library
-        - [ ] maybe some data structure's
-
     - [ ] file format (some JSON stuff)
         - [ ] needs JSON lib
         - [ ] serialization
@@ -19,11 +16,11 @@ moved all stuff here that is not soon
             - [ ] main Deserializer class
 
 - [ ] todo some day(after 0:0 version), wrote just to not forget
-    - [ ] change DeclNode api -> std::string_view get_name() -> const std::string& get_name()
+    - [X] change DeclNode api -> std::string_view get_name() -> const std::string& get_name()
     - [X] remove ModuleDecl node (file_name is module name)
     - [X] replace namespaces with modules (remove namespaces)
     - [ ] use precompiled headers in project
-    - [ ] design modules system (for increment compilation)
+    - [ ] increment build
     - [ ] multi-threading
 
 - [ ] language features after 0:0 version
