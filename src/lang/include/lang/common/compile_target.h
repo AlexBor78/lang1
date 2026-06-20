@@ -10,6 +10,7 @@
 
 #include <lang/common/source_file.h>
 #include <lang/syntax/translation_bundle.h>
+#include <lang/semantic/types/semantic_unit.h>
 
 namespace lang {
 	struct TargetID{
@@ -49,7 +50,10 @@ namespace lang {
 
 		common::memory::ArenaAlloc* hir_arena{nullptr};
 		common::memory::PoolAlloc* 	data_pool{nullptr};
-		// CompileUnit unit; // it will be none semantic module (stores module symbol, hir, data structs, may be more)
+		// it will be none semantic module (stores module symbol, hir, data structs, may be more)
+		semantic::SemanticUnit unit;
+		
+	public:
 
 		CompileTarget(
 			TargetID _id

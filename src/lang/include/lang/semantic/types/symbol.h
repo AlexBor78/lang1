@@ -8,13 +8,10 @@
 #include <lang/semantic/types/typesystem.h>
 
 namespace lang::semantic {
-	class Symbol;
 	class Scope;
-	struct Module;
-	using SymbolID 	= common::utils::BasicID<Symbol>;
+	class Symbol;
 	using ScopeID 	= common::utils::BasicID<Scope>;
-	using TypeID		= common::utils::BasicID<AbstractType>;
-	using ModuleID	= common::utils::BasicID<Module>;
+	using SymbolID 	= common::utils::BasicID<Symbol>;
 
 	namespace hir {
 		class DeclVar;
@@ -67,12 +64,12 @@ namespace lang::semantic {
 
 		template <class T>
 		inline T& as() {
-			return std::get<T>(&symbol);
+			return std::get<T>(symbol);
 		}
 
 		template <class T>
 		inline const T& as() const {
-			return std::get<T>(&symbol);
+			return std::get<T>(symbol);
 		}
 	};
 }
