@@ -8,7 +8,7 @@
 #include <common/streams/stream.h>
 #include <lang/syntax/token.h> 
 #include <lang/syntax/keywords.h> 
-#include <lang/common/source_file.h>
+#include <lang/syntax/source_file.h>
 
 namespace lang::syntax::lexer
 {

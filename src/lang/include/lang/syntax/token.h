@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <string_view>
 #include <common/common.h>
 
 namespace lang::syntax

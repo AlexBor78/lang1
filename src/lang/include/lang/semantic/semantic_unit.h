@@ -1,7 +1,7 @@
 #pragma once
 
-#include <lang/semantic/types/hir/hir.h>
-#include <lang/semantic/types/symbol.h>
+#include <lang/semantic/hir/hir.h>
+#include <lang/semantic/symbol.h>
 
 namespace lang::semantic {
 	struct SemanticUnit {

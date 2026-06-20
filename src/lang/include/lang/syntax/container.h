@@ -1,10 +1,8 @@
 #pragma once
 
-#include <unordered_map>
 #include <unordered_set>
 #include <lang/syntax/ast/ast.h>
 #include <lang/syntax/ast/stmt.h>
-#include <lang/semantic/types/typesystem.h>
 
 namespace lang::syntax {
 	/**
@@ -12,21 +10,6 @@ namespace lang::syntax {
 	 */
 	struct SyntaxContainer {
 		AST ast;
-
-//		/**
-//		 * @brief DeclNode of something -> It's type
-//		 */
-//		std::unordered_map<BaseNode*, std::unique_ptr<AbstractType>> types_context;
-//
-//		/**
-//		 * @brief DeclNode of something -> is it exported
-//		 */
-//		std::unordered_set<BaseNode*> export_list;
-//
-//		/**
-//		 * @brief DeclNode of something -> is it extern
-//		 */
-//		std::unordered_set<BaseNode*> extern_list;
 
 		/**
 		 * @brief list of all imported modules (without submodule)

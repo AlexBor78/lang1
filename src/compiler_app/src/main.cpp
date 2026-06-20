@@ -6,7 +6,7 @@
 #include <common/common.h>
 
 #include <compiler/cliparser.h>
-#include <lang/pipeline/compiledriver.h>
+#include <lang/pipeline/compile_driver.h>
 
 int main(int argc, char** argv) { try {
     common::debug_break();

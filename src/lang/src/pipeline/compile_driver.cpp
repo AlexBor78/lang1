@@ -6,7 +6,7 @@
 #include <common/memory/arena_alloc.h>
 #include <common/utils/strings_storage.h>
 
-#include <lang/pipeline/compiledriver.h>
+#include <lang/pipeline/compile_driver.h>
 
 namespace lang::pipeline {
   void CompileDriver::run(CompileOptions _options) {

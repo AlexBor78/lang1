@@ -1,5 +1,5 @@
-#include <lang/semantic/types/hir/hir.h>
-#include <lang/semantic/types/hir/visitor.h>
+#include <lang/semantic/hir/hir.h>
+#include <lang/semantic/hir/visitor.h>
 
 namespace lang::semantic::hir {
 

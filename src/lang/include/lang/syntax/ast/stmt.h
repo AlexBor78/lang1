@@ -5,7 +5,7 @@
 #include <string_view>
 #include <lang/syntax/ast/ast.h>
 #include <lang/common/symbol_path.h>
-#include <lang/semantic/types/typesystem.h>
+#include <lang/semantic/typesystem.h>
 
 /**
  * @todo rename _pos to _full_range_loc, all pos like to loc like.

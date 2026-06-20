@@ -6,8 +6,8 @@
 #include <common/utils/strings_storage.h>
 
 #include <lang/common/symbol_path.h>
-#include <lang/semantic/types/symbol.h>
-#include <lang/semantic/types/typesystem.h>
+#include <lang/semantic/symbol.h>
+#include <lang/semantic/typesystem.h>
 
 namespace lang::semantic {
 	class Scope;

@@ -5,7 +5,7 @@
 #include <common/memory/arena_alloc.h>
 //#include <lang/common/symbol_path.h>
 
-#include <lang/semantic/types/typesystem.h>
+#include <lang/semantic/typesystem.h>
 
 namespace lang::semantic {
 	class Scope;

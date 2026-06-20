@@ -1,12 +1,11 @@
 #pragma once
 
 #include <cstddef>
-#include <memory>
 
 #include <common/memory/arena_alloc.h>
 #include <common/utils/logger.h>
 
-#include <lang/semantic/types/typesystem.h>
+#include <lang/semantic/typesystem.h>
 #include <lang/utils/diagnostic.h>
 #include <lang/syntax/container.h>
 #include <lang/syntax/ast/ast.h>

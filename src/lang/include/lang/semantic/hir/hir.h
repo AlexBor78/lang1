@@ -9,8 +9,8 @@
 #include <string_view>
 
 #include <lang/syntax/ast/ast.h>
-#include <lang/semantic/types/typesystem.h>
-#include <lang/semantic/types/symbol.h>
+#include <lang/semantic/typesystem.h>
+#include <lang/semantic/symbol.h>
 
 namespace lang::semantic::hir {
 

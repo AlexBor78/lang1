@@ -4,9 +4,9 @@
 #include <filesystem>
 
 #include <common/diagnostic/diagnostic.h>
-
 #include <common/streams/istream.h>
-#include <lang/common/source_file.h>
+
+#include <lang/syntax/source_file.h>
 #include <lang/syntax/lexer.h>
 #include <lang/syntax/parser.h>
 

@@ -8,9 +8,9 @@
 #include <common/memory/pool_alloc.h>
 #include <common/utils/strings_storage.h>
 
-#include <lang/common/source_file.h>
+#include <lang/syntax/source_file.h>
 #include <lang/syntax/translation_bundle.h>
-#include <lang/semantic/types/semantic_unit.h>
+#include <lang/semantic/semantic_unit.h>
 
 namespace lang {
 	struct TargetID{

@@ -5,7 +5,7 @@
 
 #include <lang/common/symbol_path.h>
 #include <lang/common/compile_options.h>
-#include <lang/common/import_resolver.h>
+#include <lang/pipeline/imports_resolver.h>
 #include <lang/pipeline/syntax_driver.h>
 
 // constexpr const char FILE_SUFFIX[] = ".lang";

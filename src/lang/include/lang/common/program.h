@@ -7,7 +7,7 @@
 #include <lang/common/compile_options.h>
 #include <lang/common/compile_target.h>
 
-#include <lang/semantic/types/scope.h> // global semantic storage
+#include <lang/semantic/scope.h> // global semantic storage
 
 namespace lang
 {

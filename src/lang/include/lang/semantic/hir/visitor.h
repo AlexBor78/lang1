@@ -1,6 +1,6 @@
 #pragma once
 
-#include <lang/semantic/types/hir/hir.h>
+#include <lang/semantic/hir/hir.h>
 
 namespace lang::semantic::hir {
 

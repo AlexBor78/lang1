@@ -30,39 +30,34 @@ endif()
 
 set(sources
     # common
-		src/common/import_resolver.cpp
+
+    # pipeline
+    src/pipeline/compile_driver.cpp
+		src/pipeline/imports_resolver.cpp
+		src/pipeline/modules_loader.cpp
+    src/pipeline/syntax_driver.cpp
+    src/pipeline/semantic_driver.cpp
 
     # syntax
     src/syntax/lexer.cpp
-    src/syntax/stmt.cpp
-    src/syntax/expr.cpp
     src/syntax/ast.cpp
     src/syntax/parser.cpp
 
     # semantic types
-    src/semantic/types/semantic_types.cpp
-    src/semantic/types/typesystem.cpp
-    src/semantic/types/identifier.cpp
-    src/semantic/types/module.cpp
-    src/semantic/types/scope.cpp
-		src/semantic/types/hir.cpp
+		src/semantic/hir.cpp
+    src/semantic/scope.cpp
+    src/semantic/symbol.cpp
+    src/semantic/typesystem.cpp
 
     # semantic analyzers
-    src/semantic/analyzers/semantic_initializer.cpp
+		# src/semantic/analyzers/semantic_initializer.cpp
     # src/semantic/analyzers/import_processor.cpp # removed
     # src/semantic/analyzers/symbols_collector.cpp # not in use yet
-
-    # pipeline
-    src/pipeline/compiledriver.cpp
-    src/pipeline/syntax_driver.cpp
-    src/pipeline/modules_loader.cpp
-    src/pipeline/semantic_driver.cpp
     
     # utils
     src/utils/diagnostic_builder.cpp
     src/utils/printast.cpp
     src/utils/utils.cpp
-    src/utils/error.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${sources})
