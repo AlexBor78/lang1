@@ -7,15 +7,27 @@
 - Semantic phases:
     1. Modules - build ast for every module in project, and then collect all symbols
     2. Names - check if name exist
-    3. types - fill TypeTable with types, check if types exists, fill types context
+    3. types - fill TypesTable with types, check if types exists, fill types context
     4. Optimize
 <!-- DOCUMENTATION UP -->
 
 ## Idea
-do not devide data and ast, but have diffrent asts.
+do not divide data and ast, but have different asts.
 
 ## Current stage - redesign architecture
 
-1. [ ] HIRBUilder for SyntaxAST -> SemanticAST
+### improve id system (in common module)
+[ ] rename common `BasicID` to `TaggedID`
+[ ] add BasicID: template class that accepts size
+[ ] add aliases such as ID32 ID64
+[ ] add IDGenerator to common (use std::atomic)
+
+### done preparations before semantic 
+[ ] pass IDGenerator to all ScopeCoreTypes by ptr
+[ ] dived TypesTable into ScopeCoreTypes and WrapperTypesStorage
+[ ] update docs
+
+### continue developing
+[ ] HIRBUilder for SyntaxAST -> SemanticAST
 
 
