@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-#include <common/utils/basic_id.h>
+#include <common/utils/tagged_id.h>
 #include <common/utils/strings_storage.h>
 
 #include <lang/common/symbol_path.h>

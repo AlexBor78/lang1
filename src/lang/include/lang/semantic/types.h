@@ -3,7 +3,7 @@
 #include <vector>
 #include <cstdint>
 #include <common/common.h>
-#include <common/utils/basic_id.h>
+#include <common/utils/tagged_id.h>
 #include <common/utils/strings_storage.h>
 
 namespace lang::semantic {
