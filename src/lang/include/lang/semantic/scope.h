@@ -25,7 +25,7 @@ namespace lang::semantic {
 
 		common::memory::IPoolAlloc* pool;
 
-		std::pmr::unordered_map<StringID, SymbolID> symbols;
+		std::pmr::unordered_map<common::utils::StringID, SymbolID> symbols;
 		std::pmr::unordered_map<SymbolID, Symbol*> symbols_context;
 
 		TypesTable _types_table;
@@ -48,29 +48,29 @@ namespace lang::semantic {
 		//  const Scope* get_parent() const noexcept;
 		//  Scope* get_parent() noexcept;
 
-		SymbolID add_symbol(StringID, Symbol*);
+		SymbolID add_symbol(common::utils::StringID, Symbol*);
 		inline TypesTable& types_table() noexcept {
 			return _types_table;
 		}
 
 		// return false in case of cannot find (symbol/type can be in global scope)
-		inline bool contains(StringID id) const noexcept {
+		inline bool contains(common::utils::StringID id) const noexcept {
 			if(contains_local(id)) return true;
 			if(parent) return parent->contains(id);
 			return false;
 		}
 
-		inline bool contains_local(StringID id) const noexcept {
+		inline bool contains_local(common::utils::StringID id) const noexcept {
 			return 	symbols.contains(id)
 			&&			_types_table.contains(id)
 			;
 		}
 
-		SymbolID get_symbol_by_name(StringID name) {
-			if(!contains(name)) throw common::diagnostic::InterError("undefind name");
+		SymbolID get_symbol_by_name(common::utils::StringID name) {
+			if(!contains(name)) throw common::diagnostic::InterError("undefined name");
 			if(contains_local(name)) return symbols.at(name);
 			if(parent) return parent->get_symbol_by_name(name);
-			throw common::diagnostic::InterError("unreacheble: cannot get symbol, that contains");
+			throw common::diagnostic::InterError("unreachable: cannot get symbol, that contains");
 		}
 	};
 }

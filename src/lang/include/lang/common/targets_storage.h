@@ -11,7 +11,7 @@ namespace lang {
 		size_t next_id{0};
 		common::memory::IPoolAlloc* pool;
 		std::pmr::unordered_map<TargetID, CompileTarget*> storage;
-		std::pmr::unordered_set<StringID> paths;
+		std::pmr::unordered_set<common::utils::StringID> paths;
 
 	public:
 		TargetsStorage(
@@ -37,11 +37,11 @@ namespace lang {
 			return nullptr;
 		}
 
-		inline void add_path(StringID path) noexcept {
+		inline void add_path(common::utils::StringID path) noexcept {
 			paths.insert(path);
 		}
 
-		inline bool contains(StringID path) const noexcept {
+		inline bool contains(common::utils::StringID path) const noexcept {
 			return paths.contains(path);
 		}
 	};

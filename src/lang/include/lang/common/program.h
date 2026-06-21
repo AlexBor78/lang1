@@ -39,14 +39,14 @@ namespace lang
 
 				// for all strings, that wont be in output program
 				// e.g. filepaths, etc
-				StringsStorage dirty_strings{&global_pool};
+				common::utils::StringsStorage dirty_strings{&global_pool};
 
 				TargetsStorage targets_storage{&global_pool};
 
 				// for all program strings
 				// e.g. symbols names, strings literals(parsed), etc
 				common::memory::PoolAlloc strings_pool{global_pool.get_resource()};
-				StringsStorage strings_storage{&global_pool};
+				common::utils::StringsStorage strings_storage{&global_pool};
 
 				common::memory::PoolAlloc global_semantic_data_pool{global_pool.get_resource()};
 				semantic::GlobalStorage global_semantic_storage{&global_pool};

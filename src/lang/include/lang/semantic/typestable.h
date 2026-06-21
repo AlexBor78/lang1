@@ -11,7 +11,7 @@ class TypesTable {
 		common::memory::IPoolAlloc* pool;
 	
 		// CoreTypes
-	  std::pmr::unordered_map<StringID, CoreTypeID> core_table;
+	  std::pmr::unordered_map<common::utils::StringID, CoreTypeID> core_table;
 		std::pmr::unordered_map<CoreTypeID, CoreType*> core_context;
 	
 		// WrapperTypes
@@ -36,10 +36,10 @@ class TypesTable {
 		{}
 	
 		// CoreTypes
-		CoreTypeID add_core(StringID);
-	  CoreTypeID add_builtin(StringID, TypeInfo = TypeInfo());
-	  bool contains(StringID) const noexcept;
-	  CoreTypeID get_core(StringID) const noexcept;
+		CoreTypeID add_core(common::utils::StringID);
+	  CoreTypeID add_builtin(common::utils::StringID, TypeInfo = TypeInfo());
+	  bool contains(common::utils::StringID) const noexcept;
+	  CoreTypeID get_core(common::utils::StringID) const noexcept;
 		const CoreType* get_core(CoreTypeID) const noexcept;
 	
 		// WrapperTypes

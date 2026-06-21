@@ -21,7 +21,7 @@ do not divide data and ast, but have different asts.
 [X] add BasicID: template class that accepts size
 [X] add aliases such as ID32 ID64
 [X] add IDGenerator to common (use std::atomic)
-[ ] move StringsStorage to common namespace
+[X] move StringsStorage to common namespace
 [ ] megrate project to new id system (a little bit)
 
 ### done preparations before semantic 

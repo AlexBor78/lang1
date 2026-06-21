@@ -10,7 +10,7 @@
 #include <common/memory/pool_alloc.h>
 #include <common/diagnostic/diagnostic.h>
 
-namespace lang {
+namespace common::utils {
 	
 	using StringID = common::utils::ID64;
 

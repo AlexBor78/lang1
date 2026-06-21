@@ -47,13 +47,13 @@ namespace lang::semantic {
   
   class BuiltInType : public CoreType {
   public:
-  	StringID name;
+		common::utils::StringID name;
   	TypeInfo info;
 
   	virtual bool is_builtin() override {return true;}
 
   	explicit BuiltInType(
-			StringID _name
+			common::utils::StringID _name
   	, TypeInfo _info = TypeInfo()
   	):  name(_name)
   	,   info(_info)
