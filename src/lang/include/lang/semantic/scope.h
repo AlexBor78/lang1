@@ -12,7 +12,7 @@
 
 namespace lang::semantic {
 	class Scope;
-	using ScopeID = common::utils::BasicID<Scope>;
+	using ScopeID = common::utils::TaggedID<Scope>;
 
 	class Scope {
 	private:

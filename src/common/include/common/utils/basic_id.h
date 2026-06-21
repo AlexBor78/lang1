@@ -6,7 +6,7 @@
 
 namespace common::utils {
 	template<class Type>
-	class BasicID {
+	class TaggedID {
 	private:
 		uintptr_t data;
 
@@ -16,13 +16,13 @@ namespace common::utils {
 
 	public:
 		template<class U> friend struct std::hash;
-    BasicID() noexcept : data(0) {} 
-		explicit BasicID(
+    TaggedID() noexcept : data(0) {} 
+		explicit TaggedID(
 			Type* ptr
 		): data(reinterpret_cast<uintptr_t>(ptr) | LOCAL_FLAG)
 		{assert((reinterpret_cast<uintptr_t>(ptr) & 1) == 0 && "Pointer must be aligned!");}
 		
-		explicit BasicID(
+		explicit TaggedID(
 			int64_t id // NOT uint64_t - WE NEED SIGND
 		): data((static_cast<uintptr_t>(id) << 1) | GLOBAL_FLAG)
 		{assert(id >= 0 && "ID overflowed into sign bit!");}
@@ -42,14 +42,14 @@ namespace common::utils {
 		}
 		
 		inline const Type* get_local_ptr() const noexcept {
-			return const_cast<BasicID*>(this)->get_local_ptr();
+			return const_cast<TaggedID*>(this)->get_local_ptr();
 		}
 		
-		inline bool operator==(const BasicID& other) const noexcept {
+		inline bool operator==(const TaggedID& other) const noexcept {
 			return data == other.data;
 		}
  
-		inline bool operator!=(const BasicID& other) const noexcept {
+		inline bool operator!=(const TaggedID& other) const noexcept {
 			return data != other.data;
 		}
 
@@ -58,8 +58,8 @@ namespace common::utils {
 
 namespace std {
 	template<class T>
-	struct hash<common::utils::BasicID<T>> {
-		inline size_t operator()(const common::utils::BasicID<T>& id) const {
+	struct hash<common::utils::TaggedID<T>> {
+		inline size_t operator()(const common::utils::TaggedID<T>& id) const {
 			return hash<size_t>{}(id.data);
 		}
 	};

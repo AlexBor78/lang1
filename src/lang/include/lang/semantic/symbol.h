@@ -10,8 +10,8 @@
 namespace lang::semantic {
 	class Scope;
 	class Symbol;
-	using ScopeID 	= common::utils::BasicID<Scope>;
-	using SymbolID 	= common::utils::BasicID<Symbol>;
+	using ScopeID 	= common::utils::TaggedID<Scope>;
+	using SymbolID 	= common::utils::TaggedID<Symbol>;
 
 	namespace hir {
 		class DeclVar;

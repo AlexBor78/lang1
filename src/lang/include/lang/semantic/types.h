@@ -32,8 +32,8 @@ namespace lang::semantic {
   	virtual bool is_builtin() {return false;}
   };
 
-	using CoreTypeID = common::utils::BasicID<CoreType>;
-	using TypeID = common::utils::BasicID<AbstractType>;
+	using CoreTypeID = common::utils::TaggedID<CoreType>;
+	using TypeID = common::utils::TaggedID<AbstractType>;
 
   /**
    * @brief struct to easier configure builtin types
@@ -132,20 +132,20 @@ namespace lang::semantic {
 
 namespace std {
 	template<>
-	struct hash<std::pair<lang::semantic::WrapperKind, common::utils::BasicID<lang::semantic::AbstractType>>> {
-		size_t operator()(const std::pair<lang::semantic::WrapperKind, common::utils::BasicID<lang::semantic::AbstractType>>& p) const noexcept {
+	struct hash<std::pair<lang::semantic::WrapperKind, common::utils::TaggedID<lang::semantic::AbstractType>>> {
+		size_t operator()(const std::pair<lang::semantic::WrapperKind, common::utils::TaggedID<lang::semantic::AbstractType>>& p) const noexcept {
 			size_t h1 = std::hash<uint8_t>{}(static_cast<uint8_t>(p.first));
-			size_t h2 = std::hash<common::utils::BasicID<lang::semantic::AbstractType>>{}(p.second);
+			size_t h2 = std::hash<common::utils::TaggedID<lang::semantic::AbstractType>>{}(p.second);
 			
 			// (boost hash_combine style)
 			return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
 		}
 	};
 	template<>
-	struct hash<std::pair<lang::semantic::WrapperKind, common::utils::BasicID<lang::semantic::CoreType>>> {
-		size_t operator()(const std::pair<lang::semantic::WrapperKind, common::utils::BasicID<lang::semantic::AbstractType>>& p) const noexcept {
+	struct hash<std::pair<lang::semantic::WrapperKind, common::utils::TaggedID<lang::semantic::CoreType>>> {
+		size_t operator()(const std::pair<lang::semantic::WrapperKind, common::utils::TaggedID<lang::semantic::AbstractType>>& p) const noexcept {
 			size_t h1 = std::hash<uint8_t>{}(static_cast<uint8_t>(p.first));
-			size_t h2 = std::hash<common::utils::BasicID<lang::semantic::AbstractType>>{}(p.second);
+			size_t h2 = std::hash<common::utils::TaggedID<lang::semantic::AbstractType>>{}(p.second);
 			
 			// (boost hash_combine style)
 			return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));

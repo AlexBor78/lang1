@@ -17,7 +17,7 @@ do not divide data and ast, but have different asts.
 ## Current stage - redesign architecture
 
 ### improve id system (in common module)
-[ ] rename common `BasicID` to `TaggedID`
+[X] rename common `BasicID` to `TaggedID`
 [ ] add BasicID: template class that accepts size
 [ ] add aliases such as ID32 ID64
 [ ] add IDGenerator to common (use std::atomic)

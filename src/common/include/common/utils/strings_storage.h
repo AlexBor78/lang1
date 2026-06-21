@@ -11,7 +11,7 @@
 
 namespace lang {
 	
-	using StringID = common::utils::BasicID<std::string>;
+	using StringID = common::utils::TaggedID<std::string>;
 
 	class StringsStorage {
 	private:
