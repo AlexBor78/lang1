@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <limits>
 
 #include <common/memory/pool_alloc.h>
 #include <common/memory/arena_alloc.h>
@@ -12,7 +13,7 @@
 
 namespace lang {
 	struct TargetID {
-		size_t id{ULLONG_MAX};
+		size_t id{std::numeric_limits<size_t>::max()};
 
 		inline bool operator==(const TargetID& other) const {
 			return id == other.id;
